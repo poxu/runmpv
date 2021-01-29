@@ -4,7 +4,9 @@ echo "compiling java"
 dir /s /B ..\*.java > sources.txt
 javac -d graalout @sources.txt
 echo "compiling native"
-call native-image --static -cp graalout com.evilcorp.StartSingleMpvInstance runmpv
+call native-image ^
+-H:ReflectionConfigurationFiles=../reflection.json ^
+--static -cp graalout com.evilcorp.StartSingleMpvInstance runmpv
 echo "removing window generation script"
 editbin /SUBSYSTEM:WINDOWS runmpv.exe
 echo over

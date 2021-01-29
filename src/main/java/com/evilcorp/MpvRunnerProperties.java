@@ -47,8 +47,8 @@ public class MpvRunnerProperties {
             final String fullFileName = executableFile.getParent() + "/" + fileName;
             final FileInputStream inStream = new FileInputStream(fullFileName);
             properties.load(inStream);
-            executableDir = executableFile.getPath();
-            executable = executableFile.getParentFile().getPath();
+            executable = executableFile.getPath();
+            executableDir = executableFile.getParentFile().getPath();
             runnerLogFile = properties.getProperty("runnerLogFile");
             waitSeconds = Short.parseShort(properties.getProperty("waitSeconds"));
             mpvHomeDir = properties.getProperty("mpvHomeDir");
