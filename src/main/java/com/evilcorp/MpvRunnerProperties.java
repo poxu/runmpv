@@ -1,9 +1,7 @@
 package com.evilcorp;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 public class MpvRunnerProperties {
@@ -12,26 +10,17 @@ public class MpvRunnerProperties {
     private final String pipeName;
     private final String mpvLogFile;
     private final String executableDir;
-    private final String executable;
     private final String runnerLogFile;
 
     public MpvRunnerProperties(
             final short waitSeconds,
             final String mpvHomeDir,
             final String pipeName,
-            final Class<?> startSingleMpvInstanceClass,
             final String mpvLogFile,
             final String runnerLogFile
     ) {
-        final File executableFile;
-        try {
-            executableFile = new File(startSingleMpvInstanceClass.getProtectionDomain().getCodeSource().getLocation()
-                    .toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        executableDir = executableFile.getPath();
-        executable = executableFile.getParentFile().getPath();
+        FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
+        executableDir = mpvRunnerHomeDir.path().toString();
         this.runnerLogFile = runnerLogFile;
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
@@ -39,23 +28,23 @@ public class MpvRunnerProperties {
         this.mpvLogFile = mpvLogFile;
     }
 
-    public MpvRunnerProperties(Class<?> startSingleMpvInstanceClass, String fileName) {
+    public MpvRunnerProperties(String fileName, FsFile mpvRunnerHomeDir, FsPaths fsPaths) {
         try {
-            final File executableFile = new File(startSingleMpvInstanceClass.getProtectionDomain()
-                    .getCodeSource().getLocation().toURI());
             final Properties properties = new Properties();
-            final String fullFileName = executableFile.getParent() + "/" + fileName;
+            final String fullFileName = mpvRunnerHomeDir.path().toString() + "/" + fileName;
             final FileInputStream inStream = new FileInputStream(fullFileName);
             properties.load(inStream);
-            executable = executableFile.getPath();
-            executableDir = executableFile.getParentFile().getPath();
-            runnerLogFile = properties.getProperty("runnerLogFile");
+            executableDir = mpvRunnerHomeDir.path().toString();
             waitSeconds = Short.parseShort(properties.getProperty("waitSeconds"));
-            mpvHomeDir = properties.getProperty("mpvHomeDir");
+            runnerLogFile = fsPaths.resolve(properties.getProperty("runnerLogFile")).path()
+                    .toString();
+            mpvHomeDir = fsPaths.resolve(properties.getProperty("mpvHomeDir"))
+                    .path().toString();
             pipeName = properties.getProperty("pipeName");
-            mpvLogFile = properties.getProperty("mpvLogFile");
+            mpvLogFile = fsPaths.resolve(properties.getProperty("mpvLogFile"))
+                    .path().toString();
             inStream.close();
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

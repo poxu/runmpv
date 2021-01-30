@@ -16,36 +16,34 @@ public class StartSingleMpvInstance {
 
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
         if (args.length < 1) {
-           return;
+            return;
         }
-        final MpvRunnerProperties config = new MpvRunnerProperties(StartSingleMpvInstance.class, "mpv_runner.properties");
+
+        final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
+        rerouteSystemOutStream(mpvRunnerHomeDir.path().toString() + "/mpv_runner_emergency.log");
+        System.out.println(args[0]);
+        System.out.println(System.getProperty("user.dir"));
+
+        final MpvRunnerProperties config = new MpvRunnerProperties(
+                "mpv_runner.properties",
+                mpvRunnerHomeDir,
+                new LocalFsPaths(
+                        new UserHomeDir(),
+                        mpvRunnerHomeDir,
+                        new VideoDir()
+                )
+        );
+
+        if (config.getRunnerLogFile() != null) {
+            rerouteSystemOutStream(config.getRunnerLogFile());
+        }
 
         final String videoFileName = args[0];
 
-        final OutputStream out;
-        if (config.getRunnerLogFile() != null) {
-            out = new FileOutputStream(config.getRunnerLogFile());
-        } else {
-            out = OutputStream.nullOutputStream();
-        }
+        LogManager.getLogManager().readConfiguration(new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties"));
+        LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        LOGGER.info("started");
 
-        // A small logging system to diagnose why real logging system fails
-        PrintWriter printWriter = new PrintWriter(out);
-        printWriter.println(args[0]);
-        printWriter.println(System.getProperty("user.dir"));
-        printWriter.println(config.getExecutableDir());
-
-        try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream(config.getExecutableDir() + "/logging.properties"));
-            LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
-            LOGGER.info("started");
-        } catch (Exception e) {
-            printWriter.println(e.getMessage());
-        }
-
-        printWriter.flush();
-        printWriter.close();
-        out.close();
         boolean mpvStarted = false;
 
         final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.getPipeName());
@@ -108,9 +106,20 @@ public class StartSingleMpvInstance {
 
         LOGGER.info("Loading file " + videoFileName);
         final String loadFileCommand = "loadfile   \"" + videoFileName.replaceAll("\\\\", "\\\\\\\\") + "\" replace";
-//        sendCommand(fileOutputStream, "set geometry 100:100");
+        sendCommand(mpvPipeStream, "set geometry 640x360");
         sendCommand(mpvPipeStream, loadFileCommand);
         mpvPipeStream.close();
+    }
+
+    // A small logging system to diagnose why real logging system fails
+    private static void rerouteSystemOutStream(String logfile) throws FileNotFoundException {
+        final OutputStream out;
+        out = new FileOutputStream(logfile);
+        PrintStream printWriter = new PrintStream(out);
+        System.out.close();
+        System.err.close();
+        System.setOut(printWriter);
+        System.setErr(printWriter);
     }
 
     private static void sendCommand(FileOutputStream pipe, String command) throws IOException {

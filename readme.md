@@ -24,8 +24,11 @@ Here is an example of a configuration.
 ```properties
 # Path to directory, containing mpv.exe
 # should be absolute path
+# %h - at the beginning means home directory
+# %r - at the beginning means runmpv executable directory
+# %v - at the beginning means directory, where video is located
 # relative paths not supported, also %PATH% is not going to be used
-mpvHomeDir=C:/Users/poxu/soft/mpv
+mpvHomeDir=%h/soft/mpv
 
 # Name of the pipe for JSON IPC.
 # Used to identify single mpv instance.
@@ -37,14 +40,18 @@ pipeName=runmpv-mpv-pipe
 # will write it's own logs.
 # If property is not found, then mpv logging is controlled by
 # mpv settings entirely
-# relative paths not supported
-mpvLogFile=C:/Users/poxu/soft/mpv/debug.log
+# %h - at the beginning means home directory
+# %r - at the beginning means runmpv executable directory
+# %v - at the beginning means directory, where video is located
+mpvLogFile=%r/debug.log
 
 # Path to emergency logging system, used to diagnose
 # why regular logging doesn't work.
 # If property is not found, emergency logging system is disabled.
-# relative paths not supported
-runnerLogFile=C:/Users/poxu/soft/mpv/debug.log
+# %h - at the beginning means home directory
+# %r - at the beginning means runmpv executable directory
+# %v - at the beginning means directory, where video is located
+runnerLogFile=%r/runner-debug.log
 
 # Amount of time after which runmpv decides, that it couldn't launch mpv
 # and it's time to quit. Measured in seconds.
