@@ -48,7 +48,8 @@ public class StartSingleMpvInstance {
 
         final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.getPipeName());
 
-        if (!mpvPipe.exists()) {
+        final boolean firstLaunch = !mpvPipe.exists();
+        if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
 
             // Using absolute path to specify executable
@@ -104,9 +105,11 @@ public class StartSingleMpvInstance {
             return;
         }
 
+        if (firstLaunch) {
+            sendCommand(mpvPipeStream, "set geometry 640x360");
+        }
         LOGGER.info("Loading file " + videoFileName);
         final String loadFileCommand = "loadfile   \"" + videoFileName.replaceAll("\\\\", "\\\\\\\\") + "\" replace";
-        sendCommand(mpvPipeStream, "set geometry 640x360");
         sendCommand(mpvPipeStream, loadFileCommand);
         mpvPipeStream.close();
     }
