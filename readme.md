@@ -24,7 +24,8 @@ Use mpv_runner.properties file to configure runmpv.
 Here is an example of a configuration.
 ```properties
 # Path to directory, containing mpv.exe
-# should be absolute path
+# should be absolute path, but place holders can be used 
+# to denote certain directories
 # %h - at the beginning means home directory
 # %r - at the beginning means runmpv executable directory
 # %v - at the beginning means directory, where video is located
@@ -41,6 +42,8 @@ pipeName=runmpv-mpv-pipe
 # will write it's own logs.
 # If property is not found, then mpv logging is controlled by
 # mpv settings entirely
+# Should be absolute path, but place holders can be used 
+# to denote certain directories
 # %h - at the beginning means home directory
 # %r - at the beginning means runmpv executable directory
 # %v - at the beginning means directory, where video is located
@@ -49,6 +52,8 @@ mpvLogFile=%r/debug.log
 # Path to emergency logging system, used to diagnose
 # why regular logging doesn't work.
 # If property is not found, emergency logging system is disabled.
+# Should be absolute path, but place holders can be used 
+# to denote certain directories
 # %h - at the beginning means home directory
 # %r - at the beginning means runmpv executable directory
 # %v - at the beginning means directory, where video is located
