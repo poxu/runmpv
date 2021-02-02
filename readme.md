@@ -16,7 +16,7 @@ Also, I like java.
 # Usage
 
 ```cmd
-rumpv.exe <path-to-video-file>
+runmpv.exe <path-to-video-file>
 ```
 # Configuration
 
