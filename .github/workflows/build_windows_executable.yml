@@ -6,7 +6,6 @@ jobs:
         fail-fast: false
         matrix:
           os: [ windows-2016, windows-latest ]
-
       steps:
         - uses: actions/checkout@v1
         - uses: DeLaGuardo/setup-graalvm@master
@@ -16,7 +15,10 @@ jobs:
         - name: Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools
           run: |
             choco install visualstudio2017-workload-vctools
-        - name: set env variables and run the Gradle build
+        - name: Install native-image component
+          run: |
+            gu.cmd install native-image
+        - name: compile runmpv.exe
           shell: cmd
           run: |
             call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
