@@ -9,7 +9,7 @@ jobs:
 
       steps:
         - uses: actions/checkout@v1
-        - uses: DeLaGuardo/setup-graalvm@2.0
+        - uses: DeLaGuardo/setup-graalvm@master
           with:
             graalvm-version: '21.0.0.java11'
         - run: java -version
