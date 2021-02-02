@@ -20,9 +20,6 @@ public class StartSingleMpvInstance {
         }
 
         final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
-        rerouteSystemOutStream(mpvRunnerHomeDir.path().toString() + "/mpv_runner_emergency.log");
-        System.out.println(args[0]);
-        System.out.println(System.getProperty("user.dir"));
 
         final MpvRunnerProperties config = new MpvRunnerProperties(
                 "mpv_runner.properties",
@@ -43,6 +40,7 @@ public class StartSingleMpvInstance {
         LogManager.getLogManager().readConfiguration(new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties"));
         LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
         LOGGER.info("started");
+        LOGGER.info("runmpv argument is " + args[0]);
 
         boolean mpvStarted = false;
 
