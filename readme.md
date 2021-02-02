@@ -76,7 +76,7 @@ waitSeconds=5
 ```bat
 if not exist build mkdir build
 cd build
-dir /s /B ..\*.java > sources.txt
+dir /s /B ..\src\main\*.java > sources.txt
 javac -d graalout @sources.txt
 call native-image ^
 -H:ReflectionConfigurationFiles=../reflection.json ^
