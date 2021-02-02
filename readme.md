@@ -15,8 +15,9 @@ Also, I like java.
 
 # Usage
 
+```cmd
 rumpv.exe <path-to-video-file>
-
+```
 # Configuration
 
 Use mpv_runner.properties file to configure runmpv.
