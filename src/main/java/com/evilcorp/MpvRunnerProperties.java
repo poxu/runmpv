@@ -13,14 +13,14 @@ public class MpvRunnerProperties {
     private final String runnerLogFile;
 
     public MpvRunnerProperties(
+            final String executableDir,
             final short waitSeconds,
             final String mpvHomeDir,
             final String pipeName,
             final String mpvLogFile,
             final String runnerLogFile
     ) {
-        FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
-        executableDir = mpvRunnerHomeDir.path().toString();
+        this.executableDir = executableDir;
         this.runnerLogFile = runnerLogFile;
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
