@@ -11,4 +11,10 @@ echo "removing window generation script"
 editbin /SUBSYSTEM:WINDOWS runmpv.exe
 echo over
 xcopy /Y runmpv.exe ..
+if not exist runmpv mkdir runmpv
+xcopy /Y runmpv.exe runmpv
+xcopy /Y ..\mpv_runner.properties runmpv
+xcopy /Y ..\logging.properties runmpv
+tar -c -f runmpv.zip runmpv
 cd ..
+
