@@ -15,6 +15,6 @@ if not exist runmpv mkdir runmpv
 xcopy /Y runmpv.exe runmpv
 xcopy /Y ..\mpv_runner.properties runmpv
 xcopy /Y ..\logging.properties runmpv
-tar -c -f runmpv.zip runmpv
+tar -a -c -f runmpv.zip runmpv
 cd ..
 
