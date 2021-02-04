@@ -10,7 +10,7 @@ public class DefaultMpvRunnerProperties implements MpvRunnerProperties {
     }
 
     @Override
-    public short waitSeconds() {
+    public Integer waitSeconds() {
         return 5;
     }
 

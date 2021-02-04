@@ -1,7 +1,7 @@
 package com.evilcorp.settings;
 
 public interface MpvRunnerProperties {
-    short waitSeconds();
+    Integer waitSeconds();
 
     String mpvHomeDir();
 

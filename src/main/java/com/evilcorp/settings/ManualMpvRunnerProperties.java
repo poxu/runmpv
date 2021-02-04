@@ -1,7 +1,7 @@
 package com.evilcorp.settings;
 
 public class ManualMpvRunnerProperties implements MpvRunnerProperties {
-    private final short waitSeconds;
+    private final Integer waitSeconds;
     private final String mpvHomeDir;
     private final String pipeName;
     private final String mpvLogFile;
@@ -9,7 +9,7 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     private final String runnerLogFile;
 
     public ManualMpvRunnerProperties(
-            short waitSeconds,
+            Integer waitSeconds,
             String mpvHomeDir,
             String pipeName,
             String mpvLogFile,
@@ -25,7 +25,7 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     }
 
     @Override
-    public short waitSeconds() {
+    public Integer waitSeconds() {
         return waitSeconds;
     }
 

@@ -21,7 +21,7 @@ public class MpvRunnerPropertiesFromFileTest {
                         new ManualFsFile(Path.of("third"))
                 ),
                 new ManualMpvRunnerProperties(
-                        (short) 5,
+                        5,
                         "mpvHomeDir",
                         "pipeName",
                         "mpvLogFile",
@@ -47,7 +47,7 @@ public class MpvRunnerPropertiesFromFileTest {
                         new ManualFsFile(Path.of("third"))
                 ),
                 new ManualMpvRunnerProperties(
-                        (short) 5,
+                        5,
                         "mpvHomeDir",
                         "pipeName",
                         "mpvLogFile",

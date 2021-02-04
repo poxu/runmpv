@@ -55,7 +55,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     }
 
     @Override
-    public short waitSeconds() {
+    public Integer waitSeconds() {
         if (!propertiesLoaded) {
             return defaultPropertyValues.waitSeconds();
         }
@@ -63,7 +63,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (waitSeconds == null) {
             return defaultPropertyValues.waitSeconds();
         }
-        return Short.parseShort(waitSeconds);
+        return Integer.parseInt(waitSeconds);
     }
 
     @Override
