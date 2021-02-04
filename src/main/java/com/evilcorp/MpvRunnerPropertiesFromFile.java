@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
-    private Properties properties;
-    private FsPaths fsPaths;
+    private final Properties properties;
+    private final FsPaths fsPaths;
 
-    public MpvRunnerPropertiesFromFile(String propertyFileName, FsPaths fsPaths, MpvRunnerProperties defaultPropertyValues) {
+    public MpvRunnerPropertiesFromFile(
+            String propertyFileName,
+            FsPaths fsPaths,
+            MpvRunnerProperties defaultPropertyValues
+    ) {
         this.fsPaths = fsPaths;
         try {
             final String fullFileName = fsPaths.resolve("%r/" + propertyFileName).path()
