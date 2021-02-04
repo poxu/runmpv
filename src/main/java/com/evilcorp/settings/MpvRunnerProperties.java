@@ -1,4 +1,4 @@
-package com.evilcorp;
+package com.evilcorp.settings;
 
 public interface MpvRunnerProperties {
     short waitSeconds();

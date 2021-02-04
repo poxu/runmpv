@@ -1,4 +1,4 @@
-package com.evilcorp;
+package com.evilcorp.fs;
 
 import java.nio.file.Path;
 

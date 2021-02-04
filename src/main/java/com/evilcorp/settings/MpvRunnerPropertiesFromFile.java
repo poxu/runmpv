@@ -1,4 +1,6 @@
-package com.evilcorp;
+package com.evilcorp.settings;
+
+import com.evilcorp.fs.FsPaths;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

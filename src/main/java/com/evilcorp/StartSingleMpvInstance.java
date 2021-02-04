@@ -1,5 +1,10 @@
 package com.evilcorp;
 
+import com.evilcorp.fs.*;
+import com.evilcorp.settings.DefaultMpvRunnerProperties;
+import com.evilcorp.settings.MpvRunnerProperties;
+import com.evilcorp.settings.MpvRunnerPropertiesFromFile;
+
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -20,6 +25,10 @@ public class StartSingleMpvInstance {
         }
 
         final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
+        LogManager.getLogManager().readConfiguration(
+                new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
+        );
+        LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
@@ -38,8 +47,6 @@ public class StartSingleMpvInstance {
 
         final String videoFileName = args[0];
 
-        LogManager.getLogManager().readConfiguration(new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties"));
-        LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
         LOGGER.info("started");
         LOGGER.info("runmpv argument is " + args[0]);
 

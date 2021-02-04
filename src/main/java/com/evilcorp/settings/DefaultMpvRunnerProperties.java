@@ -1,4 +1,6 @@
-package com.evilcorp;
+package com.evilcorp.settings;
+
+import com.evilcorp.fs.FsPaths;
 
 public class DefaultMpvRunnerProperties implements MpvRunnerProperties {
     private final FsPaths fsPaths;

@@ -1,4 +1,4 @@
-package com.evilcorp;
+package com.evilcorp.settings;
 
 public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     private final short waitSeconds;

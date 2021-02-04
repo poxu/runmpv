@@ -1,5 +1,9 @@
 package com.evilcorp;
 
+import com.evilcorp.fs.LocalFsPaths;
+import com.evilcorp.fs.ManualFsFile;
+import com.evilcorp.settings.ManualMpvRunnerProperties;
+import com.evilcorp.settings.MpvRunnerPropertiesFromFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

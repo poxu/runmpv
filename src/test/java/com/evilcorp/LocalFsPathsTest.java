@@ -1,5 +1,9 @@
 package com.evilcorp;
 
+import com.evilcorp.fs.FsFile;
+import com.evilcorp.fs.FsPaths;
+import com.evilcorp.fs.LocalFsPaths;
+import com.evilcorp.fs.ManualFsFile;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
