@@ -14,7 +14,7 @@ public class DefaultMpvRunnerProperties implements MpvRunnerProperties {
 
     @Override
     public String mpvHomeDir() {
-        return fsPaths.resolve("%h/soft/mpv")
+        return fsPaths.resolve("%r/..")
                 .path().toString();
     }
 
@@ -25,8 +25,7 @@ public class DefaultMpvRunnerProperties implements MpvRunnerProperties {
 
     @Override
     public String mpvLogFile() {
-        return fsPaths.resolve("%r/debug.log")
-                .path().toString();
+        return null;
     }
 
     @Override
@@ -38,7 +37,6 @@ public class DefaultMpvRunnerProperties implements MpvRunnerProperties {
 
     @Override
     public String runnerLogFile() {
-        return fsPaths.resolve("%r/runner-debug.log").path()
-                .toString();
+        return null;
     }
 }
