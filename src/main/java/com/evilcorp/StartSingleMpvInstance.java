@@ -23,7 +23,6 @@ public class StartSingleMpvInstance {
 
         final MpvRunnerProperties config = new MpvRunnerProperties(
                 "mpv_runner.properties",
-                mpvRunnerHomeDir,
                 new LocalFsPaths(
                         new UserHomeDir(),
                         mpvRunnerHomeDir,

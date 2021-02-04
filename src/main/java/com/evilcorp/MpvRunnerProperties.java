@@ -28,13 +28,16 @@ public class MpvRunnerProperties {
         this.mpvLogFile = mpvLogFile;
     }
 
-    public MpvRunnerProperties(String fileName, FsFile mpvRunnerHomeDir, FsPaths fsPaths) {
+    public MpvRunnerProperties(String propertyFileName, FsPaths fsPaths) {
         try {
-            final Properties properties = new Properties();
-            final String fullFileName = mpvRunnerHomeDir.path().toString() + "/" + fileName;
+            final String fullFileName = fsPaths.resolve("%r/" + propertyFileName).path()
+                    .toString();
             final FileInputStream inStream = new FileInputStream(fullFileName);
+            final Properties properties = new Properties();
             properties.load(inStream);
-            executableDir = mpvRunnerHomeDir.path().toString();
+            inStream.close();
+            executableDir = fsPaths.resolve("%r").path()
+                    .toString();
             waitSeconds = Short.parseShort(properties.getProperty("waitSeconds"));
             runnerLogFile = fsPaths.resolve(properties.getProperty("runnerLogFile")).path()
                     .toString();
@@ -43,7 +46,6 @@ public class MpvRunnerProperties {
             pipeName = properties.getProperty("pipeName");
             mpvLogFile = fsPaths.resolve(properties.getProperty("mpvLogFile"))
                     .path().toString();
-            inStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
