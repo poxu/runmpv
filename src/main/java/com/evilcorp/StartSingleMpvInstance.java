@@ -21,7 +21,7 @@ public class StartSingleMpvInstance {
 
         final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
 
-        final MpvRunnerProperties config = new MpvRunnerProperties(
+        final MpvRunnerProperties config = new MpvRunnerPropertiesFromFile(
                 "mpv_runner.properties",
                 new LocalFsPaths(
                         new UserHomeDir(),
