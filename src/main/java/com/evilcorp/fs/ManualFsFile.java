@@ -1,7 +1,5 @@
 package com.evilcorp.fs;
 
-import com.evilcorp.fs.FsFile;
-
 import java.nio.file.Path;
 
 public class ManualFsFile implements FsFile {

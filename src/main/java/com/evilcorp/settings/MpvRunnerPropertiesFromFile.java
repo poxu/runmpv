@@ -11,15 +11,13 @@ import java.util.Properties;
 public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     private Properties properties;
     private final FsPaths fsPaths;
-    private final MpvRunnerProperties defaultPropertyValues;
     private boolean propertiesLoaded;
 
     public MpvRunnerPropertiesFromFile(
             String propertyFileName,
-            FsPaths fsPaths,
-            MpvRunnerProperties defaultPropertyValues
+            FsPaths fsPaths
     ) {
-        this(getInStream(propertyFileName, fsPaths), fsPaths, defaultPropertyValues);
+        this(getInStream(propertyFileName, fsPaths), fsPaths);
     }
 
     private static InputStream getInStream(String propertyFileName, FsPaths fsPaths) {
@@ -33,11 +31,9 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
 
     public MpvRunnerPropertiesFromFile(
             InputStream inStream,
-            FsPaths fsPaths,
-            MpvRunnerProperties defaultPropertyValues
+            FsPaths fsPaths
     ) {
         this.fsPaths = fsPaths;
-        this.defaultPropertyValues = defaultPropertyValues;
         if (inStream == null) {
             properties = null;
             propertiesLoaded = false;
@@ -57,11 +53,11 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     @Override
     public Integer waitSeconds() {
         if (!propertiesLoaded) {
-            return defaultPropertyValues.waitSeconds();
+            return null;
         }
         final String waitSeconds = properties.getProperty("waitSeconds");
         if (waitSeconds == null) {
-            return defaultPropertyValues.waitSeconds();
+            return null;
         }
         return Integer.parseInt(waitSeconds);
     }
@@ -69,11 +65,11 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     @Override
     public String mpvHomeDir() {
         if (!propertiesLoaded) {
-            return defaultPropertyValues.mpvHomeDir();
+            return null;
         }
         final String mpvHomeDir = properties.getProperty("mpvHomeDir");
         if (mpvHomeDir == null) {
-            return defaultPropertyValues.mpvHomeDir();
+            return null;
         }
         return fsPaths.resolve(mpvHomeDir).path()
                 .toString();
@@ -82,23 +78,19 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     @Override
     public String pipeName() {
         if (!propertiesLoaded) {
-            return defaultPropertyValues.pipeName();
+            return null;
         }
-        final String pipeName = properties.getProperty("pipeName");
-        if (pipeName == null) {
-            return defaultPropertyValues.pipeName();
-        }
-        return pipeName;
+        return properties.getProperty("pipeName");
     }
 
     @Override
     public String mpvLogFile() {
         if (!propertiesLoaded) {
-            return defaultPropertyValues.mpvLogFile();
+            return null;
         }
         final String mpvLogFile = properties.getProperty("mpvLogFile");
         if (mpvLogFile == null) {
-            return defaultPropertyValues.mpvLogFile();
+            return null;
         }
         return fsPaths.resolve(mpvLogFile).path()
                 .toString();
@@ -106,9 +98,6 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
 
     @Override
     public String executableDir() {
-        if (!propertiesLoaded) {
-            return defaultPropertyValues.executableDir();
-        }
         return fsPaths.resolve("%r").path()
                 .toString();
     }
@@ -116,11 +105,11 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
     @Override
     public String runnerLogFile() {
         if (!propertiesLoaded) {
-            return defaultPropertyValues.runnerLogFile();
+            return null;
         }
         final String runnerLogFile = properties.getProperty("runnerLogFile");
         if (runnerLogFile == null) {
-            return defaultPropertyValues.runnerLogFile();
+            return null;
         }
         return fsPaths.resolve(runnerLogFile).path()
                 .toString();

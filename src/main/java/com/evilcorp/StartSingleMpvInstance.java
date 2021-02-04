@@ -1,6 +1,7 @@
 package com.evilcorp;
 
 import com.evilcorp.fs.*;
+import com.evilcorp.settings.CompositeMpvRunnerProperties;
 import com.evilcorp.settings.DefaultMpvRunnerProperties;
 import com.evilcorp.settings.MpvRunnerProperties;
 import com.evilcorp.settings.MpvRunnerPropertiesFromFile;
@@ -35,10 +36,11 @@ public class StartSingleMpvInstance {
                 mpvRunnerHomeDir,
                 new VideoDir()
         );
-        final MpvRunnerProperties config = new MpvRunnerPropertiesFromFile(
-                "mpv_runner.properties",
-                fsPaths,
-                new DefaultMpvRunnerProperties(fsPaths)
+        final MpvRunnerProperties config = new CompositeMpvRunnerProperties(
+                new MpvRunnerPropertiesFromFile(
+                        "mpv_runner.properties",
+                        fsPaths
+                ), new DefaultMpvRunnerProperties(fsPaths)
         );
 
         if (config.runnerLogFile() != null) {
