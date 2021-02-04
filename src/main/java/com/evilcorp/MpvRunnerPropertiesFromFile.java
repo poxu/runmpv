@@ -5,47 +5,18 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
-    private final short waitSeconds;
-    private final String mpvHomeDir;
-    private final String pipeName;
-    private final String mpvLogFile;
-    private final String executableDir;
-    private final String runnerLogFile;
+    private Properties properties;
+    private FsPaths fsPaths;
 
-    public MpvRunnerPropertiesFromFile(
-            final String executableDir,
-            final short waitSeconds,
-            final String mpvHomeDir,
-            final String pipeName,
-            final String mpvLogFile,
-            final String runnerLogFile
-    ) {
-        this.executableDir = executableDir;
-        this.runnerLogFile = runnerLogFile;
-        this.waitSeconds = waitSeconds;
-        this.mpvHomeDir = mpvHomeDir;
-        this.pipeName = pipeName;
-        this.mpvLogFile = mpvLogFile;
-    }
-
-    public MpvRunnerPropertiesFromFile(String propertyFileName, FsPaths fsPaths) {
+    public MpvRunnerPropertiesFromFile(String propertyFileName, FsPaths fsPaths, MpvRunnerProperties defaultPropertyValues) {
+        this.fsPaths = fsPaths;
         try {
             final String fullFileName = fsPaths.resolve("%r/" + propertyFileName).path()
                     .toString();
             final FileInputStream inStream = new FileInputStream(fullFileName);
-            final Properties properties = new Properties();
+            properties = new Properties();
             properties.load(inStream);
             inStream.close();
-            executableDir = fsPaths.resolve("%r").path()
-                    .toString();
-            waitSeconds = Short.parseShort(properties.getProperty("waitSeconds"));
-            runnerLogFile = fsPaths.resolve(properties.getProperty("runnerLogFile")).path()
-                    .toString();
-            mpvHomeDir = fsPaths.resolve(properties.getProperty("mpvHomeDir"))
-                    .path().toString();
-            pipeName = properties.getProperty("pipeName");
-            mpvLogFile = fsPaths.resolve(properties.getProperty("mpvLogFile"))
-                    .path().toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -53,31 +24,35 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
 
     @Override
     public short waitSeconds() {
-        return waitSeconds;
+        return Short.parseShort(properties.getProperty("waitSeconds"));
     }
 
     @Override
     public String mpvHomeDir() {
-        return mpvHomeDir;
+        return fsPaths.resolve(properties.getProperty("mpvHomeDir")).path()
+                .toString();
     }
 
     @Override
     public String pipeName() {
-        return pipeName;
+        return properties.getProperty("pipeName");
     }
 
     @Override
     public String mpvLogFile() {
-        return mpvLogFile;
+        return fsPaths.resolve(properties.getProperty("mpvLogFile")) .path()
+                .toString();
     }
 
     @Override
     public String executableDir() {
-        return executableDir;
+        return fsPaths.resolve("%r").path()
+                .toString();
     }
 
     @Override
     public String runnerLogFile() {
-        return runnerLogFile;
+        return fsPaths.resolve(properties.getProperty("runnerLogFile")).path()
+                .toString();
     }
 }

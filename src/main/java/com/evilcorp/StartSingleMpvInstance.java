@@ -21,13 +21,15 @@ public class StartSingleMpvInstance {
 
         final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
 
+        final LocalFsPaths fsPaths = new LocalFsPaths(
+                new UserHomeDir(),
+                mpvRunnerHomeDir,
+                new VideoDir()
+        );
         final MpvRunnerProperties config = new MpvRunnerPropertiesFromFile(
                 "mpv_runner.properties",
-                new LocalFsPaths(
-                        new UserHomeDir(),
-                        mpvRunnerHomeDir,
-                        new VideoDir()
-                )
+                fsPaths,
+                new DefaultMpvRunnerProperties(fsPaths)
         );
 
         if (config.runnerLogFile() != null) {
