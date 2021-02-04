@@ -51,27 +51,27 @@ public class MpvRunnerProperties {
         }
     }
 
-    public short getWaitSeconds() {
+    public short waitSeconds() {
         return waitSeconds;
     }
 
-    public String getMpvHomeDir() {
+    public String mpvHomeDir() {
         return mpvHomeDir;
     }
 
-    public String getPipeName() {
+    public String pipeName() {
         return pipeName;
     }
 
-    public String getMpvLogFile() {
+    public String mpvLogFile() {
         return mpvLogFile;
     }
 
-    public String getExecutableDir() {
+    public String executableDir() {
         return executableDir;
     }
 
-    public String getRunnerLogFile() {
+    public String runnerLogFile() {
         return runnerLogFile;
     }
 }

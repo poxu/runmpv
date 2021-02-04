@@ -30,8 +30,8 @@ public class StartSingleMpvInstance {
                 )
         );
 
-        if (config.getRunnerLogFile() != null) {
-            rerouteSystemOutStream(config.getRunnerLogFile());
+        if (config.runnerLogFile() != null) {
+            rerouteSystemOutStream(config.runnerLogFile());
         }
 
         final String videoFileName = args[0];
@@ -43,7 +43,7 @@ public class StartSingleMpvInstance {
 
         boolean mpvStarted = false;
 
-        final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.getPipeName());
+        final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.pipeName());
 
         final boolean firstLaunch = !mpvPipe.exists();
         if (firstLaunch) {
@@ -51,7 +51,7 @@ public class StartSingleMpvInstance {
 
             // Using absolute path to specify executable
             // PATH variable is, therefore ignored.
-            arguments.add(config.getMpvHomeDir() + "/mpv.exe");
+            arguments.add(config.mpvHomeDir() + "/mpv.exe");
 
             // Argument is needed to make mpv show ui
             // if mpv.exe is launched with output stream redirected
@@ -64,11 +64,11 @@ public class StartSingleMpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + config.getPipeName());
+            arguments.add("--input-ipc-server=" + config.pipeName());
 
-            if (config.getMpvLogFile() != null) {
+            if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes it's logs
-                arguments.add("--log-file=" + config.getMpvLogFile());
+                arguments.add("--log-file=" + config.mpvLogFile());
             }
             final ProcessBuilder processBuilder = new ProcessBuilder(arguments);
 
@@ -85,20 +85,20 @@ public class StartSingleMpvInstance {
         // wait until mpv is started and communication pipe is open
         while (!mpvStarted && !waitTimeOver) {
             try {
-                mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.getPipeName());
+                mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.pipeName());
                 mpvStarted = true;
             } catch (Exception e) {
                 Thread.sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
-                if (interval > config.getWaitSeconds() * 1_000_000_000) {
+                if (interval > config.waitSeconds() * 1_000_000_000) {
                     waitTimeOver = true;
                 }
             }
         }
 
         if (waitTimeOver) {
-            LOGGER.warning("Waited more than " + config.getWaitSeconds());
+            LOGGER.warning("Waited more than " + config.waitSeconds());
             return;
         }
 
