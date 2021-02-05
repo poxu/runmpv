@@ -4,7 +4,7 @@ import com.evilcorp.fs.*;
 import com.evilcorp.settings.CompositeMpvRunnerProperties;
 import com.evilcorp.settings.DefaultMpvRunnerProperties;
 import com.evilcorp.settings.MpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerPropertiesFromFile;
+import com.evilcorp.settings.MpvRunnerSettingsFromFile;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -37,7 +37,7 @@ public class StartSingleMpvInstance {
                 new VideoDir()
         );
         final MpvRunnerProperties config = new CompositeMpvRunnerProperties(
-                new MpvRunnerPropertiesFromFile(
+                new MpvRunnerSettingsFromFile(
                         "mpv_runner.properties",
                         fsPaths
                 ), new DefaultMpvRunnerProperties(fsPaths)

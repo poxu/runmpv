@@ -8,7 +8,6 @@ public class CompositeMpvRunnerProperties implements MpvRunnerProperties {
             MpvRunnerProperties actualProperties,
             MpvRunnerProperties defaultProperties
     ) {
-
         this.actualProperties = actualProperties;
         this.defaultProperties = defaultProperties;
     }

@@ -6,14 +6,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
-public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
-    private Properties properties;
+public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
+    private SoftSettings settings;
     private final FsPaths fsPaths;
     private boolean propertiesLoaded;
 
-    public MpvRunnerPropertiesFromFile(
+    public MpvRunnerSettingsFromFile(
             String propertyFileName,
             FsPaths fsPaths
     ) {
@@ -29,23 +28,23 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         }
     }
 
-    public MpvRunnerPropertiesFromFile(
+    public MpvRunnerSettingsFromFile(
             InputStream inStream,
             FsPaths fsPaths
     ) {
         this.fsPaths = fsPaths;
         if (inStream == null) {
-            properties = null;
+            settings = null;
             propertiesLoaded = false;
             return;
         }
         try {
-            properties = new Properties();
-            properties.load(inStream);
+            settings = new TextFileSettings(inStream);
+//            settings.load(inStream);
             inStream.close();
             propertiesLoaded = true;
         } catch (IOException e) {
-            properties = null;
+            settings = null;
             propertiesLoaded = false;
         }
     }
@@ -55,7 +54,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String waitSeconds = properties.getProperty("waitSeconds");
+        final String waitSeconds = settings.setting("waitSeconds");
         if (waitSeconds == null) {
             return null;
         }
@@ -67,7 +66,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String mpvHomeDir = properties.getProperty("mpvHomeDir");
+        final String mpvHomeDir = settings.setting("mpvHomeDir");
         if (mpvHomeDir == null) {
             return null;
         }
@@ -80,7 +79,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        return properties.getProperty("pipeName");
+        return settings.setting("pipeName");
     }
 
     @Override
@@ -88,7 +87,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String mpvLogFile = properties.getProperty("mpvLogFile");
+        final String mpvLogFile = settings.setting("mpvLogFile");
         if (mpvLogFile == null) {
             return null;
         }
@@ -107,7 +106,7 @@ public class MpvRunnerPropertiesFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String runnerLogFile = properties.getProperty("runnerLogFile");
+        final String runnerLogFile = settings.setting("runnerLogFile");
         if (runnerLogFile == null) {
             return null;
         }

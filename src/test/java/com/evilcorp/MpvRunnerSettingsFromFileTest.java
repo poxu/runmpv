@@ -2,7 +2,8 @@ package com.evilcorp;
 
 import com.evilcorp.fs.LocalFsPaths;
 import com.evilcorp.fs.ManualFsFile;
-import com.evilcorp.settings.MpvRunnerPropertiesFromFile;
+import com.evilcorp.settings.MpvRunnerProperties;
+import com.evilcorp.settings.MpvRunnerSettingsFromFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -11,10 +12,10 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class MpvRunnerPropertiesFromFileTest {
+public class MpvRunnerSettingsFromFileTest {
     @Test
     public void fileNotFound() {
-        final MpvRunnerPropertiesFromFile mpvRunnerPropertiesFromFile = new MpvRunnerPropertiesFromFile("non existent file",
+        final MpvRunnerProperties mpvRunnerPropertiesFromFile = new MpvRunnerSettingsFromFile("non existent file",
                 new LocalFsPaths(
                         new ManualFsFile(Path.of("first")),
                         new ManualFsFile(Path.of("second")),
@@ -31,7 +32,7 @@ public class MpvRunnerPropertiesFromFileTest {
 
     @Test
     public void propertyNotFound() {
-        final MpvRunnerPropertiesFromFile mpvRunnerPropertiesFromFile = new MpvRunnerPropertiesFromFile(
+        final MpvRunnerProperties mpvRunnerPropertiesFromFile = new MpvRunnerSettingsFromFile(
                 new ByteArrayInputStream("waitSeconds=10".getBytes()),
                 new LocalFsPaths(
                         new ManualFsFile(Path.of("first")),
