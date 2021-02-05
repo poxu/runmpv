@@ -1,12 +1,8 @@
 package com.evilcorp.settings;
 
-import java.util.Properties;
-
 public class CompositeMpvRunnerProperties implements MpvRunnerProperties {
     private final MpvRunnerProperties actualProperties;
     private final MpvRunnerProperties defaultProperties;
-    private Properties properties;
-    private boolean propertiesLoaded;
 
     public CompositeMpvRunnerProperties(
             MpvRunnerProperties actualProperties,
