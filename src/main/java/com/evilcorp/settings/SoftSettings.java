@@ -1,5 +1,7 @@
 package com.evilcorp.settings;
 
+import java.util.Optional;
+
 public interface SoftSettings {
-    String setting(String name);
+    Optional<String> setting(String name);
 }

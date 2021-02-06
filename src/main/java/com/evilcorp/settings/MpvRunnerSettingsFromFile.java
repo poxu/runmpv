@@ -40,7 +40,6 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         }
         try {
             settings = new TextFileSettings(inStream);
-//            settings.load(inStream);
             inStream.close();
             propertiesLoaded = true;
         } catch (IOException e) {
@@ -54,7 +53,7 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String waitSeconds = settings.setting("waitSeconds");
+        final String waitSeconds = settings.setting("waitSeconds").orElseThrow();
         if (waitSeconds == null) {
             return null;
         }
@@ -66,7 +65,7 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String mpvHomeDir = settings.setting("mpvHomeDir");
+        final String mpvHomeDir = settings.setting("mpvHomeDir").orElse(null);
         if (mpvHomeDir == null) {
             return null;
         }
@@ -79,7 +78,7 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        return settings.setting("pipeName");
+        return settings.setting("pipeName").orElse(null);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String mpvLogFile = settings.setting("mpvLogFile");
+        final String mpvLogFile = settings.setting("mpvLogFile").orElse(null);
         if (mpvLogFile == null) {
             return null;
         }
@@ -106,7 +105,7 @@ public class MpvRunnerSettingsFromFile implements MpvRunnerProperties {
         if (!propertiesLoaded) {
             return null;
         }
-        final String runnerLogFile = settings.setting("runnerLogFile");
+        final String runnerLogFile = settings.setting("runnerLogFile").orElse(null);
         if (runnerLogFile == null) {
             return null;
         }
