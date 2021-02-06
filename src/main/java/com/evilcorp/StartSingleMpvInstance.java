@@ -69,7 +69,8 @@ public class StartSingleMpvInstance {
 
             // Using absolute path to specify executable.
             // PATH variable is, therefore, ignored.
-            arguments.add(config.mpvHomeDir() + "/mpv.exe");
+            final String mpvExecutable = config.mpvHomeDir() + "/mpv.exe";
+            arguments.add(mpvExecutable);
 
             // Argument is needed to make mpv show ui
             // if mpv.exe is launched with output stream redirected
@@ -98,7 +99,7 @@ public class StartSingleMpvInstance {
                 if (e.getMessage().contains("CreateProcess error=2")) {
                     LOGGER.severe(e.getMessage());
                     LOGGER.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
-                            + config.mpvHomeDir() + "/mpv.exe");
+                            + mpvExecutable);
                 } else {
                     throw new RuntimeException(e);
                 }
