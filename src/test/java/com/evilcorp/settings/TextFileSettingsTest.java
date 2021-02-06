@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TextFileSettingsTest {
     @Test
@@ -17,10 +17,10 @@ class TextFileSettingsTest {
                 +  "=\n"
                 ;
         final TextFileSettings settings = new TextFileSettings(new ByteArrayInputStream(rawSettings.getBytes()));
-        assertEquals("10", settings.setting("waitSeconds"));
-        assertNull(settings.setting("Seconds"));
-        assertNull(settings.setting("illegalSefinedSetting"));
-        assertNull(settings.setting("halfDefinedSetting"));
+        assertEquals("10", settings.setting("waitSeconds").orElseThrow());
+        assertTrue(settings.setting("Seconds").isEmpty());
+        assertTrue(settings.setting("illegalSefinedSetting").isEmpty());
+        assertTrue(settings.setting("halfDefinedSetting").isEmpty());
     }
 
 }
