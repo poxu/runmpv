@@ -37,14 +37,14 @@ public class StartSingleMpvInstance {
         final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
                 new CompositeSettings(
                         new TextFileSettings(
-                                fsPaths.resolve("%r/mpv_runner.properties").path().toString()
+                                fsPaths.resolve("%r/runmpv.properties").path().toString()
                         ),
                         new ManualSettings(Map.of(
                                 "waitSeconds", "10",
                                 "mpvHomeDir", "%h/..",
                                 "pipeName", "myPipe",
-                                "mpvLogFile", "%r/debug.log",
-                                "runnerLogFile", "%v/runner-debug.log",
+                                "mpvLogFile", "%r/runmpv-mpv.log",
+                                "runnerLogFile", "%v/runmpv.log",
                                 "executableDir", mpvRunnerHomeDir.path().toString()
                         ))
                 ),
