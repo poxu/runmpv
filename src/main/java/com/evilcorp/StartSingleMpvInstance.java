@@ -45,7 +45,8 @@ public class StartSingleMpvInstance {
                                 "mpvHomeDir", "%h/..",
                                 "pipeName", "myPipe",
                                 "mpvLogFile", "%r/debug.log",
-                                "runnerLogFile", "%v/runner-debug.log"
+                                "runnerLogFile", "%v/runner-debug.log",
+                                "executableDir", mpvRunnerHomeDir.path().toString()
                         ))
                 ),
                 fsPaths

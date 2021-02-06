@@ -40,7 +40,8 @@ public class MpvRunnerPropertiesFromSettings implements MpvRunnerProperties {
 
     @Override
     public String executableDir() {
-        return null;
+        return settings.setting("executableDir")
+                .orElse(null);
     }
 
     @Override

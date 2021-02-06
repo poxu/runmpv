@@ -21,7 +21,8 @@ public class MpvRunnerSettingsFromSettingsTest {
                             "mpvHomeDir", "%h/soft/mpv",
                             "pipeName", "myPipe",
                             "mpvLogFile", "%r/debug.log",
-                            "runnerLogFile", "%v/runner-debug.log"
+                            "runnerLogFile", "%v/runner-debug.log",
+                            "executableDir", "execDir"
                     )
             ),
             new LocalFsPaths(
@@ -56,6 +57,12 @@ public class MpvRunnerSettingsFromSettingsTest {
     @Test
     public void runnerLogFile() {
         assertEquals("video/runner-debug.log", properties.runnerLogFile()
+                .replace('\\','/'));
+    }
+
+    @Test
+    public void executableDir() {
+        assertEquals("execDir", properties.executableDir()
                 .replace('\\','/'));
     }
 }
