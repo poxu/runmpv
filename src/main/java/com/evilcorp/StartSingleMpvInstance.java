@@ -1,10 +1,7 @@
 package com.evilcorp;
 
 import com.evilcorp.fs.*;
-import com.evilcorp.settings.CompositeMpvRunnerProperties;
-import com.evilcorp.settings.DefaultMpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerSettingsFromFile;
+import com.evilcorp.settings.*;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -12,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -36,13 +34,24 @@ public class StartSingleMpvInstance {
                 mpvRunnerHomeDir,
                 new VideoDir()
         );
-        final MpvRunnerProperties config = new CompositeMpvRunnerProperties(
-                new MpvRunnerSettingsFromFile(
-                        "mpv_runner.properties",
-                        fsPaths
-                ), new DefaultMpvRunnerProperties(fsPaths)
+        final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
+                new CompositeSettings(
+                        new TextFileSettings(
+                                "mpv_runner.properties",
+                                fsPaths
+                        ),
+                        new ManualSettings(
+                                Map.of(
+                                        "waitSeconds", "10",
+                                        "mpvHomeDir", "%h/..",
+                                        "pipeName", "myPipe",
+                                        "mpvLogFile", "%r/debug.log",
+                                        "runnerLogFile", "%v/runner-debug.log"
+                                )
+                        )
+                ),
+                fsPaths
         );
-
         if (config.runnerLogFile() != null) {
             rerouteSystemOutStream(config.runnerLogFile());
         }

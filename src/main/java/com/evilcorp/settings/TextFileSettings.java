@@ -1,8 +1,8 @@
 package com.evilcorp.settings;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.evilcorp.fs.FsPaths;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +21,19 @@ public class TextFileSettings implements SoftSettings {
                 .filter(s -> !s[1].isBlank())
                 .map(s -> new String[] {s[0].trim(), s[1].trim()})
                 .collect(Collectors.toUnmodifiableMap(s -> s[0], s -> s[1]));
+    }
+
+    public TextFileSettings(String propertyFileName, FsPaths fsPaths) {
+        this(getInStream(propertyFileName, fsPaths));
+    }
+
+    private static InputStream getInStream(String propertyFileName, FsPaths fsPaths) {
+        try {
+            return new FileInputStream(fsPaths.resolve("%r/" + propertyFileName).path()
+                    .toString());
+        } catch (FileNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
