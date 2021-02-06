@@ -6,6 +6,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Settings, contained in a text file.
+ * One setting per line, name and value separated by =.
+ * Names and value are trimmed.
+ * If value is empty or contains only spaces,
+ * then property is treated as non existent.
+ *
+ * Example:
+ *
+ * setting1=value1
+ * setting2=value2
+ *   setting3  =  value3
+ *
+ */
 public class TextFileSettings implements SoftSettings {
     private final Map<String, String> settings;
 

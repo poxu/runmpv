@@ -2,12 +2,24 @@ package com.evilcorp.fs;
 
 import java.nio.file.Path;
 
+/**
+ * Able to resolve placeholders standing in the beginning
+ * of the path.
+ *
+ * %r - directory where runmpv is located
+ * %h - user home directory
+ * %v - directory, containing video file, currently played
+ */
 public class LocalFsPaths implements FsPaths {
     private final FsFile homeDir;
     private final FsFile mpvRunnerDir;
     private final FsFile videoDir;
 
-    public LocalFsPaths(FsFile homeDir, FsFile mpvRunnerDir, FsFile videoDir) {
+    public LocalFsPaths(
+            FsFile homeDir,
+            FsFile mpvRunnerDir,
+            FsFile videoDir
+    ) {
         this.homeDir = homeDir;
         this.mpvRunnerDir = mpvRunnerDir;
         this.videoDir = videoDir;

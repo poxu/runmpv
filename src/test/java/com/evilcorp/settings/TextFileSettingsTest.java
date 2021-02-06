@@ -22,7 +22,7 @@ class TextFileSettingsTest {
     }
 
     @Test
-    public void notExistintProperty() {
+    public void notExistingProperty() {
         assertTrue(settings.setting("Seconds").isEmpty());
         assertTrue(settings.setting("halfDefinedSetting").isEmpty());
     }

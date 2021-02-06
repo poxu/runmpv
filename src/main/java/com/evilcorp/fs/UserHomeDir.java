@@ -2,6 +2,10 @@ package com.evilcorp.fs;
 
 import java.nio.file.Path;
 
+/**
+ * Represents user home directory.
+ * Encapsulates System.getProperty("user.home")
+ */
 public class UserHomeDir implements FsFile {
     private final Path homeDir;
 

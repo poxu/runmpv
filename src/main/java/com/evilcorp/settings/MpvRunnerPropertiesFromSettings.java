@@ -2,6 +2,12 @@ package com.evilcorp.settings;
 
 import com.evilcorp.fs.FsPaths;
 
+/**
+ * Settings for runmpv.
+ * Uses SoftSettings to take raw values and then
+ * converts them to proper data types and
+ * resolves paths if needed.
+ */
 public class MpvRunnerPropertiesFromSettings implements MpvRunnerProperties {
     private final FsPaths fsPaths;
     private final SoftSettings settings;
