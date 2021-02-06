@@ -37,8 +37,7 @@ public class StartSingleMpvInstance {
         final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
                 new CompositeSettings(
                         new TextFileSettings(
-                                "mpv_runner.properties",
-                                fsPaths
+                                fsPaths.resolve("%r/mpv_runner.properties").path().toString()
                         ),
                         new ManualSettings(Map.of(
                                 "waitSeconds", "10",
@@ -99,7 +98,7 @@ public class StartSingleMpvInstance {
                 if (e.getMessage().contains("CreateProcess error=2")) {
                     LOGGER.severe(e.getMessage());
                     LOGGER.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
-                            + config.executableDir() + "/mpv.exe");
+                            + config.mpvHomeDir() + "/mpv.exe");
                 } else {
                     throw new RuntimeException(e);
                 }

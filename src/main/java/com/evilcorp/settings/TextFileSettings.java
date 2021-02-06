@@ -1,7 +1,5 @@
 package com.evilcorp.settings;
 
-import com.evilcorp.fs.FsPaths;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -23,14 +21,13 @@ public class TextFileSettings implements SoftSettings {
                 .collect(Collectors.toUnmodifiableMap(s -> s[0], s -> s[1]));
     }
 
-    public TextFileSettings(String propertyFileName, FsPaths fsPaths) {
-        this(getInStream(propertyFileName, fsPaths));
+    public TextFileSettings(String propertyFileName) {
+        this(getInStream(propertyFileName));
     }
 
-    private static InputStream getInStream(String propertyFileName, FsPaths fsPaths) {
+    private static InputStream getInStream(String propertyFileName) {
         try {
-            return new FileInputStream(fsPaths.resolve("%r/" + propertyFileName).path()
-                    .toString());
+            return new FileInputStream(propertyFileName);
         } catch (FileNotFoundException e) {
             return null;
         }
