@@ -40,15 +40,13 @@ public class StartSingleMpvInstance {
                                 "mpv_runner.properties",
                                 fsPaths
                         ),
-                        new ManualSettings(
-                                Map.of(
-                                        "waitSeconds", "10",
-                                        "mpvHomeDir", "%h/..",
-                                        "pipeName", "myPipe",
-                                        "mpvLogFile", "%r/debug.log",
-                                        "runnerLogFile", "%v/runner-debug.log"
-                                )
-                        )
+                        new ManualSettings(Map.of(
+                                "waitSeconds", "10",
+                                "mpvHomeDir", "%h/..",
+                                "pipeName", "myPipe",
+                                "mpvLogFile", "%r/debug.log",
+                                "runnerLogFile", "%v/runner-debug.log"
+                        ))
                 ),
                 fsPaths
         );
@@ -69,8 +67,8 @@ public class StartSingleMpvInstance {
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
 
-            // Using absolute path to specify executable
-            // PATH variable is, therefore ignored.
+            // Using absolute path to specify executable.
+            // PATH variable is, therefore, ignored.
             arguments.add(config.mpvHomeDir() + "/mpv.exe");
 
             // Argument is needed to make mpv show ui
