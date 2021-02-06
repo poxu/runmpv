@@ -92,7 +92,18 @@ public class StartSingleMpvInstance {
 
             processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
             processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-            processBuilder.start();
+            try {
+                processBuilder.start();
+            } catch (IOException e) {
+                if (e.getMessage().contains("CreateProcess error=2")) {
+                    LOGGER.severe(e.getMessage());
+                    LOGGER.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
+                            + config.executableDir() + "/mpv.exe");
+                } else {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
         }
 
         FileOutputStream mpvPipeStream = null;
