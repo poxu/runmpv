@@ -13,7 +13,8 @@ class TextFileSettingsTest {
             + "waitSeconds=10\n"
             + "illegalSetting\n"
             +  "halfDefinedSetting= \n"
-            +  "=\n";
+            +  "=\n"
+            ;
     private TextFileSettings settings = new TextFileSettings(new ByteArrayInputStream(RAW_SETTINGS.getBytes()));
 
     @Test
