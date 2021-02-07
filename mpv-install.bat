@@ -12,62 +12,62 @@ call :ensure_vista
 :: Make sure the script is running as admin
 call :ensure_admin
 
-:: Command line arguments to use when launching mpv from a file association
-set mpv_args=
+:: Command line arguments to use when launching runmpv from a file association
+set runmpv_args=
 
-:: Get mpv.exe location
-set mpv_path=%~dp0mpv.exe
-if not exist "%mpv_path%" call :die "mpv.exe not found"
+:: Get runmpv.exe location
+set runmpv_path=%~dp0runmpv.exe
+if not exist "%runmpv_path%" call :die "runmpv.exe not found"
 
-:: Get mpv-document.ico location
-set icon_path=%~dp0mpv-document.ico
-if not exist "%icon_path%" call :die "mpv-document.ico not found"
+:: Get runmpv-document.ico location
+set icon_path=%~dp0runmpv-document.ico
+if not exist "%icon_path%" call :die "runmpv-document.ico not found"
 
-:: Register mpv.exe under the "App Paths" key, so it can be found by
+:: Register runmpv.exe under the "App Paths" key, so it can be found by
 :: ShellExecute, the run command, the start menu, etc.
-set app_paths_key=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\mpv.exe
-call :reg add "%app_paths_key%" /d "%mpv_path%" /f
+set app_paths_key=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\runmpv.exe
+call :reg add "%app_paths_key%" /d "%runmpv_path%" /f
 call :reg add "%app_paths_key%" /v "UseUrl" /t REG_DWORD /d 1 /f
 
-:: Register mpv.exe under the "Applications" key to add some default verbs for
-:: when mpv is used from the "Open with" menu
+:: Register runmpv.exe under the "Applications" key to add some default verbs for
+:: when runmpv is used from the "Open with" menu
 set classes_root_key=HKLM\SOFTWARE\Classes
-set app_key=%classes_root_key%\Applications\mpv.exe
-call :reg add "%app_key%" /v "FriendlyAppName" /d "mpv" /f
+set app_key=%classes_root_key%\Applications\runmpv.exe
+call :reg add "%app_key%" /v "FriendlyAppName" /d "runmpv" /f
 call :add_verbs "%app_key%"
 
-:: Add mpv to the "Open with" list for all video and audio file types
-call :reg add "%classes_root_key%\SystemFileAssociations\video\OpenWithList\mpv.exe" /d "" /f
-:: call :reg add "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\mpv.exe" /d "" /f
+:: Add runmpv to the "Open with" list for all video and audio file types
+call :reg add "%classes_root_key%\SystemFileAssociations\video\OpenWithList\runmpv.exe" /d "" /f
+:: call :reg add "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\runmpv.exe" /d "" /f
 
 :: Remove dvd AutoPlay Handler
 :: Add DVD AutoPlay handler
 :: set autoplay_key=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers
-:: call :reg add "%classes_root_key%\io.mpv.dvd\shell\play" /d "&Play" /f
-:: call :reg add "%classes_root_key%\io.mpv.dvd\shell\play\command" /d "\"%mpv_path%\" %mpv_args% dvd:// --dvd-device=\"%%%%L" /f
+:: call :reg add "%classes_root_key%\io.runmpv.dvd\shell\play" /d "&Play" /f
+:: call :reg add "%classes_root_key%\io.runmpv.dvd\shell\play\command" /d "\"%runmpv_path%\" %runmpv_args% dvd:// --dvd-device=\"%%%%L" /f
 :: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "Action" /d "Play DVD movie" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "DefaultIcon" /d "%mpv_path%,0" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "InvokeProgID" /d "io.mpv.dvd" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "DefaultIcon" /d "%runmpv_path%,0" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "InvokeProgID" /d "io.runmpv.dvd" /f
 :: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "InvokeVerb" /d "play" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "Provider" /d "mpv" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /v "Provider" /d "runmpv" /f
 :: call :reg add "%autoplay_key%\EventHandlers\PlayDVDMovieOnArrival" /v "MpvPlayDVDMovieOnArrival" /f
 
 :: Remove blu-ray AutoPlay Handler
 :: Add Blu-ray AutoPlay handler
-:: call :reg add "%classes_root_key%\io.mpv.bluray\shell\play" /d "&Play" /f
-:: call :reg add "%classes_root_key%\io.mpv.bluray\shell\play\command" /d "\"%mpv_path%\" %mpv_args% bd:// --bluray-device=\"%%%%L" /f
+:: call :reg add "%classes_root_key%\io.runmpv.bluray\shell\play" /d "&Play" /f
+:: call :reg add "%classes_root_key%\io.runmpv.bluray\shell\play\command" /d "\"%runmpv_path%\" %runmpv_args% bd:// --bluray-device=\"%%%%L" /f
 :: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "Action" /d "Play Blu-ray movie" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "DefaultIcon" /d "%mpv_path%,0" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "InvokeProgID" /d "io.mpv.bluray" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "DefaultIcon" /d "%runmpv_path%,0" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "InvokeProgID" /d "io.runmpv.bluray" /f
 :: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "InvokeVerb" /d "play" /f
-:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "Provider" /d "mpv" /f
+:: call :reg add "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /v "Provider" /d "runmpv" /f
 :: call :reg add "%autoplay_key%\EventHandlers\PlayBluRayOnArrival" /v "MpvPlayBluRayOnArrival" /f
 
-:: Add a capabilities key for mpv, which is registered later on for use in the
+:: Add a capabilities key for runmpv, which is registered later on for use in the
 :: "Default Programs" control panel
-set capabilities_key=HKLM\SOFTWARE\Clients\Media\mpv\Capabilities
-call :reg add "%capabilities_key%" /v "ApplicationName" /d "mpv" /f
-call :reg add "%capabilities_key%" /v "ApplicationDescription" /d "mpv media player" /f
+set capabilities_key=HKLM\SOFTWARE\Clients\Media\runmpv\Capabilities
+call :reg add "%capabilities_key%" /v "ApplicationName" /d "runmpv" /f
+call :reg add "%capabilities_key%" /v "ApplicationDescription" /d "runmpv media player" /f
 
 :: Add file types
 set supported_types_key=%app_key%\SupportedTypes
@@ -101,7 +101,7 @@ call :add_type "video/vnd.dlna.mpeg-tts"          "video" "MPEG-2 Transport Stre
 :: call :add_type "audio/vnd.dlna.adts"              "audio" "ADTS Audio"                 ".adts" ".adt"
 :: call :add_type "audio/mpeg"                       "audio" "MPEG Audio"                 ".mpa" ".m1a" ".m2a" ".mp1" ".mp2"
 :: call :add_type "audio/mpeg"                       "audio" "MP3 Audio"                  ".mp3"
-call :add_type "video/mpeg"                       "video" "MPEG Video"                 ".mpeg" ".mpg" ".mpe" ".mpeg2" ".m1v" ".m2v" ".mp2v" ".mpv" ".mpv2" ".mod" ".tod"
+call :add_type "video/mpeg"                       "video" "MPEG Video"                 ".mpeg" ".mpg" ".mpe" ".mpeg2" ".m1v" ".m2v" ".mp2v" ".runmpv" ".runmpv2" ".mod" ".tod"
 call :add_type "video/dvd"                        "video" "Video Object"               ".vob" ".vro"
 call :add_type ""                                 "video" "Enhanced VOB"               ".evob" ".evo"
 call :add_type "video/mp4"                        "video" "MPEG-4 Video"               ".mpeg4" ".m4v" ".mp4" ".mp4v" ".mpg4"
@@ -177,10 +177,10 @@ call :add_type "video/3gpp2"                      "video" "3GPP Video"          
 ::call :add_type ""                                 "audio" "CUE Sheet"                  ".cue"
 
 :: Register "Default Programs" entry
-call :reg add "HKLM\SOFTWARE\RegisteredApplications" /v "mpv" /d "SOFTWARE\Clients\Media\mpv\Capabilities" /f
+call :reg add "HKLM\SOFTWARE\RegisteredApplications" /v "runmpv" /d "SOFTWARE\Clients\Media\runmpv\Capabilities" /f
 
 echo.
-echo Installed successfully^^! You can now configure mpv's file associations in the
+echo Installed successfully^^! You can now configure runmpv's file associations in the
 echo Default Programs control panel.
 echo.
 if [%unattended%] == [yes] exit 0
@@ -202,7 +202,7 @@ exit 0
 	openfiles >nul 2>&1
 	if errorlevel 1 (
 		echo This batch script requires administrator privileges. Right-click on
-		echo mpv-install.bat and select "Run as administrator".
+		echo runmpv-install.bat and select "Run as administrator".
 		call :die
 	)
 	goto :EOF
@@ -244,11 +244,11 @@ exit 0
 	call :reg add "%key%\shell\open" /v "LegacyDisable" /f
 
 	:: Set open command
-	call :reg add "%key%\shell\open\command" /d "\"%mpv_path%\" %mpv_args% -- \"%%%%L" /f
+	call :reg add "%key%\shell\open\command" /d "\"%runmpv_path%\" %runmpv_args% -- \"%%%%L" /f
 
 	:: Add "play" verb
 	call :reg add "%key%\shell\play" /d "&Play" /f
-	call :reg add "%key%\shell\play\command" /d "\"%mpv_path%\" %mpv_args% -- \"%%%%L" /f
+	call :reg add "%key%\shell\play\command" /d "\"%runmpv_path%\" %runmpv_args% -- \"%%%%L" /f
 
 	goto :EOF
 
@@ -295,7 +295,7 @@ exit 0
 	echo Adding "%extension%" file type
 
 	:: Add ProgId
-	set prog_id=io.mpv%extension%
+	set prog_id=io.runmpv%extension%
 	call :add_progid "%prog_id%" "%friendly_name%"
 
 	:: Add extensions
