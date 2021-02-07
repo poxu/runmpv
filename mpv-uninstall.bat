@@ -20,10 +20,10 @@ reg delete "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\mpv.exe
 
 :: Delete AutoPlay handlers
 set autoplay_key=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers
-reg delete "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /f >nul
-reg delete "%autoplay_key%\EventHandlers\PlayDVDMovieOnArrival" /v "MpvPlayDVDMovieOnArrival" /f >nul
-reg delete "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /f >nul
-reg delete "%autoplay_key%\EventHandlers\PlayBluRayOnArrival" /v "MpvPlayBluRayOnArrival" /f >nul
+:: reg delete "%autoplay_key%\Handlers\MpvPlayDVDMovieOnArrival" /f >nul
+:: reg delete "%autoplay_key%\EventHandlers\PlayDVDMovieOnArrival" /v "MpvPlayDVDMovieOnArrival" /f >nul
+:: reg delete "%autoplay_key%\Handlers\MpvPlayBluRayOnArrival" /f >nul
+:: reg delete "%autoplay_key%\EventHandlers\PlayBluRayOnArrival" /v "MpvPlayBluRayOnArrival" /f >nul
 
 :: Delete "Default Programs" entry
 reg delete "HKLM\SOFTWARE\RegisteredApplications" /v "mpv" /f >nul
