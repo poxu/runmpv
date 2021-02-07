@@ -38,7 +38,7 @@ call :add_verbs "%app_key%"
 
 :: Add mpv to the "Open with" list for all video and audio file types
 call :reg add "%classes_root_key%\SystemFileAssociations\video\OpenWithList\mpv.exe" /d "" /f
-call :reg add "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\mpv.exe" /d "" /f
+:: call :reg add "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\mpv.exe" /d "" /f
 
 :: Remove dvd AutoPlay Handler
 :: Add DVD AutoPlay handler
@@ -73,53 +73,56 @@ call :reg add "%capabilities_key%" /v "ApplicationDescription" /d "mpv media pla
 set supported_types_key=%app_key%\SupportedTypes
 set file_associations_key=%capabilities_key%\FileAssociations
 :: DVD/Blu-ray audio formats
-call :add_type "audio/ac3"                        "audio" "AC-3 Audio"                 ".ac3" ".a52"
-call :add_type "audio/eac3"                       "audio" "E-AC-3 Audio"               ".eac3"
-call :add_type "audio/vnd.dolby.mlp"              "audio" "MLP Audio"                  ".mlp"
-call :add_type "audio/vnd.dts"                    "audio" "DTS Audio"                  ".dts"
-call :add_type "audio/vnd.dts.hd"                 "audio" "DTS-HD Audio"               ".dts-hd" ".dtshd"
-call :add_type ""                                 "audio" "TrueHD Audio"               ".true-hd" ".thd" ".truehd" ".thd+ac3"
-call :add_type ""                                 "audio" "True Audio"                 ".tta"
+:: call :add_type "audio/ac3"                        "audio" "AC-3 Audio"                 ".ac3" ".a52"
+:: call :add_type "audio/eac3"                       "audio" "E-AC-3 Audio"               ".eac3"
+:: call :add_type "audio/vnd.dolby.mlp"              "audio" "MLP Audio"                  ".mlp"
+:: call :add_type "audio/vnd.dts"                    "audio" "DTS Audio"                  ".dts"
+:: call :add_type "audio/vnd.dts.hd"                 "audio" "DTS-HD Audio"               ".dts-hd" ".dtshd"
+:: call :add_type ""                                 "audio" "TrueHD Audio"               ".true-hd" ".thd" ".truehd" ".thd+ac3"
+:: call :add_type ""                                 "audio" "True Audio"                 ".tta"
 :: Uncompressed formats
-call :add_type ""                                 "audio" "PCM Audio"                  ".pcm"
-call :add_type "audio/wav"                        "audio" "Wave Audio"                 ".wav"
-call :add_type "audio/aiff"                       "audio" "AIFF Audio"                 ".aiff" ".aif" ".aifc"
-call :add_type "audio/amr"                        "audio" "AMR Audio"                  ".amr"
-call :add_type "audio/amr-wb"                     "audio" "AMR-WB Audio"               ".awb"
-call :add_type "audio/basic"                      "audio" "AU Audio"                   ".au" ".snd"
-call :add_type ""                                 "audio" "Linear PCM Audio"           ".lpcm"
+:: call :add_type ""                                 "audio" "PCM Audio"                  ".pcm"
+:: call :add_type "audio/wav"                        "audio" "Wave Audio"                 ".wav"
+:: call :add_type "audio/aiff"                       "audio" "AIFF Audio"                 ".aiff" ".aif" ".aifc"
+:: call :add_type "audio/amr"                        "audio" "AMR Audio"                  ".amr"
+:: call :add_type "audio/amr-wb"                     "audio" "AMR-WB Audio"               ".awb"
+:: call :add_type "audio/basic"                      "audio" "AU Audio"                   ".au" ".snd"
+:: call :add_type ""                                 "audio" "Linear PCM Audio"           ".lpcm"
 call :add_type ""                                 "video" "Raw YUV Video"              ".yuv"
 call :add_type ""                                 "video" "YUV4MPEG2 Video"            ".y4m"
+
 :: Free lossless formats
-call :add_type "audio/x-ape"                      "audio" "Monkey's Audio"             ".ape"
-call :add_type "audio/x-wavpack"                  "audio" "WavPack Audio"              ".wv"
-call :add_type "audio/x-shorten"                  "audio" "Shorten Audio"              ".shn"
+:: call :add_type "audio/x-ape"                      "audio" "Monkey's Audio"             ".ape"
+:: call :add_type "audio/x-wavpack"                  "audio" "WavPack Audio"              ".wv"
+:: call :add_type "audio/x-shorten"                  "audio" "Shorten Audio"              ".shn"
+
 :: MPEG formats
 call :add_type "video/vnd.dlna.mpeg-tts"          "video" "MPEG-2 Transport Stream"    ".m2ts" ".m2t" ".mts" ".mtv" ".ts" ".tsv" ".tsa" ".tts" ".trp"
-call :add_type "audio/vnd.dlna.adts"              "audio" "ADTS Audio"                 ".adts" ".adt"
-call :add_type "audio/mpeg"                       "audio" "MPEG Audio"                 ".mpa" ".m1a" ".m2a" ".mp1" ".mp2"
-call :add_type "audio/mpeg"                       "audio" "MP3 Audio"                  ".mp3"
+:: call :add_type "audio/vnd.dlna.adts"              "audio" "ADTS Audio"                 ".adts" ".adt"
+:: call :add_type "audio/mpeg"                       "audio" "MPEG Audio"                 ".mpa" ".m1a" ".m2a" ".mp1" ".mp2"
+:: call :add_type "audio/mpeg"                       "audio" "MP3 Audio"                  ".mp3"
 call :add_type "video/mpeg"                       "video" "MPEG Video"                 ".mpeg" ".mpg" ".mpe" ".mpeg2" ".m1v" ".m2v" ".mp2v" ".mpv" ".mpv2" ".mod" ".tod"
 call :add_type "video/dvd"                        "video" "Video Object"               ".vob" ".vro"
 call :add_type ""                                 "video" "Enhanced VOB"               ".evob" ".evo"
 call :add_type "video/mp4"                        "video" "MPEG-4 Video"               ".mpeg4" ".m4v" ".mp4" ".mp4v" ".mpg4"
-call :add_type "audio/mp4"                        "audio" "MPEG-4 Audio"               ".m4a"
-call :add_type "audio/aac"                        "audio" "Raw AAC Audio"              ".aac"
+:: call :add_type "audio/mp4"                        "audio" "MPEG-4 Audio"               ".m4a"
+:: call :add_type "audio/aac"                        "audio" "Raw AAC Audio"              ".aac"
 call :add_type ""                                 "video" "Raw H.264/AVC Video"        ".h264" ".avc" ".x264" ".264"
 call :add_type ""                                 "video" "Raw H.265/HEVC Video"       ".hevc" ".h265" ".x265" ".265"
 :: Xiph formats
-call :add_type "audio/flac"                       "audio" "FLAC Audio"                 ".flac"
-call :add_type "audio/ogg"                        "audio" "Ogg Audio"                  ".oga" ".ogg"
-call :add_type "audio/ogg"                        "audio" "Opus Audio"                 ".opus"
-call :add_type "audio/ogg"                        "audio" "Speex Audio"                ".spx"
+:: call :add_type "audio/flac"                       "audio" "FLAC Audio"                 ".flac"
+:: call :add_type "audio/ogg"                        "audio" "Ogg Audio"                  ".oga" ".ogg"
+:: call :add_type "audio/ogg"                        "audio" "Opus Audio"                 ".opus"
+:: call :add_type "audio/ogg"                        "audio" "Speex Audio"                ".spx"
 call :add_type "video/ogg"                        "video" "Ogg Video"                  ".ogv" ".ogm"
 call :add_type "application/ogg"                  "video" "Ogg Video"                  ".ogx"
 :: Matroska formats
 call :add_type "video/x-matroska"                 "video" "Matroska Video"             ".mkv"
 call :add_type "video/x-matroska"                 "video" "Matroska 3D Video"          ".mk3d"
-call :add_type "audio/x-matroska"                 "audio" "Matroska Audio"             ".mka"
+:: call :add_type "audio/x-matroska"                 "audio" "Matroska Audio"             ".mka"
 call :add_type "video/webm"                       "video" "WebM Video"                 ".webm"
-call :add_type "audio/webm"                       "audio" "WebM Audio"                 ".weba"
+::call :add_type "audio/webm"                       "audio" "WebM Audio"                 ".weba"
+
 :: Misc formats
 call :add_type "video/avi"                        "video" "Video Clip"                 ".avi" ".vfw"
 call :add_type ""                                 "video" "DivX Video"                 ".divx"
@@ -131,7 +134,7 @@ call :add_type ""                                 "video" "Nullsoft Streaming Vi
 call :add_type "application/gxf"                  "video" "General Exchange Format"    ".gxf"
 call :add_type "application/mxf"                  "video" "Material Exchange Format"   ".mxf"
 :: Windows Media formats
-call :add_type "audio/x-ms-wma"                   "audio" "Windows Media Audio"        ".wma"
+:: call :add_type "audio/x-ms-wma"                   "audio" "Windows Media Audio"        ".wma"
 call :add_type "video/x-ms-wm"                    "video" "Windows Media Video"        ".wm"
 call :add_type "video/x-ms-wmv"                   "video" "Windows Media Video"        ".wmv"
 call :add_type "video/x-ms-asf"                   "video" "Windows Media Video"        ".asf"
@@ -142,35 +145,36 @@ call :add_type ""                                 "video" "DV Video"            
 :: Flash Video formats
 call :add_type "video/x-flv"                      "video" "Flash Video"                ".flv"
 call :add_type "video/mp4"                        "video" "Flash Video"                ".f4v"
-call :add_type "audio/mp4"                        "audio" "Flash Audio"                ".f4a"
+:: call :add_type "audio/mp4"                        "audio" "Flash Audio"                ".f4a"
 :: QuickTime formats
 call :add_type "video/quicktime"                  "video" "QuickTime Video"            ".qt" ".mov"
 call :add_type "video/quicktime"                  "video" "QuickTime HD Video"         ".hdmov"
 :: Real Media formats
 call :add_type "application/vnd.rn-realmedia"     "video" "Real Media Video"           ".rm"
 call :add_type "application/vnd.rn-realmedia-vbr" "video" "Real Media Video"           ".rmvb"
-call :add_type "audio/vnd.rn-realaudio"           "audio" "Real Media Audio"           ".ra" ".ram"
+:: call :add_type "audio/vnd.rn-realaudio"           "audio" "Real Media Audio"           ".ra" ".ram"
+
 :: 3GPP formats
-call :add_type "audio/3gpp"                       "audio" "3GPP Audio"                 ".3ga"
-call :add_type "audio/3gpp2"                      "audio" "3GPP Audio"                 ".3ga2"
+:: call :add_type "audio/3gpp"                       "audio" "3GPP Audio"                 ".3ga"
+:: call :add_type "audio/3gpp2"                      "audio" "3GPP Audio"                 ".3ga2"
 call :add_type "video/3gpp"                       "video" "3GPP Video"                 ".3gpp" ".3gp"
 call :add_type "video/3gpp2"                      "video" "3GPP Video"                 ".3gp2" ".3g2"
 :: Video game formats
-call :add_type ""                                 "audio" "AY Audio"                   ".ay"
-call :add_type ""                                 "audio" "GBS Audio"                  ".gbs"
-call :add_type ""                                 "audio" "GYM Audio"                  ".gym"
-call :add_type ""                                 "audio" "HES Audio"                  ".hes"
-call :add_type ""                                 "audio" "KSS Audio"                  ".kss"
-call :add_type ""                                 "audio" "NSF Audio"                  ".nsf"
-call :add_type ""                                 "audio" "NSFE Audio"                 ".nsfe"
-call :add_type ""                                 "audio" "SAP Audio"                  ".sap"
-call :add_type ""                                 "audio" "SPC Audio"                  ".spc"
-call :add_type ""                                 "audio" "VGM Audio"                  ".vgm"
-call :add_type ""                                 "audio" "VGZ Audio"                  ".vgz"
+:: call :add_type ""                                 "audio" "AY Audio"                   ".ay"
+:: call :add_type ""                                 "audio" "GBS Audio"                  ".gbs"
+:: call :add_type ""                                 "audio" "GYM Audio"                  ".gym"
+:: call :add_type ""                                 "audio" "HES Audio"                  ".hes"
+:: call :add_type ""                                 "audio" "KSS Audio"                  ".kss"
+:: call :add_type ""                                 "audio" "NSF Audio"                  ".nsf"
+:: call :add_type ""                                 "audio" "NSFE Audio"                 ".nsfe"
+:: call :add_type ""                                 "audio" "SAP Audio"                  ".sap"
+:: call :add_type ""                                 "audio" "SPC Audio"                  ".spc"
+:: call :add_type ""                                 "audio" "VGM Audio"                  ".vgm"
+:: call :add_type ""                                 "audio" "VGZ Audio"                  ".vgz"
 :: Playlist formats
-call :add_type "audio/x-mpegurl"                  "audio" "M3U Playlist"               ".m3u" ".m3u8"
-call :add_type "audio/x-scpls"                    "audio" "PLS Playlist"               ".pls"
-call :add_type ""                                 "audio" "CUE Sheet"                  ".cue"
+::call :add_type "audio/x-mpegurl"                  "audio" "M3U Playlist"               ".m3u" ".m3u8"
+::call :add_type "audio/x-scpls"                    "audio" "PLS Playlist"               ".pls"
+::call :add_type ""                                 "audio" "CUE Sheet"                  ".cue"
 
 :: Register "Default Programs" entry
 call :reg add "HKLM\SOFTWARE\RegisteredApplications" /v "mpv" /d "SOFTWARE\Clients\Media\mpv\Capabilities" /f
