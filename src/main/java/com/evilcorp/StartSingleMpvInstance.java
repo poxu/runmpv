@@ -84,6 +84,7 @@ public class StartSingleMpvInstance {
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
             arguments.add("--input-ipc-server=" + config.pipeName());
+            arguments.add("--title=runmpv_win");
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes it's logs
@@ -139,12 +140,23 @@ public class StartSingleMpvInstance {
         final String loadFileCommand = "loadfile   \"" + videoFileName.replaceAll("\\\\", "\\\\\\\\") + "\" replace";
         sendCommand(mpvPipeStream, loadFileCommand);
         mpvPipeStream.close();
+
+        final List<String> focusArgs = List.of(
+                "cscript",
+                "/B",
+                config.executableDir() + "/focus.js",
+                "runmpv_win"
+        );
+        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
+
+        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        processBuilder.start();
     }
 
     // A small logging system to diagnose why real logging system fails
     private static void rerouteSystemOutStream(String logfile) throws FileNotFoundException {
-        final OutputStream out;
-        out = new FileOutputStream(logfile);
+        final OutputStream out = new FileOutputStream(logfile);
         PrintStream printWriter = new PrintStream(out);
         System.out.close();
         System.err.close();

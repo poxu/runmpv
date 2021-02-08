@@ -1,0 +1,1 @@
+(new ActiveXObject("WScript.Shell")).AppActivate(WScript.Arguments(0))
