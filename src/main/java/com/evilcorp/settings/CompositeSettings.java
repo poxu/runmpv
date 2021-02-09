@@ -14,10 +14,10 @@ public class CompositeSettings implements SoftSettings {
 
     public CompositeSettings(
             SoftSettings actualSettings,
-            SoftSettings defautlSettings
+            SoftSettings defaultSettings
     ) {
         this.actualSettings = actualSettings;
-        this.defautlSettings = defautlSettings;
+        this.defautlSettings = defaultSettings;
     }
 
     @Override
