@@ -1,22 +1,19 @@
 package com.evilcorp;
 
 import com.evilcorp.fs.*;
+import com.evilcorp.mpv.MpvInstance;
+import com.evilcorp.mpv.MpvInstanceWindows;
+import com.evilcorp.mpv.OpenFile;
 import com.evilcorp.settings.*;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class StartSingleMpvInstance {
     private static Logger LOGGER;
-
-    public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
 
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
         if (args.length < 1) {
@@ -59,99 +56,15 @@ public class StartSingleMpvInstance {
         LOGGER.info("started");
         LOGGER.info("runmpv argument is " + args[0]);
 
-        boolean mpvStarted = false;
-
-        final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.pipeName());
-
-        final boolean firstLaunch = !mpvPipe.exists();
-        if (firstLaunch) {
-            List<String> arguments = new ArrayList<>();
-
-            // Using absolute path to specify executable.
-            // PATH variable is, therefore, ignored.
-            final String mpvExecutable = config.mpvHomeDir() + "/mpv.exe";
-            arguments.add(mpvExecutable);
-
-            // Argument is needed to make mpv show ui
-            // if mpv.exe is launched with output stream redirected
-            // somewhere else, then it just prints help to terminal.
-            // One workaround is to pass filename argument.
-            // Then ui is shown.
-            // Other workaround, which is used here, is to provide
-            // this argument
-            arguments.add("--player-operation-mode=pseudo-gui");
-
-            // Argument is needed so that mpv could open control pipe
-            // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + config.pipeName());
-            arguments.add("--title=runmpv_win");
-
-            if (config.mpvLogFile() != null) {
-                // File, where mpv.exe writes it's logs
-                arguments.add("--log-file=" + config.mpvLogFile());
-            }
-            final ProcessBuilder processBuilder = new ProcessBuilder(arguments);
-
-            processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-            try {
-                processBuilder.start();
-            } catch (IOException e) {
-                if (e.getMessage().contains("CreateProcess error=2")) {
-                    LOGGER.severe(e.getMessage());
-                    LOGGER.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
-                            + mpvExecutable);
-                } else {
-                    throw new RuntimeException(e);
-                }
-                return;
-            }
-        }
-
-        FileOutputStream mpvPipeStream = null;
-
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-
-        // wait until mpv is started and communication pipe is open
-        while (!mpvStarted && !waitTimeOver) {
-            try {
-                mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.pipeName());
-                mpvStarted = true;
-            } catch (Exception e) {
-                Thread.sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > config.waitSeconds() * 1_000_000_000) {
-                    waitTimeOver = true;
-                }
-            }
-        }
-
-        if (waitTimeOver) {
-            LOGGER.warning("Waited more than " + config.waitSeconds());
-            return;
-        }
-
+        MpvInstance mpvInstance = new MpvInstanceWindows(config);
+        mpvInstance.execute(new OpenFile(videoFileName));
+        mpvInstance.focus();
+        /*
         if (firstLaunch) {
             sendCommand(mpvPipeStream, "set geometry 640x360");
         }
+        */
         LOGGER.info("Loading file " + videoFileName);
-        final String loadFileCommand = "loadfile   \"" + videoFileName.replaceAll("\\\\", "\\\\\\\\") + "\" replace";
-        sendCommand(mpvPipeStream, loadFileCommand);
-        mpvPipeStream.close();
-
-        final List<String> focusArgs = List.of(
-                "cscript",
-                "/B",
-                config.executableDir() + "/focus.js",
-                "runmpv_win"
-        );
-        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
-
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.start();
     }
 
     // A small logging system to diagnose why real logging system fails
@@ -162,14 +75,6 @@ public class StartSingleMpvInstance {
         System.err.close();
         System.setOut(printWriter);
         System.setErr(printWriter);
-    }
-
-    private static void sendCommand(FileOutputStream pipe, String command) throws IOException {
-        final PrintWriter writer = new PrintWriter(pipe);
-        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command);
-        pipe.write(utf8Bytes.array());
-        writer.println();
-        writer.flush();
     }
 
     public static boolean isAscii(String string) {
