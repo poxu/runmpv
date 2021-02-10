@@ -31,4 +31,11 @@ public interface MpvRunnerProperties {
      *  logging.properties
      */
     String runnerLogFile();
+
+    /**
+     * If true, mpv window is focused after new
+     * file is loaded. If false, mpv window
+     * is only focused on first launch
+     */
+    boolean focusAfterOpen();
 }

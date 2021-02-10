@@ -42,7 +42,8 @@ public class StartSingleMpvInstance {
                                 "pipeName", "myPipe",
                                 "mpvLogFile", "%r/runmpv-mpv.log",
                                 "runnerLogFile", "%v/runmpv.log",
-                                "executableDir", mpvRunnerHomeDir.path().toString()
+                                "executableDir", mpvRunnerHomeDir.path().toString(),
+                                "focusAfterOpen", "true"
                         ))
                 ),
                 fsPaths
@@ -58,7 +59,9 @@ public class StartSingleMpvInstance {
 
         MpvInstance mpvInstance = new MpvInstanceWindows(config);
         mpvInstance.execute(new OpenFile(videoFileName));
-        mpvInstance.focus();
+        if (config.focusAfterOpen()) {
+            mpvInstance.focus();
+        }
         /*
         if (firstLaunch) {
             sendCommand(mpvPipeStream, "set geometry 640x360");

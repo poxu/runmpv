@@ -56,4 +56,11 @@ public class MpvRunnerPropertiesFromSettings implements MpvRunnerProperties {
                 .map(s -> fsPaths.resolve(s).path().toString())
                 .orElse(null);
     }
+
+    @Override
+    public boolean focusAfterOpen() {
+        return settings.setting("focusAfterOpen")
+                .map(Boolean::valueOf)
+                .orElse(false);
+    }
 }

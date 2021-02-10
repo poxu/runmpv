@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MpvRunnerSettingsFromSettingsTest {
 
@@ -22,7 +23,8 @@ public class MpvRunnerSettingsFromSettingsTest {
                             "pipeName", "myPipe",
                             "mpvLogFile", "%r/debug.log",
                             "runnerLogFile", "%v/runner-debug.log",
-                            "executableDir", "execDir"
+                            "executableDir", "execDir",
+                            "focusAfterOpen", "true"
                     )
             ),
             new LocalFsPaths(
@@ -64,5 +66,10 @@ public class MpvRunnerSettingsFromSettingsTest {
     public void executableDir() {
         assertEquals("execDir", properties.executableDir()
                 .replace('\\','/'));
+    }
+
+    @Test
+    public void focusAfterOpen() {
+        assertTrue(properties.focusAfterOpen());
     }
 }

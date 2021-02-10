@@ -7,6 +7,7 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     private final String mpvLogFile;
     private final String executableDir;
     private final String runnerLogFile;
+    private final boolean focusAfterOpen;
 
     public ManualMpvRunnerProperties(
             Integer waitSeconds,
@@ -14,14 +15,15 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
             String pipeName,
             String mpvLogFile,
             String executableDir,
-            String runnerLogFile
-    ) {
+            String runnerLogFile,
+            boolean focusAfterOpen) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
         this.pipeName = pipeName;
         this.mpvLogFile = mpvLogFile;
         this.executableDir = executableDir;
         this.runnerLogFile = runnerLogFile;
+        this.focusAfterOpen = focusAfterOpen;
     }
 
     @Override
@@ -52,5 +54,10 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     @Override
     public String runnerLogFile() {
         return runnerLogFile;
+    }
+
+    @Override
+    public boolean focusAfterOpen() {
+        return focusAfterOpen;
     }
 }
