@@ -13,14 +13,27 @@ want to use umpvw, because I wanted something easily ported to linux.
 
 Also, I like java.
 
+# Installation
+
+Copy runmpv directory to the directory, where mpv.exe is located
+and then launch runmpv-install.bat to associate video files with
+runmpv.exe . You still have to select runmpv manually from a dropdown
+list, when you play a certain file type for the first time.
+
+If you want to store runmmp.exe in a directory of you choice,
+you'll have to manually specify mpvHomeDir parameter in 
+runmpv.properties
+
 # Usage
 
+This is how you start new mpv instance, or tell existing instance to
+load a new file.
 ```cmd
 runmpv.exe <path-to-video-file>
 ```
 # Configuration
 
-Use mpv_runner.properties file to configure runmpv.
+Use runmpv.properties file to configure runmpv.
 Here is an example of a configuration.
 ```properties
 # Path to directory, containing mpv.exe
@@ -30,7 +43,7 @@ Here is an example of a configuration.
 # %r - at the beginning means runmpv executable directory
 # %v - at the beginning means directory, where video is located
 # relative paths not supported, also %PATH% is not going to be used
-mpvHomeDir=%h/soft/mpv
+mpvHomeDir=%r/..
 
 # Name of the pipe for JSON IPC.
 # Used to identify single mpv instance.
@@ -64,6 +77,14 @@ runnerLogFile=%r/runner-debug.log
 # Needed, because if you launch video files from hard drive,
 # a lot of time may pass until the HDD spins up
 waitSeconds=5
+
+# If true, mpv window is focused after new
+# file is loaded. If false, mpv window
+# is only focused on first launch.
+# Anything but true or false will result
+# in na error.
+# Default value is true
+focusAfterOpen=true
 ```
 
 # Build instructions
