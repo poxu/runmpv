@@ -108,6 +108,9 @@
             <property name="excludedClasses" value="StartSingleMpvInstance"/>
         </module>
         <module name="AvoidStarImport"/>
+        <!--
+        Two consecutive upper case letters not allowed
+        -->
         <module name="AbbreviationAsWordInName">
             <property name="allowedAbbreviationLength" value="0"/>
             <property name="tokens" value="INTERFACE_DEF"/>
