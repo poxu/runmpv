@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static com.evilcorp.util.Shortcuts.sleep;
+
 public class MpvInstanceWindows implements MpvInstance {
-    private final FileOutputStream controlPipe;
     public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
+    private final FileOutputStream controlPipe;
     private final Logger LOGGER;
     private final String executableDir;
 
@@ -96,14 +98,6 @@ public class MpvInstanceWindows implements MpvInstance {
             throw new RuntimeException("Couldn't wait until mpv started");
         }
 
-    }
-
-    private void sleep(long milis) {
-        try {
-            Thread.sleep(milis);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override

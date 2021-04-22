@@ -25,8 +25,13 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class StartSingleMpvInstance {
-    private static Logger LOGGER;
+    private static Logger logger;
 
+    /**
+     * Maint method, which runs mpv
+     * @param args one argument supported - video file name
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             return;
@@ -36,7 +41,7 @@ public class StartSingleMpvInstance {
         LogManager.getLogManager().readConfiguration(
                 new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
         );
-        LOGGER = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
@@ -66,8 +71,8 @@ public class StartSingleMpvInstance {
 
         final String videoFileName = args[0];
 
-        LOGGER.info("started");
-        LOGGER.info("runmpv argument is " + args[0]);
+        logger.info("started");
+        logger.info("runmpv argument is " + args[0]);
 
         MpvInstance mpvInstance = new MpvInstanceWindows(config);
         mpvInstance.execute(new OpenFile(videoFileName));
@@ -79,11 +84,11 @@ public class StartSingleMpvInstance {
             sendCommand(mpvPipeStream, "set geometry 640x360");
         }
         */
-        LOGGER.info("Loading file " + videoFileName);
+        logger.info("Loading file " + videoFileName);
     }
 
     // A small logging system to diagnose why real logging system fails
-    private static void rerouteSystemOutStream(String logfile) throws FileNotFoundException {
+    public static void rerouteSystemOutStream(String logfile) throws FileNotFoundException {
         final OutputStream out = new FileOutputStream(logfile);
         PrintStream printWriter = new PrintStream(out);
         System.out.close();
