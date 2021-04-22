@@ -23,27 +23,27 @@ public class LocalFsPathsTest {
     public void absolutePath() {
         final FsFile hiDir = localFsPaths.resolve("c:/hi");
         assertNotNull(hiDir);
-        assertEquals(Path.of("C:/hi"), hiDir.path());
+        assertEquals(Path.of("c:/hi"), hiDir.path());
     }
 
     @Test
     public void relativeToHomeDir() {
         final FsFile hiDir = localFsPaths.resolve("%h/hi");
         assertNotNull(hiDir);
-        assertEquals(Path.of("C:/home/hi"), hiDir.path());
+        assertEquals(Path.of("c:/home/hi"), hiDir.path());
     }
 
     @Test
     public void relativeToRunmpvDir() {
         final FsFile hiDir = localFsPaths.resolve("%r/hi");
         assertNotNull(hiDir);
-        assertEquals(Path.of("C:/runmpv/hi"), hiDir.path());
+        assertEquals(Path.of("c:/runmpv/hi"), hiDir.path());
     }
 
     @Test
     public void relativeToVideoDir() {
         final FsFile hiDir = localFsPaths.resolve("%v/hi");
         assertNotNull(hiDir);
-        assertEquals(Path.of("C:/video/hi"), hiDir.path());
+        assertEquals(Path.of("c:/video/hi"), hiDir.path());
     }
 }
