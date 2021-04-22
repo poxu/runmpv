@@ -1,6 +1,10 @@
 package com.evilcorp.settings;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +43,7 @@ public class TextFileSettings implements SoftSettings {
         this(getInStream(propertyFileName));
     }
 
-    private static InputStream getInStream(String propertyFileName) {
+    static InputStream getInStream(String propertyFileName) {
         try {
             return new FileInputStream(propertyFileName);
         } catch (FileNotFoundException e) {

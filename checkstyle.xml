@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <module name="TreeWalker">
+        <property name="tabWidth" value="4"/>
+        <module name="AnonInnerLength">
+            <property name="max" value="221"/>
+        </module>
+        <module name="ArrayTypeStyle"/>
+        <module name="AvoidNestedBlocks"/>
+        <module name="BooleanExpressionComplexity">
+            <property name="max" value="60"/>
+        </module>
+        <module name="ClassDataAbstractionCoupling">
+            <property name="max" value="96"/>
+        </module>
+        <module name="ClassFanOutComplexity">
+            <property name="max" value="205"/>
+        </module>
+        <module name="ClassTypeParameterName">
+            <property name="format" value="^([A-Z][a-zA-Z0-9]*)$"/>
+        </module>
+        <module name="CovariantEquals"/>
+        <module name="CyclomaticComplexity">
+            <property name="max" value="121"/>
+        </module>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyBlock">
+            <property name="option" value="statement"/>
+            <property name="tokens"
+                      value="LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
+        </module>
+        <module name="EmptyStatement"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="IllegalImport"/>
+        <module name="IllegalInstantiation">
+            <property name="classes" value="java.lang.Boolean"/>
+        </module>
+        <module name="IllegalThrows">
+            <property name="illegalClassNames" value="java.lang.Error, java.lang.RuntimeException"/>
+        </module>
+        <module name="IllegalToken">
+            <property name="tokens" value="STRICTFP,LITERAL_NATIVE,LABELED_STAT"/>
+        </module>
+        <module name="JavaNCSS">
+            <property name="methodMaximum" value="356"/>
+            <property name="classMaximum" value="2745"/>
+            <property name="fileMaximum" value="2810"/>
+        </module>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MethodTypeParameterName">
+            <property name="format" value="^([A-Z][a-zA-Z0-9]*)$"/>
+        </module>
+        <module name="ModifiedControlVariable"/>
+        <module name="ModifierOrder"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="NeedBraces"/>
+        <module name="NestedForDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="NestedIfDepth">
+            <property name="max" value="5"/>
+        </module>
+        <module name="NestedTryDepth">
+            <property name="max" value="3"/>
+        </module>
+        <module name="NoClone"/>
+        <module name="NoFinalizer"/>
+        <module name="NoWhitespaceAfter">
+            <property name="tokens" value="DOT"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
+        <module name="OneStatementPerLine"/>
+        <module name="OperatorWrap">
+            <property name="tokens"
+                      value="BAND, BOR, BSR, BXOR, EQUAL, GE, GT, LE, LITERAL_INSTANCEOF, LT, MINUS, MOD, NOT_EQUAL, SL, SR, STAR"/>
+        </module>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="ParameterNumber">
+            <property name="max" value="18"/>
+        </module>
+        <module name="RedundantImport"/>
+        <module name="RedundantModifier"/>
+        <module name="ReturnCount">
+            <property name="max" value="29"/>
+            <property name="format" value="^((equals)|(compareTo))$"/>
+        </module>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StaticVariableName"/>
+        <module name="StringLiteralEquality"/>
+        <module name="SuperClone"/>
+        <module name="SuperFinalize"/>
+        <module name="SuppressWarningsHolder"/>
+        <module name="TypeName"/>
+        <module name="UnusedImports"/>
+        <module name="UpperEll"/>
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
+            <property name="protectedAllowed" value="true"/>
+        </module>
+        <module name="UncommentedMain">
+            <property name="excludedClasses" value=".*Application$"/>
+        </module>
+        <module name="AvoidStarImport"/>
+        <module name="AbbreviationAsWordInName">
+            <property name="allowedAbbreviationLength" value="0"/>
+            <property name="tokens" value="INTERFACE_DEF"/>
+            <property name="severity" value="warning"/>
+        </module>
+
+        <module name="DeclarationOrderCheck"/> <!-- new -->
+
+        <module name="ImportOrder"> <!-- new -->
+            <property name="groups" value="*,javax,java"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="bottom"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
+        </module>
+        <module name="SuppressionXpathSingleFilter"> <!-- new -->
+            <property name="checks" value="ImportOrder"/>
+            <property name="message" value="^'java\..*'.*"/>
+        </module>
+        <module name="EmptyLineSeparator"> <!-- new -->
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="tokens"
+                      value="PACKAGE_DEF , IMPORT , STATIC_IMPORT , CLASS_DEF , INTERFACE_DEF , ENUM_DEF , STATIC_INIT , INSTANCE_INIT , METHOD_DEF , CTOR_DEF , RECORD_DEF , COMPACT_CTOR_DEF" />
+        </module>
+        <module name="ParenPad"/> <!-- new -->
+        <module name="WhitespaceAround"/> <!-- new -->
+        <module name="LeftCurly"/> <!-- new -->
+        <module name="NoWhitespaceBefore"/> <!-- new -->
+        <module name="MethodCount">
+            <property name="maxPrivate" value="0"/>
+        </module>
+    </module>
+    <module name="RegexpMultiline"> <!-- new -->
+        <property name="message" value="Multiple empty lines after this line."/>
+        <property name="format" value="[\r]?\n\s*[\r]?\n\s*[\r]?\n"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+    <module name="SuppressWarningsFilter"/>
+
+</module>
