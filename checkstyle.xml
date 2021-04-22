@@ -114,6 +114,9 @@
             <property name="severity" value="warning"/>
         </module>
 
+        <!--
+        Static fields first, then instance fields etc.
+        -->
         <module name="DeclarationOrderCheck"/> <!-- new -->
 
         <module name="ImportOrder"> <!-- new -->
@@ -127,20 +130,41 @@
             <property name="checks" value="ImportOrder"/>
             <property name="message" value="^'java\..*'.*"/>
         </module>
-        <module name="EmptyLineSeparator"> <!-- new -->
+        <!--
+        There should be empty lines where needed.
+        -->
+        <module name="EmptyLineSeparator">
             <property name="allowMultipleEmptyLines" value="false"/>
             <property name="tokens"
                       value="PACKAGE_DEF , IMPORT , STATIC_IMPORT , CLASS_DEF , INTERFACE_DEF , ENUM_DEF , STATIC_INIT , INSTANCE_INIT , METHOD_DEF , CTOR_DEF , RECORD_DEF , COMPACT_CTOR_DEF" />
         </module>
+        <!--
+        Parentheses "(", ")" are formatted correctly.
+        For example there are no spaces before ")"
+        -->
         <module name="ParenPad"/> <!-- new -->
+        <!--
+        Curly braces, =, - etc are surrounded with spaces
+        -->
         <module name="WhitespaceAround"/> <!-- new -->
+        <!--
+        { is on a correct line. It should be on the same line as if statement
+        for example.
+        -->
         <module name="LeftCurly"/> <!-- new -->
-        <module name="NoWhitespaceBefore"/> <!-- new -->
+        <!--
+        There are no whitespaces before , ; etc.
+        -->
+        <module name="NoWhitespaceBefore"/>
+        <!-- I don't like private methods )) -->
         <module name="MethodCount">
             <property name="maxPrivate" value="0"/>
         </module>
     </module>
-    <module name="RegexpMultiline"> <!-- new -->
+    <!--
+    There should be no consecutive empty lines.
+    -->
+    <module name="RegexpMultiline">
         <property name="message" value="Multiple empty lines after this line."/>
         <property name="format" value="[\r]?\n\s*[\r]?\n\s*[\r]?\n"/>
         <property name="fileExtensions" value="java"/>
