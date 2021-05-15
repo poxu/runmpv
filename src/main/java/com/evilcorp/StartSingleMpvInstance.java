@@ -25,7 +25,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class StartSingleMpvInstance {
-
     /**
      * Main method, which runs mpv
      * @param args one argument supported - video file name

@@ -97,7 +97,6 @@ public class MpvInstanceWindows implements MpvInstance {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-
     }
 
     @Override
