@@ -17,11 +17,11 @@ import static com.evilcorp.util.Shortcuts.sleep;
 public class MpvInstanceWindows implements MpvInstance {
     public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
     private final FileOutputStream controlPipe;
-    private final Logger LOGGER;
+    private final Logger logger;
     private final String executableDir;
 
     public MpvInstanceWindows(MpvRunnerProperties config) {
-        LOGGER = Logger.getLogger(MpvInstanceWindows.class.getName());
+        logger = Logger.getLogger(MpvInstanceWindows.class.getName());
         executableDir = config.executableDir();
         boolean mpvStarted = false;
 
@@ -62,8 +62,8 @@ public class MpvInstanceWindows implements MpvInstance {
                 processBuilder.start();
             } catch (IOException e) {
                 if (e.getMessage().contains("CreateProcess error=2")) {
-                    LOGGER.severe(e.getMessage());
-                    LOGGER.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
+                    logger.severe(e.getMessage());
+                    logger.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
                             + mpvExecutable);
                     throw new RuntimeException(e);
                 } else {
@@ -94,7 +94,7 @@ public class MpvInstanceWindows implements MpvInstance {
         controlPipe = mpvPipeStream;
 
         if (waitTimeOver) {
-            LOGGER.warning("Waited more than " + config.waitSeconds());
+            logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
 
