@@ -25,7 +25,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class StartSingleMpvInstance {
-    private static Logger logger;
 
     /**
      * Main method, which runs mpv
@@ -42,7 +41,7 @@ public class StartSingleMpvInstance {
         LogManager.getLogManager().readConfiguration(
                 new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
         );
-        logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
