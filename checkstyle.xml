@@ -175,6 +175,25 @@
             <property name="maxPublic" value="10"/>
             <property name="maxTotal" value="10"/>
         </module>
+        <!--
+        There should be no empty lines before }
+        https://stackoverflow.com/a/61396457/6548090
+        -->
+        <module name="Regexp">
+            <property name="message" value="Blank line at the end of a block is not allowed"/>
+            <property name="format" value="^\s*$^\s*\}"/>
+            <property name="ignoreComments" value="true"/>
+            <property name="illegalPattern" value="true"/>
+        </module>
+        <!--
+        There should be no empty lines after {
+        -->
+        <module name="Regexp">
+            <property name="message" value="Blank line at the beginning of a block is not allowed"/>
+            <property name="format" value="\{\s*$^\s*$"/>
+            <property name="ignoreComments" value="true"/>
+            <property name="illegalPattern" value="true"/>
+        </module>
     </module>
     <!--
     There should be no consecutive empty lines.
@@ -184,6 +203,8 @@
         <property name="format" value="[\r]?\n\s*[\r]?\n\s*[\r]?\n"/>
         <property name="fileExtensions" value="java"/>
     </module>
+
+
     <module name="SuppressWarningsFilter"/>
 
 </module>
