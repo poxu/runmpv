@@ -51,7 +51,12 @@
             <property name="fileMaximum" value="2810"/>
         </module>
         <module name="LocalFinalVariableName"/>
+        <!-- Cames case variable naming -->
         <module name="LocalVariableName"/>
+        <!-- Cames case field naming -->
+        <module name="MemberName"/>
+        <!-- Cames case method naming -->
+        <module name="MethodName"/>
         <module name="MethodTypeParameterName">
             <property name="format" value="^([A-Z][a-zA-Z0-9]*)$"/>
         </module>
@@ -84,6 +89,10 @@
         <module name="ParameterNumber">
             <property name="max" value="18"/>
         </module>
+        <module name="VariableDeclarationUsageDistance">
+            <property name="allowedDistance" value="3"/>
+        </module>
+
         <module name="RedundantImport"/>
         <module name="RedundantModifier"/>
         <module name="ReturnCount">
@@ -107,7 +116,6 @@
         <module name="UncommentedMain">
             <property name="excludedClasses" value="StartSingleMpvInstance"/>
         </module>
-        <module name="AvoidStarImport"/>
         <!--
         Two consecutive upper case letters not allowed
         -->
@@ -116,7 +124,6 @@
             <property name="tokens" value="INTERFACE_DEF"/>
             <property name="severity" value="warning"/>
         </module>
-
         <!--
         Static fields first, then instance fields etc.
         -->
@@ -133,13 +140,14 @@
             <property name="checks" value="ImportOrder"/>
             <property name="message" value="^'java\..*'.*"/>
         </module>
+        <module name="AvoidStarImport"/>
         <!--
         There should be empty lines where needed.
         -->
         <module name="EmptyLineSeparator">
             <property name="allowMultipleEmptyLines" value="false"/>
             <property name="tokens"
-                      value="PACKAGE_DEF , IMPORT , STATIC_IMPORT , CLASS_DEF , INTERFACE_DEF , ENUM_DEF , STATIC_INIT , INSTANCE_INIT , METHOD_DEF , CTOR_DEF , RECORD_DEF , COMPACT_CTOR_DEF" />
+                      value="PACKAGE_DEF , IMPORT , STATIC_IMPORT , CLASS_DEF , INTERFACE_DEF , ENUM_DEF , STATIC_INIT , INSTANCE_INIT , METHOD_DEF , CTOR_DEF , RECORD_DEF , COMPACT_CTOR_DEF"/>
         </module>
         <!--
         Parentheses "(", ")" are formatted correctly.
@@ -162,6 +170,10 @@
         <!-- I don't like private methods )) -->
         <module name="MethodCount">
             <property name="maxPrivate" value="0"/>
+            <property name="maxPackage" value="0"/>
+            <property name="maxProtected" value="0"/>
+            <property name="maxPublic" value="10"/>
+            <property name="maxTotal" value="10"/>
         </module>
     </module>
     <!--
