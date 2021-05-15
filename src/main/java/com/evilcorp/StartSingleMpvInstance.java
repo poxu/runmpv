@@ -1,25 +1,12 @@
 package com.evilcorp;
 
-import com.evilcorp.fs.FsFile;
-import com.evilcorp.fs.LocalFsPaths;
-import com.evilcorp.fs.MpvRunnerExecutable;
-import com.evilcorp.fs.UserHomeDir;
-import com.evilcorp.fs.VideoDir;
+import com.evilcorp.fs.*;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MpvInstanceWindows;
 import com.evilcorp.mpv.OpenFile;
-import com.evilcorp.settings.CompositeSettings;
-import com.evilcorp.settings.ManualSettings;
-import com.evilcorp.settings.MpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerPropertiesFromSettings;
-import com.evilcorp.settings.TextFileSettings;
+import com.evilcorp.settings.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -28,9 +15,10 @@ public class StartSingleMpvInstance {
     private static Logger logger;
 
     /**
-     * Maint method, which runs mpv
+     * Main method, which runs mpv
      * @param args one argument supported - video file name
-     * @throws IOException
+     * @throws IOException exception might be thrown when starting logging system
+     * or when starting emergency logging system
      */
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
