@@ -1,14 +1,14 @@
 package com.evilcorp.settings;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.evilcorp.util.Shortcuts.getInStream;
 
 /**
  * Settings, contained in a text file.
@@ -41,14 +41,6 @@ public class TextFileSettings implements SoftSettings {
 
     public TextFileSettings(String propertyFileName) {
         this(getInStream(propertyFileName));
-    }
-
-    public static InputStream getInStream(String propertyFileName) {
-        try {
-            return new FileInputStream(propertyFileName);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
     }
 
     @Override
