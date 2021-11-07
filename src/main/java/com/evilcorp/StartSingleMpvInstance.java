@@ -12,6 +12,7 @@ import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvRunnerProperties;
 import com.evilcorp.settings.MpvRunnerPropertiesFromSettings;
+import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 
@@ -28,11 +29,12 @@ import java.util.logging.Logger;
 public class StartSingleMpvInstance {
     /**
      * Main method, which runs mpv
+     *
      * @param args one argument supported - video file name
      * @throws IOException exception might be thrown when starting logging system
-     * or when starting emergency logging system
+     *                     or when starting emergency logging system
      */
-    public static void main(String[] args) throws IOException  {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             return;
         }
@@ -50,34 +52,38 @@ public class StartSingleMpvInstance {
                 videoDir
         );
         final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
-                new CompositeSettings(
+                new PipeSettings(
+                        new UniquePipePerDirectorySettings(videoDir),
                         new CompositeSettings(
-                            new UniquePipePerDirectorySettings(videoDir),
-                            new TextFileSettings(
-                                    fsPaths.resolve("%r/runmpv.properties").path().toString()
-                            )
-                        ),
-                        new ManualSettings(Map.of(
-                                // @formatter:off
-                                // checkstyle:off
-                                //     name     ,              default              //
-                                "waitSeconds"   , "10",
-                                //--------------|-----------------------------------//
-                                "mpvHomeDir"    , "%h/..",
-                                //--------------|-----------------------------------//
-                                "pipeName"      , "myPipe",
-                                //--------------|-----------------------------------//
-                                "mpvLogFile"    , "%r/runmpv-mpv.log",
-                                //--------------|-----------------------------------//
-                                "runnerLogFile" , "%v/runmpv.log",
-                                //--------------|-----------------------------------//
-                                "executableDir" , mpvRunnerHomeDir.path().toString(),
-                                //--------------|-----------------------------------//
-                                "focusAfterOpen", "true"
-                                //--------------|-----------------------------------//
-                                // checkstyle:on
-                                // @formatter:on
-                        ))
+                                new TextFileSettings(
+                                        fsPaths.resolve("%r/runmpv.properties").path().toString()
+                                ),
+                                new ManualSettings(Map.of(
+                                        // @formatter:off
+                                        // checkstyle:off
+                                        //--------------|-----------------------------------//
+                                        //     name     |         default value             //
+                                        //--------------|-----------------------------------//
+                                        "waitSeconds"   , "10",
+                                        //--------------|-----------------------------------//
+                                        "mpvHomeDir"    , "%h/..",
+                                        //--------------|-----------------------------------//
+                                        "openMode"      , "instance-per-directory",
+                                        //--------------|-----------------------------------//
+                                        "pipeName"      , "myPipe",
+                                        //--------------|-----------------------------------//
+                                        "mpvLogFile"    , "%r/runmpv-mpv.log",
+                                        //--------------|-----------------------------------//
+                                        "runnerLogFile" , "%v/runmpv.log",
+                                        //--------------|-----------------------------------//
+                                        "executableDir" , mpvRunnerHomeDir.path().toString(),
+                                        //--------------|-----------------------------------//
+                                        "focusAfterOpen", "true"
+                                        //--------------|-----------------------------------//
+                                        // checkstyle:on
+                                        // @formatter:on
+                                ))
+                        )
                 ),
                 fsPaths
         );
