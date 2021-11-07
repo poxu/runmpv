@@ -5,6 +5,7 @@ public class Shortcuts {
         try {
             Thread.sleep(milis);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }

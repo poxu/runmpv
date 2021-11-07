@@ -47,7 +47,7 @@ public class TextFileSettings implements SoftSettings {
         try {
             return new FileInputStream(propertyFileName);
         } catch (FileNotFoundException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
