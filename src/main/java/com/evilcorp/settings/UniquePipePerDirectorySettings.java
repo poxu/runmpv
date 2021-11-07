@@ -32,7 +32,7 @@ public class UniquePipePerDirectorySettings implements SoftSettings {
         return Optional.empty();
     }
 
-    private static String bytesToHex(byte[] hash) {
+     public static String bytesToHex(byte[] hash) {
         final StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
             final String hex = Integer.toHexString(0xff & hash[i]);

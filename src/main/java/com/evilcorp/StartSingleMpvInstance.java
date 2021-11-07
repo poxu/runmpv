@@ -59,6 +59,7 @@ public class StartSingleMpvInstance {
                         ),
                         new ManualSettings(Map.of(
                                 // @formatter:off
+                                // checkstyle:off
                                 //     name     ,              default              //
                                 "waitSeconds"   , "10",
                                 //--------------|-----------------------------------//
@@ -74,6 +75,7 @@ public class StartSingleMpvInstance {
                                 //--------------|-----------------------------------//
                                 "focusAfterOpen", "true"
                                 //--------------|-----------------------------------//
+                                // checkstyle:on
                                 // @formatter:on
                         ))
                 ),
