@@ -16,9 +16,9 @@ public class LocalFsPaths implements FsPaths {
     private final FsFile videoDir;
 
     public LocalFsPaths(
-            FsFile homeDir,
-            FsFile mpvRunnerDir,
-            FsFile videoDir
+            final FsFile homeDir,
+            final FsFile mpvRunnerDir,
+            final FsFile videoDir
     ) {
         this.homeDir = homeDir;
         this.mpvRunnerDir = mpvRunnerDir;
@@ -30,12 +30,13 @@ public class LocalFsPaths implements FsPaths {
         if (path.charAt(0) != '%') {
             return new ManualFsFile(Path.of(path));
         }
-        FsFile relativeTo;
-        if (path.charAt(1) == 'h') {
+        final FsFile relativeTo;
+        final char directoryPlaceholder = path.charAt(1);
+        if (directoryPlaceholder == 'h') {
             relativeTo = homeDir;
-        } else if (path.charAt(1) == 'r') {
+        } else if (directoryPlaceholder == 'r') {
             relativeTo = mpvRunnerDir;
-        } else if (path.charAt(1) == 'v') {
+        } else if (directoryPlaceholder == 'v') {
             relativeTo = videoDir;
         } else {
             return new ManualFsFile(Path.of(path));
