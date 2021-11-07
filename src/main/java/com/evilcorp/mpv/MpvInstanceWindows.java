@@ -3,6 +3,7 @@ package com.evilcorp.mpv;
 import com.evilcorp.settings.MpvRunnerProperties;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,11 +20,12 @@ public class MpvInstanceWindows implements MpvInstance {
     private final FileOutputStream controlPipe;
     private final Logger logger;
     private final String executableDir;
+    private final MpvRunnerProperties config;
 
     public MpvInstanceWindows(MpvRunnerProperties config) {
+        this.config = config;
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
         executableDir = config.executableDir();
-        boolean mpvStarted = false;
 
         final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.pipeName());
 
@@ -43,12 +45,20 @@ public class MpvInstanceWindows implements MpvInstance {
             // Then ui is shown.
             // Other workaround, which is used here, is to provide
             // this argument
+            //
+            // Why not always pass filename argument? Because java
+            // can not encode process parameters to utf8.
+            // So you can only pass english filenames as arguments
+            // to starting mpv instances.
+            // Because of that rumpv always opens mpv first and
+            // sends a name of video file through controlling pipe
+            // second.
             arguments.add("--player-operation-mode=pseudo-gui");
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
             arguments.add("--input-ipc-server=" + config.pipeName());
-            arguments.add("--title=runmpv_win");
+            arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes it's logs
@@ -78,11 +88,12 @@ public class MpvInstanceWindows implements MpvInstance {
         boolean waitTimeOver = false;
 
         // wait until mpv is started and communication pipe is open
+        boolean mpvStarted = false;
         while (!mpvStarted && !waitTimeOver) {
             try {
                 mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.pipeName());
                 mpvStarted = true;
-            } catch (Exception e) {
+            } catch (FileNotFoundException e) {
                 sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
@@ -117,8 +128,8 @@ public class MpvInstanceWindows implements MpvInstance {
         final List<String> focusArgs = List.of(
                 "cscript",
                 "/B",
-                executableDir + "/focus.js",
-                "runmpv_win"
+                config.executableDir() + "/focus.js",
+                "runmpv_win_" + config.pipeName()
         );
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 

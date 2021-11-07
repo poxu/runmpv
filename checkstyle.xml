@@ -6,6 +6,11 @@
 <module name="Checker">
     <module name="TreeWalker">
         <property name="tabWidth" value="4"/>
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="checkstyle:off"/>
+            <property name="onCommentFormat" value="checkstyle:on"/>
+        </module>
+
         <module name="AnonInnerLength">
             <property name="max" value="221"/>
         </module>
@@ -206,5 +211,4 @@
 
 
     <module name="SuppressWarningsFilter"/>
-
 </module>
