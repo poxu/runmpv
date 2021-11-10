@@ -6,8 +6,9 @@ import com.evilcorp.fs.MpvRunnerExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.fs.VideoDir;
 import com.evilcorp.mpv.MpvInstance;
-import com.evilcorp.mpv.MpvInstanceWindows;
+import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
+import com.evilcorp.os.OperatingSystem;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvRunnerProperties;
@@ -38,6 +39,7 @@ public class StartSingleMpvInstance {
         if (args.length < 1) {
             return;
         }
+        final VideoDir videoDir = new VideoDir();
 
         final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
         LogManager.getLogManager().readConfiguration(
@@ -45,7 +47,6 @@ public class StartSingleMpvInstance {
         );
         Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
-        final VideoDir videoDir = new VideoDir();
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
                 mpvRunnerHomeDir,
@@ -66,7 +67,7 @@ public class StartSingleMpvInstance {
                                         //--------------|-----------------------------------//
                                         "waitSeconds"   , "10",
                                         //--------------|-----------------------------------//
-                                        "mpvHomeDir"    , "%h/..",
+                                        "mpvHomeDir"    , "/usr/bin",
                                         //--------------|-----------------------------------//
                                         "openMode"      , "instance-per-directory",
                                         //--------------|-----------------------------------//
@@ -96,7 +97,10 @@ public class StartSingleMpvInstance {
         logger.info("started");
         logger.info("runmpv argument is " + args[0]);
 
-        MpvInstance mpvInstance = new MpvInstanceWindows(config);
+        OperatingSystem os = new OperatingSystem();
+        MvpInstanceProvider provider = new MvpInstanceProvider(config,
+                os.operatingSystemFamily());
+        MpvInstance mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
         if (config.focusAfterOpen()) {
             mpvInstance.focus();

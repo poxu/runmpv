@@ -15,7 +15,7 @@ public class MpvRunnerExecutable implements FsFile {
         try {
             File executableFile = new File(MpvRunnerExecutable.class.getProtectionDomain().getCodeSource().getLocation()
                     .toURI());
-            this.executablePath = executableFile.toPath().getParent();
+            executablePath = executableFile.toPath().getParent();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

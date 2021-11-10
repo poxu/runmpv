@@ -3,10 +3,10 @@ package com.evilcorp.mpv;
 import com.evilcorp.settings.MpvRunnerProperties;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,25 +14,33 @@ import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
 
-public class MpvInstanceWindows implements MpvInstance {
-    public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
-    private final FileOutputStream controlPipe;
+public class MpvInstanceLinux implements MpvInstance {
+    public static final String LINUX_PIPE_PREFIX = "./pipe-";
     private final Logger logger;
     private final MpvRunnerProperties config;
+    private final SocketChannel channel;
 
-    public MpvInstanceWindows(MpvRunnerProperties config) {
+    public MpvInstanceLinux(MpvRunnerProperties config) {
         this.config = config;
-        logger = Logger.getLogger(MpvInstanceWindows.class.getName());
+        logger = Logger.getLogger(MpvInstanceLinux.class.getName());
 
-        final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.pipeName());
+        final File mpvPipe = new File(LINUX_PIPE_PREFIX + config.pipeName());
 
-        final boolean firstLaunch = !mpvPipe.exists();
+        boolean firstLaunch;
+        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvPipe.getPath());
+        try {
+            SocketChannel channel = SocketChannel.open(address);
+            channel.close();
+            firstLaunch = false;
+        } catch (IOException e) {
+            firstLaunch = true;
+        }
+
         if (firstLaunch) {
+            System.out.println("launching for the first time");
             List<String> arguments = new ArrayList<>();
 
-            // Using absolute path to specify executable.
-            // PATH variable is, therefore, ignored.
-            final String mpvExecutable = config.mpvHomeDir() + "/mpv.exe";
+            final String mpvExecutable = "mpv";
             arguments.add(mpvExecutable);
 
             // Argument is needed to make mpv show ui
@@ -54,7 +62,7 @@ public class MpvInstanceWindows implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + config.pipeName());
+            arguments.add("--input-ipc-server=" + LINUX_PIPE_PREFIX + config.pipeName());
             arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
@@ -79,27 +87,26 @@ public class MpvInstanceWindows implements MpvInstance {
             }
         }
 
-        FileOutputStream mpvPipeStream = null;
-
         final long start = System.nanoTime();
         boolean waitTimeOver = false;
 
+        SocketChannel channel = null;
         // wait until mpv is started and communication pipe is open
         boolean mpvStarted = false;
         while (!mpvStarted && !waitTimeOver) {
             try {
-                mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.pipeName());
+                channel = SocketChannel.open(address);
                 mpvStarted = true;
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
-                if (interval > config.waitSeconds() * 1_000_000_000) {
+                if (interval > (long)config.waitSeconds() * 1_000_000_000) {
                     waitTimeOver = true;
                 }
             }
         }
-        controlPipe = mpvPipeStream;
+        this.channel = channel;
 
         if (waitTimeOver) {
             logger.warning("Waited more than " + config.waitSeconds());
@@ -111,7 +118,7 @@ public class MpvInstanceWindows implements MpvInstance {
     public void execute(MpvCommand command) {
         final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command.content() + System.lineSeparator());
         try {
-            controlPipe.write(utf8Bytes.array());
+            channel.write(utf8Bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -125,6 +132,7 @@ public class MpvInstanceWindows implements MpvInstance {
                 config.executableDir() + "/focus.js",
                 "runmpv_win_" + config.pipeName()
         );
+        /*
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 
         processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
@@ -134,5 +142,6 @@ public class MpvInstanceWindows implements MpvInstance {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        */
     }
 }
