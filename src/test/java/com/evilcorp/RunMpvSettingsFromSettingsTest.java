@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MpvRunnerSettingsFromSettingsTest {
+public class RunMpvSettingsFromSettingsTest {
 
     private MpvRunnerProperties properties = new MpvRunnerPropertiesFromSettings(
             new ManualSettings(

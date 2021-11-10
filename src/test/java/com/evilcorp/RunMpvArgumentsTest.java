@@ -4,6 +4,7 @@ import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,4 +59,16 @@ public class RunMpvArgumentsTest {
         RunMpvArguments arguments = new RunMpvArguments(args);
         assertThrows(IllegalArgumentException.class, arguments::mpvRunnerHome);
     }
+
+    @Test
+    public void donddd() {
+        final String[] ray = "--runmpv-executable-dir=/path/to/runmpv-executable"
+                .split("=");
+        System.out.println(Arrays.toString(ray));
+        final String substring = ray[0].substring(2);
+        System.out.println(substring);
+        final boolean b = substring.equals("runmpv-executable-dir");
+        System.out.println(b);
+    }
+
 }

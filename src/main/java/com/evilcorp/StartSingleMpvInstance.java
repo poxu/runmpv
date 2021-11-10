@@ -1,5 +1,6 @@
 package com.evilcorp;
 
+import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
 import com.evilcorp.fs.MpvRunnerExecutable;
@@ -36,16 +37,18 @@ public class StartSingleMpvInstance {
      *                     or when starting emergency logging system
      */
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
+        final RunMpvArguments arguments = new RunMpvArguments(args);
+        if (arguments.empty()) {
             return;
         }
-        final VideoDir videoDir = new VideoDir();
+        final FsFile videoDir = new VideoDir();
 
-        final FsFile mpvRunnerHomeDir = new MpvRunnerExecutable();
+        final FsFile mpvRunnerHomeDir = arguments.mpvRunnerHome()
+                .orElse(new MpvRunnerExecutable()) ;
         LogManager.getLogManager().readConfiguration(
                 new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
         );
-        Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
@@ -92,10 +95,10 @@ public class StartSingleMpvInstance {
             rerouteSystemOutStream(config.runnerLogFile());
         }
 
-        final String videoFileName = args[0];
+        final String videoFileName = arguments.video().path().toString();
 
         logger.info("started");
-        logger.info("runmpv argument is " + args[0]);
+        logger.info("runmpv argument is " + videoFileName);
 
         OperatingSystem os = new OperatingSystem();
         MvpInstanceProvider provider = new MvpInstanceProvider(config,

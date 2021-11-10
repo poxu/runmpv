@@ -37,7 +37,6 @@ public class MpvInstanceLinux implements MpvInstance {
         }
 
         if (firstLaunch) {
-            System.out.println("launching for the first time");
             List<String> arguments = new ArrayList<>();
 
             final String mpvExecutable = "mpv";
