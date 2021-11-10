@@ -3,9 +3,9 @@ package com.evilcorp;
 import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
+import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.MpvRunnerExecutable;
 import com.evilcorp.fs.UserHomeDir;
-import com.evilcorp.fs.VideoDir;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
@@ -41,10 +41,10 @@ public class StartSingleMpvInstance {
         if (arguments.empty()) {
             return;
         }
-        final FsFile videoDir = new VideoDir();
+        final FsFile videoDir = new ManualFsFile(arguments.video().path().getParent());
 
         final FsFile mpvRunnerHomeDir = arguments.mpvRunnerHome()
-                .orElse(new MpvRunnerExecutable()) ;
+                .orElse(new MpvRunnerExecutable());
         LogManager.getLogManager().readConfiguration(
                 new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
         );
