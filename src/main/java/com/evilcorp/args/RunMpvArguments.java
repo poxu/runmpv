@@ -35,7 +35,8 @@ public class RunMpvArguments {
     }
 
     public FsFile video() {
-        return new ManualFsFile(Path.of(args[args.length - 1]));
+        final int lastArgument = args.length - 1;
+        return new ManualFsFile(Path.of(args[lastArgument]));
     }
 
     public boolean empty() {
