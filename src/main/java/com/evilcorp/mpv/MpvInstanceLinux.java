@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceLinux implements MpvInstance {
-    public static final String LINUX_PIPE_PREFIX = "./pipe-";
+    public static final String LINUX_SOCKET_PREFIX = "./mpv-control-socket";
     private final Logger logger;
     private final MpvRunnerProperties config;
     private final SocketChannel channel;
@@ -24,10 +24,10 @@ public class MpvInstanceLinux implements MpvInstance {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
 
-        final File mpvPipe = new File(LINUX_PIPE_PREFIX + config.pipeName());
+        final File mpvSocket = new File(LINUX_SOCKET_PREFIX + config.pipeName());
 
         boolean firstLaunch;
-        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvPipe.getPath());
+        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket.getPath());
         try {
             SocketChannel channel = SocketChannel.open(address);
             channel.close();
@@ -61,7 +61,7 @@ public class MpvInstanceLinux implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + LINUX_PIPE_PREFIX + config.pipeName());
+            arguments.add("--input-ipc-server=" + LINUX_SOCKET_PREFIX + config.pipeName());
             arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
