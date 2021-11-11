@@ -33,5 +33,4 @@ public class UniquePipePerDirectorySettings implements SoftSettings {
         final String hashString = bytesToHex(hashBytes);
         return Optional.of(hashString);
     }
-
 }
