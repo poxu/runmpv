@@ -8,7 +8,7 @@ public class OperatingSystem {
         } else if (os.toLowerCase().startsWith("linux")) {
             return OperatingSystemFamily.LINUX;
         } else {
-            throw new RuntimeException("Unknown operationg system " + os);
+            throw new RuntimeException("Unknown operating system " + os);
         }
     }
 }
