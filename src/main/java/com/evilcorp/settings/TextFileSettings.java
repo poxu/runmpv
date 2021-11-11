@@ -17,8 +17,11 @@ import static com.evilcorp.util.Shortcuts.getInStream;
  * If value is empty or contains only spaces,
  * then property is treated as non existent.
  *
- * Example:
+ * Start line with # symbol to comment the line
  *
+ *
+ * Example:
+ * # commented line
  * setting1=value1
  * setting2=value2
  *   setting3  =  value3
