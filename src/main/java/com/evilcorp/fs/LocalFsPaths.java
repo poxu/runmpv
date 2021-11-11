@@ -30,17 +30,14 @@ public class LocalFsPaths implements FsPaths {
         if (path.charAt(0) != '%') {
             return new ManualFsFile(Path.of(path));
         }
-        final FsFile relativeTo;
         final char directoryPlaceholder = path.charAt(1);
-        if (directoryPlaceholder == 'h') {
-            relativeTo = homeDir;
-        } else if (directoryPlaceholder == 'r') {
-            relativeTo = mpvRunnerDir;
-        } else if (directoryPlaceholder == 'v') {
-            relativeTo = videoDir;
-        } else {
-            return new ManualFsFile(Path.of(path));
-        }
-        return new ManualFsFile(relativeTo.path().resolve("./" + path.substring(2)).normalize());
+        final FsFile relativeTo = switch (directoryPlaceholder) {
+            case 'h' -> homeDir;
+            case 'r' -> mpvRunnerDir;
+            case 'v' -> videoDir;
+            default -> new ManualFsFile(Path.of(path));
+        };
+        return new ManualFsFile(relativeTo.path()
+                .resolve("./" + path.substring(2)).normalize());
     }
 }
