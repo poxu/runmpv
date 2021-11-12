@@ -3,7 +3,7 @@ name: Build linux version of runmpv
 on:
   push:
     tags:
-      - 'v*'
+      - 'b*'
 
 jobs:
   java17:
