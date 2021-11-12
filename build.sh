@@ -13,3 +13,5 @@ cp ../logging.properties runmpv-prog
 cp ../runmpv-install.bat runmpv-prog
 cp ../runmpv-uninstall.bat runmp-prog
 cp ../runmpv-document.ico runmpv-prog
+mv runmpv runmpv-prog
+mv runmpv-prog runmpv
