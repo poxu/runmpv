@@ -79,6 +79,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./build/runmpv-linux-x86_64.zip
-          asset_name: runmpv.zip
+          asset_path: ./build/runmpv.zip
+          asset_name: runmpv-linux-x86_64.zip
           asset_content_type: application/zip
