@@ -31,7 +31,7 @@ public class RunMpvArgumentsTest {
     public void onlyVideoFile() {
         String[] args = {"video-file"};
         RunMpvArguments arguments = new RunMpvArguments(args);
-        assertTrue(arguments.mpvRunnerHome().isEmpty());
+        assertTrue(arguments.runMpvHome().isEmpty());
         final FsFile video = arguments.video();
         assertEquals("video-file", video.path().toString());
     }
@@ -40,7 +40,7 @@ public class RunMpvArgumentsTest {
     public void videoAndExecutableDir() {
         String[] args = {"--runmpv-executable-dir=/non/existent/dir", "video-file"};
         RunMpvArguments arguments = new RunMpvArguments(args);
-        final Optional<FsFile> fsFile = arguments.mpvRunnerHome();
+        final Optional<FsFile> fsFile = arguments.runMpvHome();
         assertEquals("/non/existent/dir", fsFile.orElseThrow().path().toString());
         final FsFile video = arguments.video();
         assertEquals("video-file", video.path().toString());
@@ -50,14 +50,14 @@ public class RunMpvArgumentsTest {
     public void executableWithNoEqualsSign() {
         String[] args = {"--runmpv-executable-dir/non/existent/dir", "video-file"};
         RunMpvArguments arguments = new RunMpvArguments(args);
-        assertThrows(IllegalArgumentException.class, arguments::mpvRunnerHome);
+        assertThrows(IllegalArgumentException.class, arguments::runMpvHome);
     }
 
     @Test
     public void executableWithWrongArgumentName() {
         String[] args = {"--not-runmpv-executable-dir/non/existent/dir", "video-file"};
         RunMpvArguments arguments = new RunMpvArguments(args);
-        assertThrows(IllegalArgumentException.class, arguments::mpvRunnerHome);
+        assertThrows(IllegalArgumentException.class, arguments::runMpvHome);
     }
 
     @Test

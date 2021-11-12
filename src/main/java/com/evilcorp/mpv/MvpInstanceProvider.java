@@ -1,13 +1,13 @@
 package com.evilcorp.mpv;
 
 import com.evilcorp.os.OperatingSystemFamily;
-import com.evilcorp.settings.MpvRunnerProperties;
+import com.evilcorp.settings.RunMpvProperties;
 
 public class MvpInstanceProvider {
-    private final MpvRunnerProperties properties;
+    private final RunMpvProperties properties;
     private final OperatingSystemFamily os;
 
-    public MvpInstanceProvider(MpvRunnerProperties properties, OperatingSystemFamily os) {
+    public MvpInstanceProvider(RunMpvProperties properties, OperatingSystemFamily os) {
         if (os == null) {
             throw new IllegalArgumentException("os argument can't be null");
         }

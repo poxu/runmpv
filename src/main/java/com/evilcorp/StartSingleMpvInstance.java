@@ -4,7 +4,7 @@ import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
 import com.evilcorp.fs.ManualFsFile;
-import com.evilcorp.fs.MpvRunnerExecutable;
+import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
@@ -14,8 +14,8 @@ import com.evilcorp.os.RuntimeOperatingSystem;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvExecutableSettings;
-import com.evilcorp.settings.MpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerPropertiesFromSettings;
+import com.evilcorp.settings.RunMpvProperties;
+import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
@@ -45,20 +45,20 @@ public class StartSingleMpvInstance {
         }
         final FsFile videoDir = new ManualFsFile(arguments.video().path().getParent());
 
-        final FsFile mpvRunnerHomeDir = arguments.mpvRunnerHome()
-                .orElse(new MpvRunnerExecutable());
+        final FsFile runMpvHomeDir = arguments.runMpvHome()
+                .orElse(new RunMpvExecutable());
         LogManager.getLogManager().readConfiguration(
-                new FileInputStream(mpvRunnerHomeDir.path().toString() + "/logging.properties")
+                new FileInputStream(runMpvHomeDir.path().toString() + "/logging.properties")
         );
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
                 new UserHomeDir(),
-                mpvRunnerHomeDir,
+                runMpvHomeDir,
                 videoDir
         );
         OperatingSystem os = new RuntimeOperatingSystem();
-        final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
+        final RunMpvProperties config = new RunMpvPropertiesFromSettings(
                 new PipeSettings(
                         new UniquePipePerDirectorySettings(videoDir),
                         new CompositeSettings(
@@ -83,7 +83,7 @@ public class StartSingleMpvInstance {
                                                 //--------------|-----------------------------------//
                                                 "pipeName"      , "myPipe",
                                                 //--------------|-----------------------------------//
-                                                "executableDir" , mpvRunnerHomeDir.path().toString(),
+                                                "executableDir" , runMpvHomeDir.path().toString(),
                                                 //--------------|-----------------------------------//
                                                 "focusAfterOpen", "true"
                                                 //--------------|-----------------------------------//

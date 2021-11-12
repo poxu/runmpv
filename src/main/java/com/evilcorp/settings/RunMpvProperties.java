@@ -3,7 +3,7 @@ package com.evilcorp.settings;
 /**
  * Settings for runmpv.
  */
-public interface MpvRunnerProperties {
+public interface RunMpvProperties {
     /**
      * Number of seconds to wait until mpv.exe starts,
      * before quitting with error.

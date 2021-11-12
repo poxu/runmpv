@@ -8,11 +8,11 @@ import com.evilcorp.fs.FsPaths;
  * converts them to proper data types and
  * resolves paths if needed.
  */
-public class MpvRunnerPropertiesFromSettings implements MpvRunnerProperties {
+public class RunMpvPropertiesFromSettings implements RunMpvProperties {
     private final FsPaths fsPaths;
     private final SoftSettings settings;
 
-    public MpvRunnerPropertiesFromSettings(SoftSettings settings, FsPaths fsPaths) {
+    public RunMpvPropertiesFromSettings(SoftSettings settings, FsPaths fsPaths) {
         this.fsPaths = fsPaths;
         this.settings = settings;
     }

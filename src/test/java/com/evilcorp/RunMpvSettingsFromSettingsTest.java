@@ -3,8 +3,8 @@ package com.evilcorp;
 import com.evilcorp.fs.LocalFsPaths;
 import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.settings.ManualSettings;
-import com.evilcorp.settings.MpvRunnerProperties;
-import com.evilcorp.settings.MpvRunnerPropertiesFromSettings;
+import com.evilcorp.settings.RunMpvProperties;
+import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RunMpvSettingsFromSettingsTest {
 
-    private MpvRunnerProperties properties = new MpvRunnerPropertiesFromSettings(
+    private RunMpvProperties properties = new RunMpvPropertiesFromSettings(
             new ManualSettings(
                     Map.of(
                             "waitSeconds", "10",

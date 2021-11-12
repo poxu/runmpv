@@ -9,12 +9,12 @@ import java.nio.file.Path;
  * or simply runmpv (without extension) under Linux
  * Uses code source location for finding executable location.
  */
-public class MpvRunnerExecutable implements FsFile {
+public class RunMpvExecutable implements FsFile {
     private final Path executablePath;
 
-    public MpvRunnerExecutable() {
+    public RunMpvExecutable() {
         try {
-            File executableFile = new File(MpvRunnerExecutable.class.getProtectionDomain().getCodeSource().getLocation()
+            File executableFile = new File(RunMpvExecutable.class.getProtectionDomain().getCodeSource().getLocation()
                     .toURI());
             executablePath = executableFile.toPath().getParent();
         } catch (URISyntaxException e) {

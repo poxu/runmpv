@@ -14,22 +14,22 @@ public class RunMpvArguments {
         this.args = args;
     }
 
-    public Optional<FsFile> mpvRunnerHome() {
+    public Optional<FsFile> runMpvHome() {
         if (args.length == 2) {
-            final String[] mpvRunnerHomeArg = args[0].split("=");
-            if (mpvRunnerHomeArg.length == 0) {
+            final String[] runMpvHomeArg = args[0].split("=");
+            if (runMpvHomeArg.length == 0) {
                 throw new IllegalArgumentException(
-                        "mpvRunnerHome argument has no = sign. " +
+                        "runMpvHome argument has no = sign. " +
                         "It should be formatted as --runmpv-executable-dir=/path/to/runmpv-executable. " +
                         "Currently arguments are " + Arrays.toString(args));
-            } else if (!mpvRunnerHomeArg[0]
+            } else if (!runMpvHomeArg[0]
                     .substring(2).equals("runmpv-executable-dir")) {
                 throw new IllegalArgumentException(
-                        "mpvRunnerHome argument has be first. But first argument is something else " +
+                        "runMpvHome argument has be first. But first argument is something else " +
                         "It should be formatted as --runmpv-executable-dir=/path/to/runmpv-executable. " +
                         "Currently arguments are " + Arrays.toString(args));
             }
-            return Optional.of(new ManualFsFile(Path.of(mpvRunnerHomeArg[1].trim())));
+            return Optional.of(new ManualFsFile(Path.of(runMpvHomeArg[1].trim())));
         }
         return Optional.empty();
     }

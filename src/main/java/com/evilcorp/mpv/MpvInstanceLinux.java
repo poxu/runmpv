@@ -1,6 +1,6 @@
 package com.evilcorp.mpv;
 
-import com.evilcorp.settings.MpvRunnerProperties;
+import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import static com.evilcorp.util.Shortcuts.sleep;
 public class MpvInstanceLinux implements MpvInstance {
     public static final String LINUX_SOCKET_PREFIX = "./mpv-control-socket";
     private final Logger logger;
-    private final MpvRunnerProperties config;
+    private final RunMpvProperties config;
     private final SocketChannel channel;
 
-    public MpvInstanceLinux(MpvRunnerProperties config) {
+    public MpvInstanceLinux(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
 

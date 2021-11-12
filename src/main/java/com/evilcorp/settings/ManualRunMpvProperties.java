@@ -1,6 +1,6 @@
 package com.evilcorp.settings;
 
-public class ManualMpvRunnerProperties implements MpvRunnerProperties {
+public class ManualRunMpvProperties implements RunMpvProperties {
     private final Integer waitSeconds;
     private final String mpvHomeDir;
     private final String pipeName;
@@ -9,7 +9,7 @@ public class ManualMpvRunnerProperties implements MpvRunnerProperties {
     private final String runnerLogFile;
     private final boolean focusAfterOpen;
 
-    public ManualMpvRunnerProperties(
+    public ManualRunMpvProperties(
             Integer waitSeconds,
             String mpvHomeDir,
             String pipeName,

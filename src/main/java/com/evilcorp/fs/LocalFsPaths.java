@@ -12,16 +12,16 @@ import java.nio.file.Path;
  */
 public class LocalFsPaths implements FsPaths {
     private final FsFile homeDir;
-    private final FsFile mpvRunnerDir;
+    private final FsFile runMpvDir;
     private final FsFile videoDir;
 
     public LocalFsPaths(
             final FsFile homeDir,
-            final FsFile mpvRunnerDir,
+            final FsFile runMpvDir,
             final FsFile videoDir
     ) {
         this.homeDir = homeDir;
-        this.mpvRunnerDir = mpvRunnerDir;
+        this.runMpvDir = runMpvDir;
         this.videoDir = videoDir;
     }
 
@@ -33,7 +33,7 @@ public class LocalFsPaths implements FsPaths {
         final char directoryPlaceholder = path.charAt(1);
         final FsFile relativeTo = switch (directoryPlaceholder) {
             case 'h' -> homeDir;
-            case 'r' -> mpvRunnerDir;
+            case 'r' -> runMpvDir;
             case 'v' -> videoDir;
             default -> new ManualFsFile(Path.of(path));
         };
