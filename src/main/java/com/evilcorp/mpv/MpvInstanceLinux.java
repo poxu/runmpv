@@ -75,14 +75,12 @@ public class MpvInstanceLinux implements MpvInstance {
             try {
                 processBuilder.start();
             } catch (IOException e) {
-                if (e.getMessage().contains("CreateProcess error=2")) {
+                if (e.getMessage().contains("error=2, , No such file or directory")) {
                     logger.severe(e.getMessage());
                     logger.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
                             + mpvExecutable);
-                    throw new RuntimeException(e);
-                } else {
-                    throw new RuntimeException(e);
                 }
+                throw new RuntimeException(e);
             }
         }
 

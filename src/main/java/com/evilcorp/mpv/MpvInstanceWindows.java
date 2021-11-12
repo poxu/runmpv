@@ -72,10 +72,8 @@ public class MpvInstanceWindows implements MpvInstance {
                     logger.severe(e.getMessage());
                     logger.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
                             + mpvExecutable);
-                    throw new RuntimeException(e);
-                } else {
-                    throw new RuntimeException(e);
                 }
+                throw new RuntimeException(e);
             }
         }
 
