@@ -1,3 +1,5 @@
+JAVA_HOME=/home/riptor/soft/jdk/graalvm-ce-java17-21.3.0
+PATH=/home/riptor/soft/jdk/graalvm-ce-java17-21.3.0/bin/:$PATH
 mkdir -p build
 find $PWD/src/main -type f -name '*.java' > build/sources.txt
 cd build
@@ -13,5 +15,7 @@ cp ../logging.properties runmpv-prog
 cp ../runmpv-install.bat runmpv-prog
 cp ../runmpv-uninstall.bat runmp-prog
 cp ../runmpv-document.ico runmpv-prog
-mv runmpv runmpv-prog
+mv runmpv runmpv-prog/
 mv runmpv-prog runmpv
+tar -a -c -f runmpv.zip runmpv
+
