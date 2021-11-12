@@ -36,6 +36,10 @@ jobs:
 
       - name: Build runmpv binary
         run: |
+          pwd
+
+      - name: Build runmpv binary
+        run: |
           ./build.sh
 
       - name: Create Release
