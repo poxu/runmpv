@@ -14,9 +14,9 @@ import com.evilcorp.os.RuntimeOperatingSystem;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvExecutableSettings;
+import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
-import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 
