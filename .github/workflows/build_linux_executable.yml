@@ -33,13 +33,6 @@ jobs:
       - name: Check gu binary
         run: ${{ matrix.gu-binary }} install native-image
 
-      - name: build runmpv binary
-        run: pwd
-      - name: build runmpv binary
-        run: ls -l
-      - name: build runmpv binary
-        run: ls -l ..
-
       - name: Build runmpv binary
         run: ./build.sh
 
