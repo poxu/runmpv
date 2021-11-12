@@ -31,24 +31,19 @@ jobs:
         run: java -version
 
       - name: Check gu binary
-        run: |
-          ${{ matrix.gu-binary }} install native-image
+        run: ${{ matrix.gu-binary }} install native-image
 
       - name: Build runmpv binary
-        run: |
-          pwd
+        run: pwd
 
       - name: Build runmpv binary
-        run: |
-          ls -l
+        run: ls -l
 
       - name: Build runmpv binary
-        run: |
-          ls -l ..
+        run: ls -l ..
 
       - name: Build runmpv binary
-        run: |
-          ./build.sh
+        run: ./build.sh
 
       - name: Create Release
         id: create_release
