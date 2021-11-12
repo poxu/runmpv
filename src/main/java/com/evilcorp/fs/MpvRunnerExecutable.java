@@ -5,8 +5,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 /**
- * FsFile, representing runmpv.exe
- * Uses code source location for find executable location.
+ * FsFile, representing runmpv.exe under Windows
+ * or simply runmpv (without extension) under Linux
+ * Uses code source location for finding executable location.
  */
 public class MpvRunnerExecutable implements FsFile {
     private final Path executablePath;
