@@ -76,10 +76,6 @@ public class StartSingleMpvInstance {
                                         //--------------|-----------------------------------//
                                         "pipeName"      , "myPipe",
                                         //--------------|-----------------------------------//
-                                        "mpvLogFile"    , "%r/runmpv-mpv.log",
-                                        //--------------|-----------------------------------//
-                                        "runnerLogFile" , "%v/runmpv.log",
-                                        //--------------|-----------------------------------//
                                         "executableDir" , mpvRunnerHomeDir.path().toString(),
                                         //--------------|-----------------------------------//
                                         "focusAfterOpen", "true"
