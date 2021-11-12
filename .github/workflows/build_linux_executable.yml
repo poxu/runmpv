@@ -1,32 +1,43 @@
+name: Build linux version of runmpv
+
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
-name: Release runmpv
+      - 'v*'
 
 jobs:
-  build:
-    runs-on: windows-latest
+  java17:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        gu-binary: [gu, gu.cmd]
+        exclude:
+          - os: ubuntu-latest
+            gu-binary: gu.cmd
+          - os: macos-latest
+            gu-binary: gu.cmd
+          - os: windows-latest
+            gu-binary: gu
     steps:
-      - uses: actions/checkout@v1
-      - uses: DeLaGuardo/setup-graalvm@master
+      - name: Setup GraalVM based on java17
+        uses: DeLaGuardo/setup-graalvm@master
         with:
           graalvm: '21.3.0'
           java: java17
-      - run: java -version
-      - name: Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools
+          personal-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check java binary
+        run: java -version
+
+      - name: Check gu binary
         run: |
-          choco install visualstudio2017-workload-vctools
-      - name: Install native-image component
+          ${{ matrix.gu-binary }} install native-image
+
+      - name: Build runmpv binary
         run: |
-          gu.cmd install native-image
-      - name: compile runmpv.exe and create runmpv.zip
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.bat
+          ./build.sh
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -37,6 +48,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
           prerelease: true
+
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
