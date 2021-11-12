@@ -1,5 +1,3 @@
-JAVA_HOME=/home/riptor/soft/jdk/graalvm-ce-java17-21.3.0
-PATH=/home/riptor/soft/jdk/graalvm-ce-java17-21.3.0/bin/:$PATH
 mkdir -p build
 find $PWD/src/main -type f -name '*.java' > build/sources.txt
 cd build

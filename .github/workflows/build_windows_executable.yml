@@ -1,4 +1,4 @@
-#on: push
+on: workflow_dispatch
 jobs:
     build-windows:
       runs-on: ${{ matrix.os }}
