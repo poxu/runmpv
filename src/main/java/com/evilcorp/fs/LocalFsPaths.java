@@ -27,7 +27,7 @@ public class LocalFsPaths implements FsPaths {
 
     @Override
     public FsFile resolve(String path) {
-        if (path.charAt(0) != '%') {
+        if (!path.startsWith("%")) {
             return new ManualFsFile(Path.of(path));
         }
         final char directoryPlaceholder = path.charAt(1);

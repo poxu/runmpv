@@ -1,14 +1,5 @@
 package com.evilcorp.os;
 
-public class OperatingSystem {
-    public OperatingSystemFamily operatingSystemFamily() {
-        final String os = System.getProperty("os.name");
-        if (os.toLowerCase().startsWith("windows")) {
-            return OperatingSystemFamily.WINDOWS;
-        } else if (os.toLowerCase().startsWith("linux")) {
-            return OperatingSystemFamily.LINUX;
-        } else {
-            throw new RuntimeException("Unknown operating system " + os);
-        }
-    }
+public interface OperatingSystem {
+    OperatingSystemFamily operatingSystemFamily();
 }

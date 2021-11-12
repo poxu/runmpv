@@ -10,8 +10,10 @@ import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
 import com.evilcorp.os.OperatingSystem;
+import com.evilcorp.os.RuntimeOperatingSystem;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
+import com.evilcorp.settings.MpvExecutableSettings;
 import com.evilcorp.settings.MpvRunnerProperties;
 import com.evilcorp.settings.MpvRunnerPropertiesFromSettings;
 import com.evilcorp.settings.PipeSettings;
@@ -55,6 +57,7 @@ public class StartSingleMpvInstance {
                 mpvRunnerHomeDir,
                 videoDir
         );
+        OperatingSystem os = new RuntimeOperatingSystem();
         final MpvRunnerProperties config = new MpvRunnerPropertiesFromSettings(
                 new PipeSettings(
                         new UniquePipePerDirectorySettings(videoDir),
@@ -62,27 +65,32 @@ public class StartSingleMpvInstance {
                                 new TextFileSettings(
                                         fsPaths.resolve("%r/runmpv.properties").path().toString()
                                 ),
-                                new ManualSettings(Map.of(
-                                        // @formatter:off
-                                        // checkstyle:off
-                                        //--------------|-----------------------------------//
-                                        //     name     |         default value             //
-                                        //--------------|-----------------------------------//
-                                        "waitSeconds"   , "10",
-                                        //--------------|-----------------------------------//
-                                        "mpvHomeDir"    , "/usr/bin",
-                                        //--------------|-----------------------------------//
-                                        "openMode"      , "instance-per-directory",
-                                        //--------------|-----------------------------------//
-                                        "pipeName"      , "myPipe",
-                                        //--------------|-----------------------------------//
-                                        "executableDir" , mpvRunnerHomeDir.path().toString(),
-                                        //--------------|-----------------------------------//
-                                        "focusAfterOpen", "true"
-                                        //--------------|-----------------------------------//
-                                        // checkstyle:on
-                                        // @formatter:on
-                                ))
+                                new CompositeSettings(
+                                        new MpvExecutableSettings(
+                                                os,
+                                                "%r/../",
+                                                ""
+                                        ),
+                                        new ManualSettings(Map.of(
+                                                // @formatter:off
+                                                // checkstyle:off
+                                                //--------------|-----------------------------------//
+                                                //     name     |         default value             //
+                                                //--------------|-----------------------------------//
+                                                "waitSeconds"   , "10",
+                                                //--------------|-----------------------------------//
+                                                "openMode"      , "instance-per-directory",
+                                                //--------------|-----------------------------------//
+                                                "pipeName"      , "myPipe",
+                                                //--------------|-----------------------------------//
+                                                "executableDir" , mpvRunnerHomeDir.path().toString(),
+                                                //--------------|-----------------------------------//
+                                                "focusAfterOpen", "true"
+                                                //--------------|-----------------------------------//
+                                                // checkstyle:on
+                                                // @formatter:on
+                                        ))
+                                )
                         )
                 ),
                 fsPaths
@@ -96,7 +104,6 @@ public class StartSingleMpvInstance {
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
 
-        OperatingSystem os = new OperatingSystem();
         MvpInstanceProvider provider = new MvpInstanceProvider(config,
                 os.operatingSystemFamily());
         MpvInstance mpvInstance = provider.mvpInstance();

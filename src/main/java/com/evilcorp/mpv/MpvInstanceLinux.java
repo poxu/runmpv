@@ -40,7 +40,7 @@ public class MpvInstanceLinux implements MpvInstance {
             List<String> arguments = new ArrayList<>();
 
             final String mpvExecutable = "mpv";
-            arguments.add(mpvExecutable);
+            arguments.add(config.mpvHomeDir() + mpvExecutable);
 
             // Argument is needed to make mpv show ui
             // if mpv.exe is launched with output stream redirected
