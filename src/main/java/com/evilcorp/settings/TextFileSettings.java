@@ -15,7 +15,7 @@ import static com.evilcorp.util.Shortcuts.getInStream;
  * One setting per line, name and value separated by =.
  * Names and value are trimmed.
  * If value is empty or contains only spaces,
- * then property is treated as non existent.
+ * then property is treated as non-existent.
  * <p>
  * Start line with # symbol to comment the line
  * <p>

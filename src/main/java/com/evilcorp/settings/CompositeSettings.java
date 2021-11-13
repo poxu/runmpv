@@ -3,26 +3,26 @@ package com.evilcorp.settings;
 import java.util.Optional;
 
 /**
- * Settings, which compose actual settigns and
+ * Settings, which compose actual settings and
  * default settings. Values are taken from actual settings
  * first and if values is not found, default settings
  * are searched.
  */
 public class CompositeSettings implements SoftSettings {
     private final SoftSettings actualSettings;
-    private final SoftSettings defautlSettings;
+    private final SoftSettings defaultSettings;
 
     public CompositeSettings(
         SoftSettings actualSettings,
         SoftSettings defaultSettings
     ) {
         this.actualSettings = actualSettings;
-        this.defautlSettings = defaultSettings;
+        this.defaultSettings = defaultSettings;
     }
 
     @Override
     public Optional<String> setting(String name) {
         return actualSettings.setting(name)
-            .or(() -> defautlSettings.setting(name));
+            .or(() -> defaultSettings.setting(name));
     }
 }

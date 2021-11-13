@@ -56,11 +56,11 @@
             <property name="fileMaximum" value="2810"/>
         </module>
         <module name="LocalFinalVariableName"/>
-        <!-- Cames case variable naming -->
+        <!-- Camel case variable naming -->
         <module name="LocalVariableName"/>
-        <!-- Cames case field naming -->
+        <!-- Camel case field naming -->
         <module name="MemberName"/>
-        <!-- Cames case method naming -->
+        <!-- Camel case method naming -->
         <module name="MethodName"/>
         <module name="MethodTypeParameterName">
             <property name="format" value="^([A-Z][a-zA-Z0-9]*)$"/>

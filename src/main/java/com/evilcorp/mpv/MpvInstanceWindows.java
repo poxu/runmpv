@@ -47,7 +47,7 @@ public class MpvInstanceWindows implements MpvInstance {
             // can not encode process parameters to utf8.
             // So you can only pass english filenames as arguments
             // to starting mpv instances.
-            // Because of that rumpv always opens mpv first and
+            // Because of that runmpv always opens mpv first and
             // sends a name of video file through controlling pipe
             // second.
             arguments.add("--player-operation-mode=pseudo-gui");
@@ -58,7 +58,7 @@ public class MpvInstanceWindows implements MpvInstance {
             arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
-                // File, where mpv.exe writes it's logs
+                // File, where mpv.exe writes its logs
                 arguments.add("--log-file=" + config.mpvLogFile());
             }
             final ProcessBuilder processBuilder = new ProcessBuilder(arguments);

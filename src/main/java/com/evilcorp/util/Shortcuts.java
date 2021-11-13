@@ -5,9 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class Shortcuts {
-    public static void sleep(long milis) {
+    public static void sleep(long millis) {
         try {
-            Thread.sleep(milis);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

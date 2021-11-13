@@ -5,9 +5,9 @@ import com.evilcorp.os.OperatingSystem;
 import java.util.Optional;
 
 public class MpvExecutableSettings implements SoftSettings {
-    private OperatingSystem os;
-    private String windowsPath;
-    private String linuxPath;
+    private final OperatingSystem os;
+    private final String windowsPath;
+    private final String linuxPath;
 
     public MpvExecutableSettings(
         OperatingSystem os,

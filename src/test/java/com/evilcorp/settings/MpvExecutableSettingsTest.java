@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MpvExecutableSettingsTest {
 
-    private OperatingSystem os = () -> OperatingSystemFamily.WINDOWS;
-    private SoftSettings settings = new MpvExecutableSettings(os, "%r/..", "/usr/bin/mpv");
+    private final OperatingSystem os = () -> OperatingSystemFamily.WINDOWS;
+    private final SoftSettings settings = new MpvExecutableSettings(os, "%r/..", "/usr/bin/mpv");
 
     @Test
     public void emptySetting() {

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RunMpvSettingsFromSettingsTest {
 
-    private RunMpvProperties properties = new RunMpvPropertiesFromSettings(
+    private final RunMpvProperties properties = new RunMpvPropertiesFromSettings(
         new ManualSettings(
             Map.of(
                 "waitSeconds", "10",

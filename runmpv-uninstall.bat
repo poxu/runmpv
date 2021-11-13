@@ -67,7 +67,7 @@ exit 0
 	exit 1
 
 :ensure_admin
-	:: 'openfiles' is just a commmand that is present on all supported Windows
+	:: 'openfiles' is just a command that is present on all supported Windows
 	:: versions, requires admin privileges and has no side effects, see:
 	:: https://stackoverflow.com/questions/4051883/batch-script-how-to-check-for-admin-rights
 	openfiles >nul 2>&1

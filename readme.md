@@ -5,9 +5,9 @@ of mpv, provided that it was started by runmpv.
 
 runmpv was inspired by umpv (unique mpv) and umpvw (unique mpv windows). The proper naming for this piece of software
 should've been umpvwj
-(unique mpv widows java), but that's too much letters for my taste.
+(unique mpv widows java), but that's too many letters for my taste.
 
-You can't use umpv on windows, because it requires sockets, and I didn't want to use umpvw, because I wanted something
+You can't use umpv on Windows, because it requires sockets, and I didn't want to use umpvw, because I wanted something
 easily ported to linux.
 
 Also, I like java.
@@ -18,7 +18,7 @@ Copy runmpv directory to the directory, where mpv.exe is located and then launch
 files with runmpv.exe . You still have to select runmpv manually from a dropdown list, when you play a certain file type
 for the first time.
 
-If you want to store runmmp.exe in a directory of you choice, you'll have to manually specify mpvHomeDir parameter in
+If you want to store runmpv.exe in a directory of you choice, you'll have to manually specify mpvHomeDir parameter in
 runmpv.properties
 
 # Usage

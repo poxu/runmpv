@@ -1,0 +1,18 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="bat-file-words">
+    <words>
+      <w>HKCR</w>
+      <w>HKEY</w>
+      <w>HKLM</w>
+      <w>delims</w>
+      <w>enabledelayedexpansion</w>
+      <w>enableextensions</w>
+      <w>errorlevel</w>
+      <w>findstr</w>
+      <w>openfiles</w>
+      <w>setlocal</w>
+      <w>subkeys</w>
+      <w>usebackq</w>
+    </words>
+  </dictionary>
+</component>
