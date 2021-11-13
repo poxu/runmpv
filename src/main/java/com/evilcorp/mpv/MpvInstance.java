@@ -7,6 +7,7 @@ package com.evilcorp.mpv;
 public interface MpvInstance {
     /**
      * Send a command to mpv instance
+     *
      * @param command action mpv should execute
      */
     void execute(MpvCommand command);

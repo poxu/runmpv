@@ -20,47 +20,47 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
     @Override
     public Integer waitSeconds() {
         return settings.setting("waitSeconds")
-                .map(Integer::valueOf)
-                .orElse(null);
+            .map(Integer::valueOf)
+            .orElse(null);
     }
 
     @Override
     public String mpvHomeDir() {
         return settings.setting("mpvHomeDir")
-                .map(s -> fsPaths.resolve(s).path().toString())
-                .orElse(null);
+            .map(s -> fsPaths.resolve(s).path().toString())
+            .orElse(null);
     }
 
     @Override
     public String pipeName() {
         return settings.setting("pipeName")
-                .orElse(null);
+            .orElse(null);
     }
 
     @Override
     public String mpvLogFile() {
         return settings.setting("mpvLogFile")
-                .map(s -> fsPaths.resolve(s).path().toString())
-                .orElse(null);
+            .map(s -> fsPaths.resolve(s).path().toString())
+            .orElse(null);
     }
 
     @Override
     public String executableDir() {
         return settings.setting("executableDir")
-                .orElse(null);
+            .orElse(null);
     }
 
     @Override
     public String runnerLogFile() {
         return settings.setting("runnerLogFile")
-                .map(s -> fsPaths.resolve(s).path().toString())
-                .orElse(null);
+            .map(s -> fsPaths.resolve(s).path().toString())
+            .orElse(null);
     }
 
     @Override
     public boolean focusAfterOpen() {
         return settings.setting("focusAfterOpen")
-                .map(Boolean::valueOf)
-                .orElse(false);
+            .map(Boolean::valueOf)
+            .orElse(false);
     }
 }

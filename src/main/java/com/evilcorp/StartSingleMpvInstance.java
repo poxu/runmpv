@@ -46,54 +46,54 @@ public class StartSingleMpvInstance {
         final FsFile videoDir = new ManualFsFile(arguments.video().path().getParent());
 
         final FsFile runMpvHomeDir = arguments.runMpvHome()
-                .orElse(new RunMpvExecutable());
+            .orElse(new RunMpvExecutable());
         LogManager.getLogManager().readConfiguration(
-                new FileInputStream(runMpvHomeDir.path().toString() + "/logging.properties")
+            new FileInputStream(runMpvHomeDir.path().toString() + "/logging.properties")
         );
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
-                new UserHomeDir(),
-                runMpvHomeDir,
-                videoDir
+            new UserHomeDir(),
+            runMpvHomeDir,
+            videoDir
         );
         OperatingSystem os = new RuntimeOperatingSystem();
         final RunMpvProperties config = new RunMpvPropertiesFromSettings(
-                new PipeSettings(
-                        new UniquePipePerDirectorySettings(videoDir),
-                        new CompositeSettings(
-                                new TextFileSettings(
-                                        fsPaths.resolve("%r/runmpv.properties").path().toString()
-                                ),
-                                new CompositeSettings(
-                                        new MpvExecutableSettings(
-                                                os,
-                                                "%r/../",
-                                                ""
-                                        ),
-                                        new ManualSettings(Map.of(
-                                                // @formatter:off
-                                                // checkstyle:off
-                                                //--------------|-----------------------------------//
-                                                //     name     |         default value             //
-                                                //--------------|-----------------------------------//
-                                                "waitSeconds"   , "10",
-                                                //--------------|-----------------------------------//
-                                                "openMode"      , "instance-per-directory",
-                                                //--------------|-----------------------------------//
-                                                "pipeName"      , "myPipe",
-                                                //--------------|-----------------------------------//
-                                                "executableDir" , runMpvHomeDir.path().toString(),
-                                                //--------------|-----------------------------------//
-                                                "focusAfterOpen", "true"
-                                                //--------------|-----------------------------------//
-                                                // checkstyle:on
-                                                // @formatter:on
-                                        ))
-                                )
-                        )
-                ),
-                fsPaths
+            new PipeSettings(
+                new UniquePipePerDirectorySettings(videoDir),
+                new CompositeSettings(
+                    new TextFileSettings(
+                        fsPaths.resolve("%r/runmpv.properties").path().toString()
+                    ),
+                    new CompositeSettings(
+                        new MpvExecutableSettings(
+                            os,
+                            "%r/../",
+                            ""
+                        ),
+                        new ManualSettings(Map.of(
+                            // @formatter:off
+                            // checkstyle:off
+                            //--------------|-----------------------------------//
+                            //     name     |         default value             //
+                            //--------------|-----------------------------------//
+                            "waitSeconds"   , "10",
+                            //--------------|-----------------------------------//
+                            "openMode"      , "instance-per-directory",
+                            //--------------|-----------------------------------//
+                            "pipeName"      , "myPipe",
+                            //--------------|-----------------------------------//
+                            "executableDir" , runMpvHomeDir.path().toString(),
+                            //--------------|-----------------------------------//
+                            "focusAfterOpen", "true"
+                            //--------------|-----------------------------------//
+                            // checkstyle:on
+                            // @formatter:on
+                        ))
+                    )
+                )
+            ),
+            fsPaths
         );
         if (config.runnerLogFile() != null) {
             rerouteSystemOutStream(config.runnerLogFile());
@@ -105,7 +105,7 @@ public class StartSingleMpvInstance {
         logger.info("runmpv argument is " + videoFileName);
 
         MvpInstanceProvider provider = new MvpInstanceProvider(config,
-                os.operatingSystemFamily());
+            os.operatingSystemFamily());
         MpvInstance mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
         if (config.focusAfterOpen()) {

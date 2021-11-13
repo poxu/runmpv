@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class LocalFsPathsTest {
 
     private FsPaths localFsPaths = new LocalFsPaths(
-            new ManualFsFile(Path.of("c:/home")),
-            new ManualFsFile(Path.of("c:/runmpv")),
-            new ManualFsFile(Path.of("c:/video"))
+        new ManualFsFile(Path.of("c:/home")),
+        new ManualFsFile(Path.of("c:/runmpv")),
+        new ManualFsFile(Path.of("c:/video"))
     );
 
     @Test

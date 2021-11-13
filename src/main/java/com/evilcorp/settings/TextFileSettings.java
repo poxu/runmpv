@@ -16,16 +16,15 @@ import static com.evilcorp.util.Shortcuts.getInStream;
  * Names and value are trimmed.
  * If value is empty or contains only spaces,
  * then property is treated as non existent.
- *
+ * <p>
  * Start line with # symbol to comment the line
- *
- *
+ * <p>
+ * <p>
  * Example:
  * # commented line
  * setting1=value1
  * setting2=value2
- *   setting3  =  value3
- *
+ * setting3  =  value3
  */
 public class TextFileSettings implements SoftSettings {
     private final Map<String, String> settings;
@@ -34,12 +33,12 @@ public class TextFileSettings implements SoftSettings {
         final InputStreamReader inputStreamReader = new InputStreamReader(source, StandardCharsets.UTF_8);
         final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         settings = bufferedReader.lines()
-                .map(l -> l.split("="))
-                .filter(s -> s.length == 2)
-                .filter(s -> !s[0].isBlank())
-                .filter(s -> !s[1].isBlank())
-                .map(s -> new String[] {s[0].trim(), s[1].trim()})
-                .collect(Collectors.toUnmodifiableMap(s -> s[0], s -> s[1]));
+            .map(l -> l.split("="))
+            .filter(s -> s.length == 2)
+            .filter(s -> !s[0].isBlank())
+            .filter(s -> !s[1].isBlank())
+            .map(s -> new String[]{s[0].trim(), s[1].trim()})
+            .collect(Collectors.toUnmodifiableMap(s -> s[0], s -> s[1]));
     }
 
     public TextFileSettings(String propertyFileName) {

@@ -10,13 +10,13 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     private final boolean focusAfterOpen;
 
     public ManualRunMpvProperties(
-            Integer waitSeconds,
-            String mpvHomeDir,
-            String pipeName,
-            String mpvLogFile,
-            String executableDir,
-            String runnerLogFile,
-            boolean focusAfterOpen) {
+        Integer waitSeconds,
+        String mpvHomeDir,
+        String pipeName,
+        String mpvLogFile,
+        String executableDir,
+        String runnerLogFile,
+        boolean focusAfterOpen) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
         this.pipeName = pipeName;

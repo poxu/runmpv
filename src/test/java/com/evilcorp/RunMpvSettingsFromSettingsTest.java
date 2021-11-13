@@ -16,22 +16,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RunMpvSettingsFromSettingsTest {
 
     private RunMpvProperties properties = new RunMpvPropertiesFromSettings(
-            new ManualSettings(
-                    Map.of(
-                            "waitSeconds", "10",
-                            "mpvHomeDir", "%h/soft/mpv",
-                            "pipeName", "myPipe",
-                            "mpvLogFile", "%r/debug.log",
-                            "runnerLogFile", "%v/runner-debug.log",
-                            "executableDir", "execDir",
-                            "focusAfterOpen", "true"
-                    )
-            ),
-            new LocalFsPaths(
-                    new ManualFsFile(Path.of("home")),
-                    new ManualFsFile(Path.of("runmpv")),
-                    new ManualFsFile(Path.of("video"))
+        new ManualSettings(
+            Map.of(
+                "waitSeconds", "10",
+                "mpvHomeDir", "%h/soft/mpv",
+                "pipeName", "myPipe",
+                "mpvLogFile", "%r/debug.log",
+                "runnerLogFile", "%v/runner-debug.log",
+                "executableDir", "execDir",
+                "focusAfterOpen", "true"
             )
+        ),
+        new LocalFsPaths(
+            new ManualFsFile(Path.of("home")),
+            new ManualFsFile(Path.of("runmpv")),
+            new ManualFsFile(Path.of("video"))
+        )
     );
 
     @Test
@@ -42,30 +42,31 @@ public class RunMpvSettingsFromSettingsTest {
     @Test
     public void mpvHomeDir() {
         assertEquals("home/soft/mpv", properties.mpvHomeDir()
-                .replace('\\','/'));
+            .replace('\\', '/'));
     }
+
     @Test
     public void pipeName() {
         assertEquals("myPipe", properties.pipeName()
-                .replace('\\','/'));
+            .replace('\\', '/'));
     }
 
     @Test
     public void mpvLogFile() {
         assertEquals("runmpv/debug.log", properties.mpvLogFile()
-                .replace('\\','/'));
+            .replace('\\', '/'));
     }
 
     @Test
     public void runnerLogFile() {
         assertEquals("video/runner-debug.log", properties.runnerLogFile()
-                .replace('\\','/'));
+            .replace('\\', '/'));
     }
 
     @Test
     public void executableDir() {
         assertEquals("execDir", properties.executableDir()
-                .replace('\\','/'));
+            .replace('\\', '/'));
     }
 
     @Test

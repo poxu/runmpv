@@ -14,10 +14,10 @@ public class PipeSettings implements SoftSettings {
     @Override
     public Optional<String> setting(String name) {
         return openModeSettings.setting(name)
-                .filter(e -> "pipeName".equals(name))
-                .filter(e -> openModeSettings.setting("openMode").orElseThrow()
-                        .equals("instance-per-directory"))
-                .map(e -> pipePerDirectorySettings.setting(name))
-                .orElse(openModeSettings.setting(name));
+            .filter(e -> "pipeName".equals(name))
+            .filter(e -> openModeSettings.setting("openMode").orElseThrow()
+                .equals("instance-per-directory"))
+            .map(e -> pipePerDirectorySettings.setting(name))
+            .orElse(openModeSettings.setting(name));
     }
 }

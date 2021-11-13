@@ -6,8 +6,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        gu-binary: [gu, gu.cmd]
+        os: [ ubuntu-latest ]
+        gu-binary: [ gu, gu.cmd ]
         exclude:
           - os: ubuntu-latest
             gu-binary: gu.cmd

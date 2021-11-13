@@ -8,7 +8,7 @@ name: Release runmpv
 
 jobs:
   create-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       upload_url: ${{ steps.create-release.outputs.upload_url }}
     steps:
@@ -24,7 +24,7 @@ jobs:
           prerelease: true
 
   windows-executable:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: create-release
     steps:
       - uses: actions/checkout@v1

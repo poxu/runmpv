@@ -13,8 +13,8 @@ public class CompositeSettings implements SoftSettings {
     private final SoftSettings defautlSettings;
 
     public CompositeSettings(
-            SoftSettings actualSettings,
-            SoftSettings defaultSettings
+        SoftSettings actualSettings,
+        SoftSettings defaultSettings
     ) {
         this.actualSettings = actualSettings;
         this.defautlSettings = defaultSettings;
@@ -23,6 +23,6 @@ public class CompositeSettings implements SoftSettings {
     @Override
     public Optional<String> setting(String name) {
         return actualSettings.setting(name)
-                .or(() -> defautlSettings.setting(name));
+            .or(() -> defautlSettings.setting(name));
     }
 }

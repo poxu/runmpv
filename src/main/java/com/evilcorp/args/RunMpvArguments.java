@@ -19,13 +19,13 @@ public class RunMpvArguments {
             final String[] runMpvHomeArg = args[0].split("=");
             if (runMpvHomeArg.length == 0) {
                 throw new IllegalArgumentException(
-                        "runMpvHome argument has no = sign. " +
+                    "runMpvHome argument has no = sign. " +
                         "It should be formatted as --runmpv-executable-dir=/path/to/runmpv-executable. " +
                         "Currently arguments are " + Arrays.toString(args));
             } else if (!runMpvHomeArg[0]
-                    .substring(2).equals("runmpv-executable-dir")) {
+                .substring(2).equals("runmpv-executable-dir")) {
                 throw new IllegalArgumentException(
-                        "runMpvHome argument has be first. But first argument is something else " +
+                    "runMpvHome argument has be first. But first argument is something else " +
                         "It should be formatted as --runmpv-executable-dir=/path/to/runmpv-executable. " +
                         "Currently arguments are " + Arrays.toString(args));
             }

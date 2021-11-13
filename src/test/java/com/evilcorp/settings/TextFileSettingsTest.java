@@ -10,11 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TextFileSettingsTest {
 
     private final String RAW_SETTINGS = ""
-            + "waitSeconds=10\n"
-            + "illegalSetting\n"
-            +  "halfDefinedSetting= \n"
-            +  "=\n"
-            ;
+        + "waitSeconds=10\n"
+        + "illegalSetting\n"
+        + "halfDefinedSetting= \n"
+        + "=\n";
     private TextFileSettings settings = new TextFileSettings(new ByteArrayInputStream(RAW_SETTINGS.getBytes()));
 
     @Test

@@ -63,7 +63,7 @@ public class RunMpvArgumentsTest {
     @Test
     public void donddd() {
         final String[] ray = "--runmpv-executable-dir=/path/to/runmpv-executable"
-                .split("=");
+            .split("=");
         System.out.println(Arrays.toString(ray));
         final String substring = ray[0].substring(2);
         System.out.println(substring);

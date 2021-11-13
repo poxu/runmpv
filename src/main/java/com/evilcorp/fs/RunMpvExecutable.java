@@ -15,7 +15,7 @@ public class RunMpvExecutable implements FsFile {
     public RunMpvExecutable() {
         try {
             File executableFile = new File(RunMpvExecutable.class.getProtectionDomain().getCodeSource().getLocation()
-                    .toURI());
+                .toURI());
             executablePath = executableFile.toPath().getParent();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

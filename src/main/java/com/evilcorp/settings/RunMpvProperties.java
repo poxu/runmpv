@@ -10,10 +10,14 @@ public interface RunMpvProperties {
      */
     Integer waitSeconds();
 
-    /** Directory, where mpv.exe is located. */
+    /**
+     * Directory, where mpv.exe is located.
+     */
     String mpvHomeDir();
 
-    /** Name of controlling pipe for mpv.exe */
+    /**
+     * Name of controlling pipe for mpv.exe
+     */
     String pipeName();
 
     /**
@@ -22,13 +26,16 @@ public interface RunMpvProperties {
      */
     String mpvLogFile();
 
-    /** Directory, where runmpv is located */
+    /**
+     * Directory, where runmpv is located
+     */
     String executableDir();
 
-    /** File, where runmpv will put emergency logs,
-     *  in case logging system fails.
-     *  Regular logging system is controlled through,
-     *  logging.properties
+    /**
+     * File, where runmpv will put emergency logs,
+     * in case logging system fails.
+     * Regular logging system is controlled through,
+     * logging.properties
      */
     String runnerLogFile();
 

@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * Able to resolve placeholders standing in the beginning
  * of the path.
- *
+ * <p>
  * %r - directory where runmpv is located
  * %h - user home directory
  * %v - directory, containing video file, currently played
@@ -16,9 +16,9 @@ public class LocalFsPaths implements FsPaths {
     private final FsFile videoDir;
 
     public LocalFsPaths(
-            final FsFile homeDir,
-            final FsFile runMpvDir,
-            final FsFile videoDir
+        final FsFile homeDir,
+        final FsFile runMpvDir,
+        final FsFile videoDir
     ) {
         this.homeDir = homeDir;
         this.runMpvDir = runMpvDir;
@@ -38,6 +38,6 @@ public class LocalFsPaths implements FsPaths {
             default -> new ManualFsFile(Path.of(path));
         };
         return new ManualFsFile(relativeTo.path()
-                .resolve("./" + path.substring(2)).normalize());
+            .resolve("./" + path.substring(2)).normalize());
     }
 }

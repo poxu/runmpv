@@ -10,9 +10,9 @@ public class MpvExecutableSettings implements SoftSettings {
     private String linuxPath;
 
     public MpvExecutableSettings(
-            OperatingSystem os,
-            String windowsPath,
-            String linuxPath
+        OperatingSystem os,
+        String windowsPath,
+        String linuxPath
     ) {
         this.os = os;
         this.windowsPath = windowsPath;

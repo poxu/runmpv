@@ -28,7 +28,7 @@ public class UniquePipePerDirectorySettings implements SoftSettings {
             throw new RuntimeException(e);
         }
         final byte[] hashBytes = digest.digest(
-                videoDir.path().toString().getBytes(StandardCharsets.UTF_8)
+            videoDir.path().toString().getBytes(StandardCharsets.UTF_8)
         );
         final String hashString = bytesToHex(hashBytes);
         return Optional.of(hashString);

@@ -71,7 +71,7 @@ public class MpvInstanceWindows implements MpvInstance {
                 if (e.getMessage().contains("CreateProcess error=2")) {
                     logger.severe(e.getMessage());
                     logger.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
-                            + mpvExecutable);
+                        + mpvExecutable);
                 }
                 throw new RuntimeException(e);
             }
@@ -118,10 +118,10 @@ public class MpvInstanceWindows implements MpvInstance {
     @Override
     public void focus() {
         final List<String> focusArgs = List.of(
-                "cscript",
-                "/B",
-                config.executableDir() + "/focus.js",
-                "runmpv_win_" + config.pipeName()
+            "cscript",
+            "/B",
+            config.executableDir() + "/focus.js",
+            "runmpv_win_" + config.pipeName()
         );
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 

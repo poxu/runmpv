@@ -78,7 +78,7 @@ public class MpvInstanceLinux implements MpvInstance {
                 if (e.getMessage().contains("error=2, , No such file or directory")) {
                     logger.severe(e.getMessage());
                     logger.severe(() -> "Couldn't launch mpv, because executable couldn't be found at path - "
-                            + mpvExecutable);
+                        + mpvExecutable);
                 }
                 throw new RuntimeException(e);
             }
@@ -98,7 +98,7 @@ public class MpvInstanceLinux implements MpvInstance {
                 sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
-                if (interval > (long)config.waitSeconds() * 1_000_000_000) {
+                if (interval > (long) config.waitSeconds() * 1_000_000_000) {
                     waitTimeOver = true;
                 }
             }
@@ -124,10 +124,10 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public void focus() {
         final List<String> focusArgs = List.of(
-                "cscript",
-                "/B",
-                config.executableDir() + "/focus.js",
-                "runmpv_win_" + config.pipeName()
+            "cscript",
+            "/B",
+            config.executableDir() + "/focus.js",
+            "runmpv_win_" + config.pipeName()
         );
         /*
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
