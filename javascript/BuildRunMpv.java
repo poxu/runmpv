@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BuildRunMpv {
     private final static Map<String, String> editbin = Map.of(
@@ -23,17 +24,12 @@ public class BuildRunMpv {
         final String vsPath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\";
 
         final String buildDirName = "build";
+        emptyDirectory(Path.of(buildDirName));
+
         File buildDirectory = new File(buildDirName);
         buildDirectory.mkdir();
 
-//        final PrintWriter printWriter = new PrintWriter(buildDirName + "/sources.txt");
-//        Files.find(Path.of("src/main/java"), 999
-//                , (path, attr) -> attr.isRegularFile() && path.toString().endsWith(".java"))
-//            .forEach(f -> printWriter.println(f.normalize().toAbsolutePath()));
-//        printWriter.close();
-
         run(List.of(
-//            "javac", "-d", "graalout", "@sources.txt"
             "javac",
             "-d", "graalout",
             "-sourcepath", "../src/main/java",
@@ -78,13 +74,6 @@ public class BuildRunMpv {
             "runmpv-document.ico"), dest);
 
 
-        final Path runmpvDir = Path.of(buildDirName + "/runmpv");
-        if (Files.exists(runmpvDir)) {
-            Files.walk(runmpvDir)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-        }
 
         Files.move(Path.of(buildDirName + "/runmpv.exe"), Path.of(buildDirName + "/runmpv-prog/runmpv.exe"), StandardCopyOption.REPLACE_EXISTING);
         Files.move(Path.of(buildDirName + "/runmpv-prog"), Path.of(buildDirName + "/runmpv"), StandardCopyOption.REPLACE_EXISTING);
@@ -93,6 +82,18 @@ public class BuildRunMpv {
         run(List.of(
             "tar", "-a", "-c", "-f", "runmpv.zip", "runmpv"
         ), buildDirectory);
+    }
+
+    private static void emptyDirectory(Path runmpvDir) throws IOException {
+        if (Files.exists(runmpvDir)) {
+            final List<Path> allFilesInBuildDirectory =
+                Files.walk(runmpvDir)
+                    .sorted(Comparator.reverseOrder())
+                    .collect(Collectors.toList());
+            for (int i = 0; i < allFilesInBuildDirectory.size() - 1; i++) {
+                Files.delete(allFilesInBuildDirectory.get(i));
+            }
+        }
     }
 
     private static void copy(List<String> filenames, String dest) {
