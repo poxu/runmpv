@@ -46,7 +46,15 @@ public class BuildRunMpv {
             "com.evilcorp.StartSingleMpvInstance",
             "runmpv"
         );
-        String os = "windows";
+//        String os = "windows";
+        String os = "linux";
+        String executableName;
+        if ("linux".equals(os)) {
+            executableName = "runmpv";
+        } else {
+            executableName = "runmpv.exe";
+        }
+
         final List<String> buildNativeImage = new ArrayList<>();
         if ("windows".equals(os)) {
             buildNativeImage.addAll(windowsArgs);
@@ -58,26 +66,23 @@ public class BuildRunMpv {
         if ("windows".equals(os)) {
             run(List.of(vsPath + editbin.get("2019"),
                 "/SUBSYSTEM:WINDOWS",
-                "runmpv.exe"
+                executableName
             ), buildDirectory);
         }
-
 
         File runmpvProg = new File(buildDirName + "/runmpv-prog");
         runmpvProg.mkdir();
 
         final String dest = buildDirName + "/runmpv-prog";
         copy(List.of(
-            buildDirName + "/runmpv.exe",
+            buildDirName + "/" + executableName,
             "runmpv.properties",
             "logging.properties",
             "runmpv-install.bat",
             "runmpv-uninstall.bat",
             "runmpv-document.ico"), dest);
 
-
-
-        Files.move(Path.of(buildDirName + "/runmpv.exe"), Path.of(buildDirName + "/runmpv-prog/runmpv.exe"), StandardCopyOption.REPLACE_EXISTING);
+        Files.move(Path.of(buildDirName + "/" + executableName), Path.of(buildDirName + "/runmpv-prog/" + executableName), StandardCopyOption.REPLACE_EXISTING);
         Files.move(Path.of(buildDirName + "/runmpv-prog"), Path.of(buildDirName + "/runmpv"), StandardCopyOption.REPLACE_EXISTING);
 
 
