@@ -55,10 +55,12 @@ public class BuildRunMpv {
 
         run(buildNativeImage, buildDirectory);
 
-        run(List.of(vsPath + editbin.get("2019"),
-            "/SUBSYSTEM:WINDOWS",
-            "runmpv.exe"
-        ), buildDirectory);
+        if ("windows".equals(os)) {
+            run(List.of(vsPath + editbin.get("2019"),
+                "/SUBSYSTEM:WINDOWS",
+                "runmpv.exe"
+            ), buildDirectory);
+        }
 
 
         File runmpvProg = new File(buildDirName + "/runmpv-prog");
