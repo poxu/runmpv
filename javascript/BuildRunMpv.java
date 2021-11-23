@@ -22,6 +22,15 @@ public class BuildRunMpv {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         final String vsPath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\";
+        final String runmpv = "runmpv";
+//        String os = "windows";
+        String os = "linux";
+        String executableName;
+        if ("linux".equals(os)) {
+            executableName = runmpv;
+        } else {
+            executableName = runmpv + ".exe";
+        }
 
         final String buildDirName = "build";
         emptyDirectory(Path.of(buildDirName));
@@ -44,16 +53,8 @@ public class BuildRunMpv {
             "--static",
             "-cp", "graalout",
             "com.evilcorp.StartSingleMpvInstance",
-            "runmpv"
+            runmpv
         );
-//        String os = "windows";
-        String os = "linux";
-        String executableName;
-        if ("linux".equals(os)) {
-            executableName = "runmpv";
-        } else {
-            executableName = "runmpv.exe";
-        }
 
         final List<String> buildNativeImage = new ArrayList<>();
         if ("windows".equals(os)) {
@@ -70,10 +71,10 @@ public class BuildRunMpv {
             ), buildDirectory);
         }
 
-        File runmpvProg = new File(buildDirName + "/runmpv-prog");
+        File runmpvProg = new File(buildDirName + "/" + runmpv + "-tmp");
         runmpvProg.mkdir();
 
-        final String dest = buildDirName + "/runmpv-prog";
+        final String dest = buildDirName + "/" + runmpv + "-tmp";
         copy(List.of(
             buildDirName + "/" + executableName,
             "runmpv.properties",
@@ -82,12 +83,12 @@ public class BuildRunMpv {
             "runmpv-uninstall.bat",
             "runmpv-document.ico"), dest);
 
-        Files.move(Path.of(buildDirName + "/" + executableName), Path.of(buildDirName + "/runmpv-prog/" + executableName), StandardCopyOption.REPLACE_EXISTING);
-        Files.move(Path.of(buildDirName + "/runmpv-prog"), Path.of(buildDirName + "/runmpv"), StandardCopyOption.REPLACE_EXISTING);
+        Files.move(Path.of(buildDirName + "/" + executableName), Path.of(buildDirName + "/" + runmpv + "-tmp" + executableName), StandardCopyOption.REPLACE_EXISTING);
+        Files.move(Path.of(buildDirName + "/" + runmpv + "-tmp"), Path.of(buildDirName + "/" + runmpv), StandardCopyOption.REPLACE_EXISTING);
 
 
         run(List.of(
-            "tar", "-a", "-c", "-f", "runmpv.zip", "runmpv"
+            "tar", "-a", "-c", "-f", runmpv + ".zip", runmpv
         ), buildDirectory);
     }
 
