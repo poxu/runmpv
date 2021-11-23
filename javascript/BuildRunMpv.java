@@ -33,10 +33,10 @@ public class BuildRunMpv {
         }
 
         final String buildDirName = "build";
-        emptyDirectory(Path.of(buildDirName));
+        createDirectoryIfNotExists(Path.of(buildDirName));
+        emptyDirectoryIfExists(Path.of(buildDirName));
 
         File buildDirectory = new File(buildDirName);
-        buildDirectory.mkdir();
 
         run(List.of(
             "javac",
@@ -71,8 +71,7 @@ public class BuildRunMpv {
             ), buildDirectory);
         }
 
-        File runmpvProg = new File(buildDirName + "/" + runmpv + "-tmp");
-        runmpvProg.mkdir();
+        createDirectoryIfNotExists(Path.of(buildDirName + "/" + runmpv + "-tmp"));
 
         final String dest = buildDirName + "/" + runmpv + "-tmp";
         copy(List.of(
@@ -86,13 +85,18 @@ public class BuildRunMpv {
         Files.move(Path.of(buildDirName + "/" + executableName), Path.of(buildDirName + "/" + runmpv + "-tmp" + executableName), StandardCopyOption.REPLACE_EXISTING);
         Files.move(Path.of(buildDirName + "/" + runmpv + "-tmp"), Path.of(buildDirName + "/" + runmpv), StandardCopyOption.REPLACE_EXISTING);
 
-
         run(List.of(
             "tar", "-a", "-c", "-f", runmpv + ".zip", runmpv
         ), buildDirectory);
     }
 
-    private static void emptyDirectory(Path runmpvDir) throws IOException {
+    private static void createDirectoryIfNotExists(Path buildDir) throws IOException {
+        if (!Files.exists(buildDir)) {
+            Files.createDirectory(buildDir);
+        }
+    }
+
+    private static void emptyDirectoryIfExists(Path runmpvDir) throws IOException {
         if (Files.exists(runmpvDir)) {
             final List<Path> allFilesInBuildDirectory =
                 Files.walk(runmpvDir)
