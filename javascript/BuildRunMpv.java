@@ -20,13 +20,23 @@ public class BuildRunMpv {
         "2019", "Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
     );
 
+    private static enum OS {
+        WINDOWS,
+        LINUX
+        ;
+        public boolean is(String os) {
+            return toString().toLowerCase().equals(os.toLowerCase());
+        }
+
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException {
         final String vsPath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\";
         final String runmpv = "runmpv";
-//        String os = "windows";
-        String os = "linux";
+        String os = "windows";
+//        String os = "linux";
         String executableName;
-        if ("linux".equals(os)) {
+        if (OS.LINUX.is(os)) {
             executableName = runmpv;
         } else {
             executableName = runmpv + ".exe";
@@ -57,14 +67,14 @@ public class BuildRunMpv {
         );
 
         final List<String> buildNativeImage = new ArrayList<>();
-        if ("windows".equals(os)) {
+        if (OS.WINDOWS.is(os)) {
             buildNativeImage.addAll(windowsArgs);
         }
         buildNativeImage.addAll(commonArgs);
 
         run(buildNativeImage, buildDirectory);
 
-        if ("windows".equals(os)) {
+        if (OS.WINDOWS.is(os)) {
             run(List.of(vsPath + editbin.get("2019"),
                 "/SUBSYSTEM:WINDOWS",
                 executableName
