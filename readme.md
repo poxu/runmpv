@@ -3,7 +3,8 @@
 Mpv launcher which helps to have a single instance of mpv running. New videos are opened in a currently running instance
 of mpv, provided that it was started by runmpv.
 
-runmpv was inspired by umpv (unique mpv) and umpvw (unique mpv windows). The proper naming for this piece of software
+runmpv was inspired by [umpv](https://github.com/mpv-player/mpv/blob/master/TOOLS/umpv) (unique mpv) 
+and [umpvw](https://github.com/SilverEzhik/umpvw) (unique mpv windows). The proper naming for this piece of software
 should've been umpvwj
 (unique mpv widows java), but that's too many letters for my taste.
 
