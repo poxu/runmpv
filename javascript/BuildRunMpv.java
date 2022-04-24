@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BuildRunMpv {
+    private final static Map<String, String> vsPath = Map.of(
+        "2019", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\",
+        "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\"
+    );
     private final static Map<String, String> editbin = Map.of(
         "2017", "Don't forget to specify",
         "2019", "Community\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\editbin"
@@ -31,7 +35,6 @@ public class BuildRunMpv {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final String vsPath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\";
         final String runmpv = "runmpv";
         final String os = args[0];
         final String executableName;
@@ -55,7 +58,7 @@ public class BuildRunMpv {
 
         ), buildDirectory);
 
-        final List<String> windowsArgs = List.of("cmd", "/C", "call", "\"" + vsPath + vcvars64bat.get("2019") + "\"", "&&");
+        final List<String> windowsArgs = List.of("cmd", "/C", "call", "\"" + vsPath.get("2019") + vcvars64bat.get("2019") + "\"", "&&");
         final List<String> commonArgs = List.of(
             "native-image",
             "-H:ReflectionConfigurationFiles=../reflection.json",
@@ -74,7 +77,7 @@ public class BuildRunMpv {
         run(buildNativeImage, buildDirectory);
 
         if (OS.WINDOWS.is(os)) {
-            run(List.of(vsPath + editbin.get("2019"),
+            run(List.of(vsPath.get("2019") + editbin.get("2019"),
                 "/SUBSYSTEM:WINDOWS",
                 executableName
             ), buildDirectory);
