@@ -37,13 +37,13 @@ public class BuildRunMpv {
     public static void main(String[] args) throws IOException, InterruptedException {
         final String runmpv = "runmpv";
         if (args.length == 0) {
-            System.out.println("You should specify operations system manually. Use \"windows\" or \"linux\" " +
+            System.out.println("You should specify operating system manually. Use \"windows\" or \"linux\" " +
                 "as first argument. No defaults.");
             return;
         }
         final String os = args[0];
         if (!List.of(OS.LINUX.toLowerCase(), OS.WINDOWS.toLowerCase().contains(os.toLowerCase()))) {
-            System.out.println("First argument should be exactly windows or linux. Other operations " +
+            System.out.println("First argument should be exactly windows or linux. Other operating " +
                 "systems are not supported");
             return;
         }
