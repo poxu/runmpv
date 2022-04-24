@@ -36,6 +36,11 @@ public class BuildRunMpv {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         final String runmpv = "runmpv";
+        if (args.length == 0) {
+            System.out.println("You should specify operations system manually. Use \"windows\" or \"linux\" " +
+                "as first argument. No defaults.");
+            return;
+        }
         final String os = args[0];
         final String vsEdition = args[1];
         final String executableName;
