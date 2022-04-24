@@ -42,12 +42,20 @@ public class BuildRunMpv {
             return;
         }
         final String os = args[0];
-        if (!List.of(OS.LINUX.toLowerCase(), OS.WINDOWS.toLowerCase().contains(os.toLowerCase()))) {
+        if (!List.of(
+            OS.LINUX.toString().toLowerCase(),
+            OS.WINDOWS.toString().toLowerCase()
+        ).contains(os.toLowerCase())) {
             System.out.println("First argument should be exactly windows or linux. Other operating " +
                 "systems are not supported");
             return;
         }
-        final String vsEdition = args[1];
+        final String vsEdition;
+        if (OS.WINDOWS.is(os)) {
+            vsEdition = args[1];
+        } else {
+            vsEdition = " Specifying Visual Studio edition is pointless, because we're building runmpv on linux";
+        }
         final String executableName;
         if (OS.LINUX.is(os)) {
             executableName = runmpv;
