@@ -42,6 +42,11 @@ public class BuildRunMpv {
             return;
         }
         final String os = args[0];
+        if (!List.of(OS.LINUX.toLowerCase(), OS.WINDOWS.toLowerCase().contains(os.toLowerCase()))) {
+            System.out.println("First argument should be exactly windows or linux. Other operations " +
+                "systems are not supported");
+            return;
+        }
         final String vsEdition = args[1];
         final String executableName;
         if (OS.LINUX.is(os)) {
