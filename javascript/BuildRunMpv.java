@@ -51,10 +51,19 @@ public class BuildRunMpv {
             return;
         }
         final String vsEdition;
+        if (OS.WINDOWS.is(os) && args.length < 2) {
+            System.out.println("Visual Studio edition should be specified for windows builds. 2017 or 2019");
+            return;
+        }
         if (OS.WINDOWS.is(os)) {
             vsEdition = args[1];
         } else {
             vsEdition = " Specifying Visual Studio edition is pointless, because we're building runmpv on linux";
+        }
+        if (OS.WINDOWS.is(os) && !List.of("2019", "2017").contains(vsEdition)) {
+            System.out.println("Specified Visual Studio edition is " + vsEdition + ", but it should be 2017 or 2019. " +
+                "Only 2017 and 2019 arguments are supported");
+            return;
         }
         final String executableName;
         if (OS.LINUX.is(os)) {
