@@ -33,9 +33,8 @@ public class BuildRunMpv {
     public static void main(String[] args) throws IOException, InterruptedException {
         final String vsPath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\";
         final String runmpv = "runmpv";
-        String os = "windows";
-//        String os = "linux";
-        String executableName;
+        final String os = args[0];
+        final String executableName;
         if (OS.LINUX.is(os)) {
             executableName = runmpv;
         } else {
