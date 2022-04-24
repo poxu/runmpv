@@ -37,6 +37,7 @@ public class BuildRunMpv {
     public static void main(String[] args) throws IOException, InterruptedException {
         final String runmpv = "runmpv";
         final String os = args[0];
+        final String vsEdition = args[1];
         final String executableName;
         if (OS.LINUX.is(os)) {
             executableName = runmpv;
@@ -58,7 +59,7 @@ public class BuildRunMpv {
 
         ), buildDirectory);
 
-        final List<String> windowsArgs = List.of("cmd", "/C", "call", "\"" + vsPath.get("2019") + vcvars64bat.get("2019") + "\"", "&&");
+        final List<String> windowsArgs = List.of("cmd", "/C", "call", "\"" + vsPath.get(vsEdition) + vcvars64bat.get(vsEdition) + "\"", "&&");
         final List<String> commonArgs = List.of(
             "native-image",
             "-H:ReflectionConfigurationFiles=../reflection.json",
@@ -77,7 +78,7 @@ public class BuildRunMpv {
         run(buildNativeImage, buildDirectory);
 
         if (OS.WINDOWS.is(os)) {
-            run(List.of(vsPath.get("2019") + editbin.get("2019"),
+            run(List.of(vsPath.get(vsEdition) + editbin.get(vsEdition),
                 "/SUBSYSTEM:WINDOWS",
                 executableName
             ), buildDirectory);
