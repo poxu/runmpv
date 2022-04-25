@@ -9,6 +9,10 @@ import java.util.Optional;
 
 import static com.evilcorp.util.Shortcuts.bytesToHex;
 
+/**
+ * Settings implementation, which overrides pipeName for instance-per-directory
+ * openMode. Setting value is computed with SHA-3 of path to video directory.
+ */
 public class UniquePipePerDirectorySettings implements SoftSettings {
     private final FsFile videoDir;
 
