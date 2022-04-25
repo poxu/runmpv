@@ -1,13 +1,14 @@
 package com.evilcorp.mpv;
 
 import com.evilcorp.settings.RunMpvProperties;
+import com.evilcorp.util.Shortcuts;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,7 +16,6 @@ import java.util.logging.Logger;
 import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceLinux implements MpvInstance {
-    public static final String LINUX_SOCKET_PREFIX = "./mpv-control-socket";
     private final Logger logger;
     private final RunMpvProperties config;
     private final SocketChannel channel;
@@ -23,11 +23,20 @@ public class MpvInstanceLinux implements MpvInstance {
     public MpvInstanceLinux(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
+        final String xdgRuntimeDir = System.getenv("XDG_RUNTIME_DIR");
+        final Path socketDir;
+        if (xdgRuntimeDir != null) {
+            socketDir = Path.of(xdgRuntimeDir).resolve("runmpv");
+        } else {
+            socketDir = Path.of("/tmp").resolve("runmpv");
+        }
 
-        final File mpvSocket = new File(LINUX_SOCKET_PREFIX + config.pipeName());
+        Shortcuts.createDirectoryIfNotExists(socketDir);
+
+        final Path mpvSocket = socketDir.resolve(config.pipeName());
 
         boolean firstLaunch;
-        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket.getPath());
+        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket);
         try {
             SocketChannel channel = SocketChannel.open(address);
             channel.close();
@@ -61,7 +70,7 @@ public class MpvInstanceLinux implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + LINUX_SOCKET_PREFIX + config.pipeName());
+            arguments.add("--input-ipc-server=" + mpvSocket);
             arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
