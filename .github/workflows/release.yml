@@ -69,7 +69,7 @@ jobs:
         run: gu install native-image
 
       - name: Build runmpv binary
-        run: java --source 17 javascript/BuildRunMpv.java windows 2017
+        run: java --source 17 javascript/BuildRunMpv.java linux
 
       - name: Upload Release Asset
         id: upload-release-asset
