@@ -38,6 +38,9 @@ tune your environment to open video files with runmpv.
 If you want to use custom mpv, then you need to specify mpvHomeDir
 in runmpv.properties
 
+runmpv uses wmctrl to focus mpv window after opening a new video, so it should
+be installed, if you want the functionality to work.
+
 # Usage
 
 This is how you start new mpv instance, or tell existing instance to load

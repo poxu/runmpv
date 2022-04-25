@@ -124,12 +124,10 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public void focus() {
         final List<String> focusArgs = List.of(
-            "cscript",
-            "/B",
-            config.executableDir() + "/focus.js",
-            "runmpv_win_" + config.pipeName()
+            "wmctrl",
+            "-a",
+            config.pipeName()
         );
-        /*
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 
         processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
@@ -139,6 +137,5 @@ public class MpvInstanceLinux implements MpvInstance {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        */
     }
 }
