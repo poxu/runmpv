@@ -4,6 +4,9 @@ import com.evilcorp.os.OperatingSystem;
 
 import java.util.Optional;
 
+/**
+ * Setting implementation, which overrides mpvHomeDir setting.
+ */
 public class MpvExecutableSettings implements SoftSettings {
     private final OperatingSystem os;
     private final String windowsPath;
