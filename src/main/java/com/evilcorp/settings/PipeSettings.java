@@ -2,6 +2,10 @@ package com.evilcorp.settings;
 
 import java.util.Optional;
 
+/**
+ * Settings implementation, which overrides pipeName setting,
+ * depending on openMode.
+ */
 public class PipeSettings implements SoftSettings {
     private final SoftSettings pipePerDirectorySettings;
     private final SoftSettings openModeSettings;
