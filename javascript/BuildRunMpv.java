@@ -15,7 +15,7 @@ public class BuildRunMpv {
         "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\"
     );
     private final static Map<String, String> editbin = Map.of(
-        "2017", "Don't forget to specify",
+        "2017", "BuildTools\\VC\\Tools\\MSVC\\14.16.27023\\bin\\Hostx64\\x64\\editbin",
         "2019", "Community\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\editbin"
     );
 
@@ -76,7 +76,7 @@ public class BuildRunMpv {
         createDirectoryIfNotExists(Path.of(buildDirName));
         emptyDirectoryIfExists(Path.of(buildDirName));
 
-        File buildDirectory = new File(buildDirName);
+        final File buildDirectory = new File(buildDirName);
 
         run(List.of(
             "javac",
