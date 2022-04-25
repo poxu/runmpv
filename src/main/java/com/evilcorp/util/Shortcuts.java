@@ -2,7 +2,10 @@ package com.evilcorp.util;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Shortcuts {
     public static void sleep(long millis) {
@@ -32,5 +35,15 @@ public class Shortcuts {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public static void createDirectoryIfNotExists(Path directory) {
+        try {
+            if (Files.notExists(directory)) {
+                Files.createDirectory(directory);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
