@@ -1,5 +1,7 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.util.Shortcuts;
 
@@ -12,7 +14,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
@@ -24,9 +28,12 @@ public class MpvInstanceLinux implements MpvInstance {
     private final RunMpvProperties config;
     private final SocketChannel channel;
 
+    private final CommandLine commandLine;
+
     public MpvInstanceLinux(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
+        this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
         final String xdgRuntimeDir = System.getenv("XDG_RUNTIME_DIR");
         final Path socketDir;
         if (xdgRuntimeDir != null) {
@@ -165,19 +172,12 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public void focus() {
         final String pid = getProperty("pid");
+        final String wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
         final List<String> focusArgs = List.of(
-            "bash",
-            "-c",
-            "xdotool windowraise $(xdotool search --pid " + pid + ")"
+            "xdotool",
+            "windowraise",
+            wid
         );
-        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
-
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        commandLine.runOrThrow(focusArgs);
     }
 }
