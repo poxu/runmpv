@@ -15,20 +15,20 @@ public class StandardCommandLine implements CommandLine {
 
     public StandardCommandLine(String rootFsDir, Map<String, String> env) {
         this(
-                Path.of(rootFsDir)
-                , env
-                , ProcessBuilder.Redirect.INHERIT
-                , ProcessBuilder.Redirect.INHERIT
-                , ProcessBuilder.Redirect.INHERIT
+            Path.of(rootFsDir),
+            env,
+            ProcessBuilder.Redirect.INHERIT,
+            ProcessBuilder.Redirect.INHERIT,
+            ProcessBuilder.Redirect.INHERIT
         );
     }
 
     public StandardCommandLine(
-            Path rootFsDir
-            , Map<String, String> env
-            , ProcessBuilder.Redirect inputType
-            , ProcessBuilder.Redirect outputType
-            , ProcessBuilder.Redirect errorType
+            Path rootFsDir,
+            Map<String, String> env,
+            ProcessBuilder.Redirect inputType,
+            ProcessBuilder.Redirect outputType,
+            ProcessBuilder.Redirect errorType
     ) {
         this.rootFsDir = rootFsDir;
         this.env = env;
@@ -39,11 +39,11 @@ public class StandardCommandLine implements CommandLine {
 
     public StandardCommandLine(String rootFsDir, Map<String, String> env, boolean inheritOutput) {
         this(
-                Path.of(rootFsDir)
-                , env
-                , inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE
-                , inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE
-                , inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE
+            Path.of(rootFsDir),
+            env,
+            inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE,
+            inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE,
+            inheritOutput ? ProcessBuilder.Redirect.INHERIT : ProcessBuilder.Redirect.PIPE
         );
     }
 
