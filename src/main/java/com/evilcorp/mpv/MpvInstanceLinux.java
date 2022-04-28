@@ -75,7 +75,6 @@ public class MpvInstanceLinux implements MpvInstance {
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
             arguments.add("--input-ipc-server=" + mpvSocket);
-            arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
