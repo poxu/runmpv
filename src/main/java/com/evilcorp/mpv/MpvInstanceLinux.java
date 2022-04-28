@@ -6,11 +6,15 @@ import com.evilcorp.util.Shortcuts;
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
@@ -130,12 +134,42 @@ public class MpvInstanceLinux implements MpvInstance {
         }
     }
 
+    public String getProperty(String name) {
+        final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
+        final String request = "{\"command\": [\"get_property\",\"" + name + "\"], \"request_id\": \"" + requestId + "\"  }\n";
+        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(
+            request
+        );
+        final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
+        try {
+            channel.write(utf8Bytes);
+            final int bytesRead = channel.read(utf8Read);
+            utf8Read.flip();
+            final CharBuffer decoded = StandardCharsets.UTF_8.decode(utf8Read);
+            final String msg = decoded.toString();
+            final Optional<String> pidMstOpt = Arrays.stream(msg.split("\n"))
+                .filter(s -> s.contains(String.valueOf(requestId)))
+                .findAny();
+            if (pidMstOpt.isEmpty()) {
+                logger.severe("Response with pid not found. Probably not ready yet");
+            }
+            final String pidMsg = pidMstOpt.orElseThrow();
+            final int startIdx = pidMsg.indexOf(":");
+            final int endIdx = pidMsg.indexOf(",");
+            final String pid = pidMsg.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+            return pid;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void focus() {
+        final String pid = getProperty("pid");
         final List<String> focusArgs = List.of(
-            "wmctrl",
-            "-a",
-            config.pipeName()
+            "bash",
+            "-c",
+            "xdotool windowraise $(xdotool search --pid " + pid + ")"
         );
         final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 
