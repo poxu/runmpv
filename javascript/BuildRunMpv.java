@@ -132,6 +132,10 @@ public class BuildRunMpv {
             "runmpv-uninstall.bat",
             "runmpv-document.ico"), dest);
 
+        if (Files.exists(Path.of("runmpv-local.properties"))) {
+            copy("runmpv-local.properties", dest + "/runmpv.properties");
+        }
+
         Files.move(Path.of(buildDirName + "/" + executableName), Path.of(buildDirName + "/" + runmpv + "-tmp" + executableName), StandardCopyOption.REPLACE_EXISTING);
         Files.move(Path.of(buildDirName + "/" + runmpv + "-tmp"), Path.of(buildDirName + "/" + runmpv), StandardCopyOption.REPLACE_EXISTING);
 
@@ -155,6 +159,14 @@ public class BuildRunMpv {
             for (int i = 0; i < allFilesInBuildDirectory.size() - 1; i++) {
                 Files.delete(allFilesInBuildDirectory.get(i));
             }
+        }
+    }
+
+    private static void copy(String src, String dest) {
+        try {
+            Files.copy(Path.of(src), Path.of(dest), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
