@@ -2,12 +2,12 @@ package com.evilcorp.mpv;
 
 import com.evilcorp.settings.RunMpvProperties;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,7 +16,7 @@ import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceWindows implements MpvInstance {
     public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
-    private final FileOutputStream controlPipe;
+    private final FileChannel controlPipeChannel;
     private final Logger logger;
     private final RunMpvProperties config;
 
@@ -24,9 +24,15 @@ public class MpvInstanceWindows implements MpvInstance {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
 
-        final File mpvPipe = new File(WINDOWS_PIPE_PREFIX + config.pipeName());
+        boolean firstLaunch;
+        try {
+            FileChannel channel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
+            channel.close();
+            firstLaunch = false;
+        } catch (IOException e) {
+            firstLaunch = true;
+        }
 
-        final boolean firstLaunch = !mpvPipe.exists();
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
 
@@ -55,7 +61,6 @@ public class MpvInstanceWindows implements MpvInstance {
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
             arguments.add("--input-ipc-server=" + config.pipeName());
-            arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
@@ -77,7 +82,7 @@ public class MpvInstanceWindows implements MpvInstance {
             }
         }
 
-        FileOutputStream mpvPipeStream = null;
+        FileChannel mpvPipeChannel = null;
 
         final long start = System.nanoTime();
         boolean waitTimeOver = false;
@@ -86,9 +91,9 @@ public class MpvInstanceWindows implements MpvInstance {
         boolean mpvStarted = false;
         while (!mpvStarted && !waitTimeOver) {
             try {
-                mpvPipeStream = new FileOutputStream(WINDOWS_PIPE_PREFIX + config.pipeName());
+                mpvPipeChannel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
                 mpvStarted = true;
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
@@ -97,7 +102,7 @@ public class MpvInstanceWindows implements MpvInstance {
                 }
             }
         }
-        controlPipe = mpvPipeStream;
+        controlPipeChannel = mpvPipeChannel;
 
         if (waitTimeOver) {
             logger.warning("Waited more than " + config.waitSeconds());
@@ -109,7 +114,8 @@ public class MpvInstanceWindows implements MpvInstance {
     public void execute(MpvCommand command) {
         final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command.content() + System.lineSeparator());
         try {
-            controlPipe.write(utf8Bytes.array());
+            controlPipeChannel.write(utf8Bytes);
+            logger.info("executed " + command.content());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
