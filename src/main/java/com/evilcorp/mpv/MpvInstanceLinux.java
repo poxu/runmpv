@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -25,7 +26,7 @@ import static com.evilcorp.util.Shortcuts.sleep;
 public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
-    private final SocketChannel channel;
+    private final ByteChannel channel;
 
     private final CommandLine commandLine;
 
@@ -48,7 +49,7 @@ public class MpvInstanceLinux implements MpvInstance {
         boolean firstLaunch;
         UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket);
         try {
-            SocketChannel channel = SocketChannel.open(address);
+            ByteChannel channel = SocketChannel.open(address);
             channel.close();
             firstLaunch = false;
         } catch (IOException e) {

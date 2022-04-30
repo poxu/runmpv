@@ -5,6 +5,7 @@ import com.evilcorp.settings.RunMpvProperties;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -20,7 +21,7 @@ import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceWindows implements MpvInstance {
     public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
-    private final FileChannel controlPipeChannel;
+    private final ByteChannel channel;
     private final Logger logger;
     private final RunMpvProperties config;
 
@@ -30,7 +31,7 @@ public class MpvInstanceWindows implements MpvInstance {
 
         boolean firstLaunch;
         try {
-            FileChannel channel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
+            ByteChannel channel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
             channel.close();
             firstLaunch = false;
         } catch (IOException e) {
@@ -106,7 +107,7 @@ public class MpvInstanceWindows implements MpvInstance {
                 }
             }
         }
-        controlPipeChannel = mpvPipeChannel;
+        channel = mpvPipeChannel;
 
         if (waitTimeOver) {
             logger.warning("Waited more than " + config.waitSeconds());
@@ -118,7 +119,7 @@ public class MpvInstanceWindows implements MpvInstance {
     public void execute(MpvCommand command) {
         final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command.content() + System.lineSeparator());
         try {
-            controlPipeChannel.write(utf8Bytes);
+            channel.write(utf8Bytes);
             logger.info("executed " + command.content());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -162,8 +163,8 @@ public class MpvInstanceWindows implements MpvInstance {
         );
         final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
         try {
-            controlPipeChannel.write(utf8Bytes);
-            final int bytesRead = controlPipeChannel.read(utf8Read);
+            channel.write(utf8Bytes);
+            final int bytesRead = channel.read(utf8Read);
             utf8Read.flip();
             final CharBuffer decoded = StandardCharsets.UTF_8.decode(utf8Read);
             final String msg = decoded.toString();
