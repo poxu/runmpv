@@ -65,6 +65,14 @@ public class BuildRunMpv {
                 "Only 2017 and 2019 arguments are supported");
             return;
         }
+        final String graalBin;
+        if (OS.WINDOWS.is(os) && args.length == 3) {
+            graalBin = args[2];
+        } else if (OS.LINUX.is(os) && args.length == 2) {
+            graalBin = args[1];
+        } else {
+            graalBin = "";
+        }
         final String executableName;
         if (OS.LINUX.is(os)) {
             executableName = runmpv;
@@ -79,7 +87,7 @@ public class BuildRunMpv {
         final File buildDirectory = new File(buildDirName);
 
         run(List.of(
-            "javac",
+            graalBin + "javac",
             "-d", "graalout",
             "-sourcepath", "../src/main/java",
             "../src/main/java/com/evilcorp/StartSingleMpvInstance.java"
@@ -88,7 +96,7 @@ public class BuildRunMpv {
 
         final List<String> windowsArgs = List.of("cmd", "/C", "call", "\"" + vsPath.get(vsEdition) + vcvars64bat.get(vsEdition) + "\"", "&&");
         final List<String> commonArgs = List.of(
-            "native-image",
+            graalBin + "native-image",
             "-H:ReflectionConfigurationFiles=../reflection.json",
             "--static",
             "-cp", "graalout",
@@ -174,7 +182,6 @@ public class BuildRunMpv {
             if (exitValue != 0) {
                 throw new RuntimeException("Process exited with bad code " + exitValue);
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
