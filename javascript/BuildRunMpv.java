@@ -98,6 +98,7 @@ public class BuildRunMpv {
         final List<String> commonArgs = List.of(
             graalBin + "native-image",
             "-H:ReflectionConfigurationFiles=../reflection.json",
+            "--gc=epsilon",
             "--static",
             "-cp", "graalout",
             "com.evilcorp.StartSingleMpvInstance",
