@@ -2,19 +2,18 @@ package com.evilcorp.mpv;
 
 import com.evilcorp.cmd.CommandLine;
 import com.evilcorp.cmd.StandardCommandLine;
+import com.evilcorp.json.MpvJson;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.util.Shortcuts;
 
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -146,25 +145,46 @@ public class MpvInstanceLinux implements MpvInstance {
         final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(
             request
         );
+        final MpvJson cons = new MpvJson();
         final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
         try {
             channel.write(utf8Bytes);
-            final int bytesRead = channel.read(utf8Read);
-            utf8Read.flip();
-            final CharBuffer decoded = StandardCharsets.UTF_8.decode(utf8Read);
-            final String msg = decoded.toString();
-            final Optional<String> pidMstOpt = Arrays.stream(msg.split("\n"))
-                .filter(s -> s.contains(String.valueOf(requestId)))
-                .findAny();
-            if (pidMstOpt.isEmpty()) {
-                logger.severe("Response with pid not found. Probably not ready yet");
+            final long start = System.nanoTime();
+            boolean waitTimeOver = false;
+            while (!waitTimeOver) {
+                final int bytesRead = channel.read(utf8Read);
+                logger.info("bytes read is " + bytesRead);
+
+                if (bytesRead == -1) {
+                    continue;
+                }
+                cons.consume(utf8Read);
+                utf8Read.clear();
+                while (cons.hasMore()) {
+                    final Optional<String> requestLine = cons.nextLine()
+                        .filter(l -> l.contains("" + requestId))
+                        .map(l -> {
+                            final int startIdx = l.indexOf(":");
+                            final int endIdx = l.indexOf(",");
+                            final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+                            return pid;
+                        });
+                    boolean requestFound = requestLine.isPresent();
+                    if (requestFound) {
+                        return requestLine.orElseThrow();
+                    }
+                }
+                sleep(5);
+                final long current = System.nanoTime();
+                final long interval = current - start;
+                if (interval > (long) 4 * 1_000_000_000) {
+                    waitTimeOver = true;
+                }
             }
-            final String pidMsg = pidMstOpt.orElseThrow();
-            final int startIdx = pidMsg.indexOf(":");
-            final int endIdx = pidMsg.indexOf(",");
-            final String pid = pidMsg.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-            return pid;
-        } catch (IOException e) {
+            logger.severe("Couldn't wait for response");
+            throw new RuntimeException("Couldn't wait for response");
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -172,7 +192,8 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public void focus() {
         final String pid = getProperty("pid");
-        final String wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
+        final String cmd = "xdotool search --pid " + pid;
+        final String wid = commandLine.singleResultOrThrow(cmd);
         final List<String> focusArgs = List.of(
             "xdotool",
             "windowraise",
