@@ -6,6 +6,7 @@ import com.evilcorp.fs.LocalFsPaths;
 import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
+import com.evilcorp.mpv.ChangeTitle;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
@@ -108,6 +109,7 @@ public class StartSingleMpvInstance {
             os.operatingSystemFamily());
         MpvInstance mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
+        mpvInstance.execute(new ChangeTitle(videoFileName));
         if (config.focusAfterOpen()) {
             mpvInstance.focus();
         }

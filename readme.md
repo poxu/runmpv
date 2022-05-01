@@ -152,6 +152,23 @@ Execute ```gu install native-image```
 Probably Visual Studio 2022 will also work, but I have tried VS 2019
 on my machine and automatic builds on github are made with VS 2017.
 
+#### Chocolatey
+You might want to use chocolatey to install Visual Studio.
+That's what github action does. To see instructions on how to
+install chocolatey visit https://chocolatey.org/install .
+
+Here is a quote from there as of 2022.04.30
+
+Run the following command.
+```ps
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+Then use chocolatey to install Visual Studio.
+
+```ps
+choco install visualstudio2017-workload-vctools
+```
+
 ### Open Native Tools Command Prompt for Visual Studio
 
 To do that on Windows 10 you manually find Visual Studio 2019 ->

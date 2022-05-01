@@ -1,16 +1,23 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.StandardCommandLine;
+import com.evilcorp.json.MpvJson;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.util.Shortcuts;
 
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
@@ -18,11 +25,14 @@ import static com.evilcorp.util.Shortcuts.sleep;
 public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
-    private final SocketChannel channel;
+    private final ByteChannel channel;
+
+    private final CommandLine commandLine;
 
     public MpvInstanceLinux(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
+        this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
         final String xdgRuntimeDir = System.getenv("XDG_RUNTIME_DIR");
         final Path socketDir;
         if (xdgRuntimeDir != null) {
@@ -38,7 +48,7 @@ public class MpvInstanceLinux implements MpvInstance {
         boolean firstLaunch;
         UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket);
         try {
-            SocketChannel channel = SocketChannel.open(address);
+            ByteChannel channel = SocketChannel.open(address);
             channel.close();
             firstLaunch = false;
         } catch (IOException e) {
@@ -71,7 +81,6 @@ public class MpvInstanceLinux implements MpvInstance {
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
             arguments.add("--input-ipc-server=" + mpvSocket);
-            arguments.add("--title=runmpv_win_" + config.pipeName());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
@@ -96,7 +105,7 @@ public class MpvInstanceLinux implements MpvInstance {
         final long start = System.nanoTime();
         boolean waitTimeOver = false;
 
-        SocketChannel channel = null;
+        ByteChannel channel = null;
         // wait until mpv is started and communication pipe is open
         boolean mpvStarted = false;
         while (!mpvStarted && !waitTimeOver) {
@@ -130,21 +139,66 @@ public class MpvInstanceLinux implements MpvInstance {
         }
     }
 
-    @Override
-    public void focus() {
-        final List<String> focusArgs = List.of(
-            "wmctrl",
-            "-a",
-            config.pipeName()
+    public String getProperty(String name) {
+        final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
+        final String request = "{\"command\": [\"get_property\",\"" + name + "\"], \"request_id\": \"" + requestId + "\"  }\n";
+        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(
+            request
         );
-        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
-
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        final MpvJson cons = new MpvJson();
+        final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
         try {
-            processBuilder.start();
-        } catch (IOException e) {
+            channel.write(utf8Bytes);
+            final long start = System.nanoTime();
+            boolean waitTimeOver = false;
+            while (!waitTimeOver) {
+                final int bytesRead = channel.read(utf8Read);
+                logger.info("bytes read is " + bytesRead);
+
+                if (bytesRead == -1) {
+                    continue;
+                }
+                cons.consume(utf8Read);
+                utf8Read.clear();
+                while (cons.hasMore()) {
+                    final Optional<String> requestLine = cons.nextLine()
+                        .filter(l -> l.contains("" + requestId))
+                        .map(l -> {
+                            final int startIdx = l.indexOf(":");
+                            final int endIdx = l.indexOf(",");
+                            final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+                            return pid;
+                        });
+                    boolean requestFound = requestLine.isPresent();
+                    if (requestFound) {
+                        return requestLine.orElseThrow();
+                    }
+                }
+                sleep(5);
+                final long current = System.nanoTime();
+                final long interval = current - start;
+                if (interval > (long) 4 * 1_000_000_000) {
+                    waitTimeOver = true;
+                }
+            }
+            logger.severe("Couldn't wait for response");
+            throw new RuntimeException("Couldn't wait for response");
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void focus() {
+        final String pid = getProperty("pid");
+        final String cmd = "xdotool search --pid " + pid;
+        final String wid = commandLine.singleResultOrThrow(cmd);
+        final List<String> focusArgs = List.of(
+            "xdotool",
+            "windowraise",
+            wid
+        );
+        commandLine.runOrThrow(focusArgs);
     }
 }
