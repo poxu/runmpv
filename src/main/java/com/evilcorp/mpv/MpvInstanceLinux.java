@@ -105,7 +105,7 @@ public class MpvInstanceLinux implements MpvInstance {
         final long start = System.nanoTime();
         boolean waitTimeOver = false;
 
-        SocketChannel channel = null;
+        ByteChannel channel = null;
         // wait until mpv is started and communication pipe is open
         boolean mpvStarted = false;
         while (!mpvStarted && !waitTimeOver) {
