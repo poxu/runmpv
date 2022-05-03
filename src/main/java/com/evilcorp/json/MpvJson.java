@@ -40,7 +40,8 @@ public class MpvJson {
 
             if (it == '\n') {
                 intBytes.flip();
-                lines.add(StandardCharsets.UTF_8.decode(intBytes).toString());
+                final String nextLine = StandardCharsets.UTF_8.decode(intBytes).toString();
+                lines.add(nextLine);
                 intBytes.clear();
             } else {
                 intBytes.put(it);

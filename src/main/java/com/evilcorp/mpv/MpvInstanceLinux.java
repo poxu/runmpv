@@ -2,7 +2,6 @@ package com.evilcorp.mpv;
 
 import com.evilcorp.cmd.CommandLine;
 import com.evilcorp.cmd.StandardCommandLine;
-import com.evilcorp.json.MpvJson;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.util.Shortcuts;
 
@@ -26,6 +25,7 @@ public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final ByteChannel channel;
+    private final MpvMessageQueue queue;
 
     private final CommandLine commandLine;
 
@@ -122,6 +122,7 @@ public class MpvInstanceLinux implements MpvInstance {
             }
         }
         this.channel = channel;
+        this.queue = new GenericMpvMessageQueue(channel, channel);
 
         if (waitTimeOver) {
             logger.warning("Waited more than " + config.waitSeconds());
@@ -142,43 +143,32 @@ public class MpvInstanceLinux implements MpvInstance {
     public String getProperty(String name) {
         final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
         final String request = "{\"command\": [\"get_property\",\"" + name + "\"], \"request_id\": \"" + requestId + "\"  }\n";
-        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(
-            request
-        );
-        final MpvJson cons = new MpvJson();
-        final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
         try {
-            channel.write(utf8Bytes);
+            queue.send(request);
             final long start = System.nanoTime();
             boolean waitTimeOver = false;
             while (!waitTimeOver) {
-                final int bytesRead = channel.read(utf8Read);
-                logger.info("bytes read is " + bytesRead);
-
-                if (bytesRead == -1) {
-                    continue;
+                final Optional<String> rawResponse = queue.nextMessage();
+                final Optional<String> requestLine = rawResponse
+                    .filter(l -> l.contains("" + requestId))
+                    .map(l -> {
+                        logger.info("mpv msg: " + l);
+                        final int startIdx = l.indexOf(":");
+                        final int endIdx = l.indexOf(",");
+                        final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+                        return pid;
+                    });
+                boolean requestFound = requestLine.isPresent();
+                if (requestFound) {
+                    return requestLine.orElseThrow();
                 }
-                cons.consume(utf8Read);
-                utf8Read.clear();
-                while (cons.hasMore()) {
-                    final Optional<String> requestLine = cons.nextLine()
-                        .filter(l -> l.contains("" + requestId))
-                        .map(l -> {
-                            final int startIdx = l.indexOf(":");
-                            final int endIdx = l.indexOf(",");
-                            final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-                            return pid;
-                        });
-                    boolean requestFound = requestLine.isPresent();
-                    if (requestFound) {
-                        return requestLine.orElseThrow();
+                if (rawResponse.isEmpty()) {
+                    sleep(5);
+                    final long current = System.nanoTime();
+                    final long interval = current - start;
+                    if (interval > (long) 4 * 1_000_000_000) {
+                        waitTimeOver = true;
                     }
-                }
-                sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > (long) 4 * 1_000_000_000) {
-                    waitTimeOver = true;
                 }
             }
             logger.severe("Couldn't wait for response");
@@ -192,8 +182,28 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public void focus() {
         final String pid = getProperty("pid");
-        final String cmd = "xdotool search --pid " + pid;
-        final String wid = commandLine.singleResultOrThrow(cmd);
+        logger.info("PID = " + pid);
+        final long start = System.nanoTime();
+        boolean waitTimeOver = false;
+        String wid = null;
+        while (!waitTimeOver) {
+            try {
+                wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
+                break;
+            } catch (RuntimeException e) {
+                logger.info(e.getMessage());
+                sleep(100);
+                final long current = System.nanoTime();
+                final long interval = current - start;
+                if (interval > (long) 4 * 1_000_000_000) {
+                    waitTimeOver = true;
+                }
+            }
+        }
+        if (waitTimeOver) {
+            logger.info("Couldn't wait until mpv starts");
+            return;
+        }
         final List<String> focusArgs = List.of(
             "xdotool",
             "windowraise",
