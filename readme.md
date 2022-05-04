@@ -38,9 +38,41 @@ tune your environment to open video files with runmpv.
 If you want to use custom mpv, then you need to specify mpvHomeDir
 in runmpv.properties
 
-runmpv uses wmctrl to focus mpv window after opening a new video, so it should
+runmpv uses xdotool to focus mpv window after opening a new video, so it should
 be installed, if you want the functionality to work.
 
+### Step by step instruction to install on generic linux desktop
+1. Unpack archive to a directory of your choice. 
+2. Copy runmpv.desktop to ~/.local/share/applications
+3. Create a soft link from ~/.local/share/bin/runmpv to \<rumpv-directory\>/runmpv
+```bash
+ln -s <runmpv-directory>/runmpv ~/.local/share/bin/runmpv
+```
+4. Copy the following to ~/.config/mimeapps.list to \[Default Applications\]
+```
+video/x-matroska=runmpv.desktop
+video/msvideo=runmpv.desktop
+video/x-msvideo=runmpv.desktop
+video/x-dv=runmpv.desktop
+video/vnd.mpegurl=runmpv.desktop
+video/x-m4v=runmpv.desktop
+video/quicktime=runmpv.desktop
+video/x-sgi-movie=runmpv.desktop
+video/mp4=runmpv.desktop
+video/mpeg=runmpv.desktop
+video/vnd.mpegurl=runmpv.desktop
+video/quicktime=runmpv.desktop
+video/x-flv=runmpv.desktop
+video/x-ogm+ogg=runmpv.desktop
+video/3gpp=runmpv.desktop
+video/x-mpeg=runmpv.desktop
+video/x-ms-wmv=runmpv.desktop
+video/x-ms-asf=runmpv.desktop
+video/x-matroska=runmpv.desktop
+video/ogg=runmpv.desktop
+```
+5. Run ```update-desktop-database ~/.local/share/applications```
+6. Now runmpv should become your default video player
 # Usage
 
 This is how you start new mpv instance, or tell existing instance to load
