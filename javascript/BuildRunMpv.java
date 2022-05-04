@@ -127,6 +127,7 @@ public class BuildRunMpv {
             buildDirName + "/" + executableName,
             "runmpv.properties",
             "logging.properties",
+            "runmpv.desktop",
             "focus.vbs",
             "runmpv-install.bat",
             "runmpv-uninstall.bat",
