@@ -7,16 +7,13 @@ import com.evilcorp.util.Shortcuts;
 
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +22,6 @@ import static com.evilcorp.util.Shortcuts.sleep;
 public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
-    private final ByteChannel channel;
     private final MpvMessageQueue queue;
 
     private final CommandLine commandLine;
@@ -122,7 +118,6 @@ public class MpvInstanceLinux implements MpvInstance {
                 }
             }
         }
-        this.channel = channel;
         this.queue = new GenericMpvMessageQueue(channel, channel);
 
         if (waitTimeOver) {
@@ -133,51 +128,40 @@ public class MpvInstanceLinux implements MpvInstance {
 
     @Override
     public void execute(MpvCommand command) {
-        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command.content() + System.lineSeparator());
-        try {
-            channel.write(utf8Bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        queue.send(command.content());
     }
 
     public String getProperty(String name) {
-        final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
-        final String request = "{\"command\": [\"get_property\",\"" + name + "\"], \"request_id\": \"" + requestId + "\"  }\n";
-        try {
-            queue.send(request);
-            final long start = System.nanoTime();
-            boolean waitTimeOver = false;
-            while (!waitTimeOver) {
-                final Optional<String> rawResponse = queue.nextMessage();
-                final Optional<String> requestLine = rawResponse
-                    .filter(l -> l.contains("" + requestId))
-                    .map(l -> {
-                        logger.info("mpv msg: " + l);
-                        final int startIdx = l.indexOf(":");
-                        final int endIdx = l.indexOf(",");
-                        final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-                        return pid;
-                    });
-                boolean requestFound = requestLine.isPresent();
-                if (requestFound) {
-                    return requestLine.orElseThrow();
-                }
-                if (rawResponse.isEmpty()) {
-                    sleep(5);
-                    final long current = System.nanoTime();
-                    final long interval = current - start;
-                    if (interval > (long) 4 * 1_000_000_000) {
-                        waitTimeOver = true;
-                    }
+        final GetProperty command = new GetProperty(name);
+        execute(command);
+        final long start = System.nanoTime();
+        boolean waitTimeOver = false;
+        while (!waitTimeOver) {
+            final Optional<String> rawResponse = queue.nextMessage();
+            rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
+            final Optional<String> requestLine = rawResponse
+                .filter(l -> l.contains("" + command.requestId()))
+                .map(l -> {
+                    final int startIdx = l.indexOf(":");
+                    final int endIdx = l.indexOf(",");
+                    final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+                    return pid;
+                });
+            boolean requestFound = requestLine.isPresent();
+            if (requestFound) {
+                return requestLine.orElseThrow();
+            }
+            if (rawResponse.isEmpty()) {
+                sleep(5);
+                final long current = System.nanoTime();
+                final long interval = current - start;
+                if (interval > (long) 4 * 1_000_000_000) {
+                    waitTimeOver = true;
                 }
             }
-            logger.severe("Couldn't wait for response");
-            throw new RuntimeException("Couldn't wait for response");
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-            throw new RuntimeException(e);
         }
+        logger.severe("Couldn't wait for response");
+        throw new RuntimeException("Couldn't wait for response");
     }
 
     @Override
