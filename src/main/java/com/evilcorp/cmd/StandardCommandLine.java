@@ -162,6 +162,14 @@ public class StandardCommandLine implements CommandLine {
         final Process guessProc = withoutInheritOutput().run(command);
         final TextProcess textProcess = new TextProcess(guessProc);
         final ProcessResult guessResult = textProcess.waitFor();
+        if (guessResult.exitCode() != 0) {
+            throw new RuntimeException("" +
+                " Couldn't execute command. " +
+                " Command: " + command + ". " +
+                " Exit code: " + guessResult.exitCode() + ". " +
+                " Errors: " + guessResult.errors() + ". "
+            );
+        }
         return guessResult.singleOutput();
     }
 }

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
@@ -191,7 +192,7 @@ public class MpvInstanceLinux implements MpvInstance {
                 wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
                 break;
             } catch (RuntimeException e) {
-                logger.info(e.getMessage());
+                logger.log(Level.INFO, "Couldn't find mpv pid", e);
                 sleep(100);
                 final long current = System.nanoTime();
                 final long interval = current - start;
