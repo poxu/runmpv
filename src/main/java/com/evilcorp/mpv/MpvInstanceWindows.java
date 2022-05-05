@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
@@ -23,6 +24,7 @@ public class MpvInstanceWindows implements MpvInstance {
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
     private final CommandLine commandLine;
+    private final boolean firstLaunch;
 
     public MpvInstanceWindows(RunMpvProperties config) {
         this.config = config;
@@ -37,6 +39,7 @@ public class MpvInstanceWindows implements MpvInstance {
         } catch (IOException e) {
             firstLaunch = true;
         }
+        this.firstLaunch = firstLaunch;
 
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
@@ -130,6 +133,9 @@ public class MpvInstanceWindows implements MpvInstance {
      */
     @Override
     public void focus() {
+        if (firstLaunch) {
+            return;
+        }
         final String pid = getProperty("pid");
         logger.info("pid is " + pid);
         final List<String> focusArgs = List.of(
@@ -138,7 +144,12 @@ public class MpvInstanceWindows implements MpvInstance {
             config.executableDir() + "/focus.vbs",
             pid
         );
-        commandLine.singleResultOrThrow(String.join(" ", focusArgs));
+
+        try {
+            commandLine.runOrThrow(String.join(" ", focusArgs));
+        } catch (RuntimeException e) {
+            logger.log(Level.INFO, "Couldn't focus mpv window", e);
+        }
     }
 
     public String getProperty(String name) {
