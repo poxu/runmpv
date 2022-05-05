@@ -1,32 +1,35 @@
 package com.evilcorp.mpv;
 
-import com.evilcorp.json.MpvJson;
+import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceWindows implements MpvInstance {
     public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
-    private final ByteChannel channel;
     private final Logger logger;
     private final RunMpvProperties config;
+    private final MpvMessageQueue queue;
+    private final CommandLine commandLine;
+    private final boolean firstLaunch;
 
     public MpvInstanceWindows(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
+        this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
 
         boolean firstLaunch;
         try {
@@ -36,6 +39,7 @@ public class MpvInstanceWindows implements MpvInstance {
         } catch (IOException e) {
             firstLaunch = true;
         }
+        this.firstLaunch = firstLaunch;
 
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
@@ -106,7 +110,7 @@ public class MpvInstanceWindows implements MpvInstance {
                 }
             }
         }
-        channel = mpvPipeChannel;
+        this.queue = new GenericMpvMessageQueue(mpvPipeChannel, mpvPipeChannel);
 
         if (waitTimeOver) {
             logger.warning("Waited more than " + config.waitSeconds());
@@ -116,13 +120,7 @@ public class MpvInstanceWindows implements MpvInstance {
 
     @Override
     public void execute(MpvCommand command) {
-        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(command.content() + System.lineSeparator());
-        try {
-            channel.write(utf8Bytes);
-            logger.info("executed " + command.content());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        queue.send(command.content());
     }
 
     /**
@@ -135,6 +133,9 @@ public class MpvInstanceWindows implements MpvInstance {
      */
     @Override
     public void focus() {
+        if (firstLaunch) {
+            return;
+        }
         final String pid = getProperty("pid");
         logger.info("pid is " + pid);
         final List<String> focusArgs = List.of(
@@ -143,52 +144,35 @@ public class MpvInstanceWindows implements MpvInstance {
             config.executableDir() + "/focus.vbs",
             pid
         );
-        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
 
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
         try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            commandLine.runOrThrow(String.join(" ", focusArgs));
+        } catch (RuntimeException e) {
+            logger.log(Level.INFO, "Couldn't focus mpv window", e);
         }
     }
 
     public String getProperty(String name) {
-        final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
-        final String request = "{\"command\": [\"get_property\",\"" + name + "\"], \"request_id\": \"" + requestId + "\"  }\n";
-        final ByteBuffer utf8Bytes = StandardCharsets.UTF_8.encode(
-            request
-        );
-        final MpvJson cons = new MpvJson();
-        final ByteBuffer utf8Read = ByteBuffer.allocate(1000);
-        try {
-            channel.write(utf8Bytes);
-            final long start = System.nanoTime();
-            boolean waitTimeOver = false;
-            while (!waitTimeOver) {
-                final int bytesRead = channel.read(utf8Read);
-                logger.info("bytes read is " + bytesRead);
-
-                if (bytesRead == -1) {
-                    continue;
-                }
-                cons.consume(utf8Read);
-                utf8Read.clear();
-                while (cons.hasMore()) {
-                    final Optional<String> requestLine = cons.nextLine()
-                        .filter(l -> l.contains("" + requestId))
-                        .map(l -> {
-                            final int startIdx = l.indexOf(":");
-                            final int endIdx = l.indexOf(",");
-                            final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-                            return pid;
-                        });
-                    boolean requestFound = requestLine.isPresent();
-                    if (requestFound) {
-                        return requestLine.orElseThrow();
-                    }
-                }
+        final GetProperty command = new GetProperty(name);
+        execute(command);
+        final long start = System.nanoTime();
+        boolean waitTimeOver = false;
+        while (!waitTimeOver) {
+            final Optional<String> rawResponse = queue.nextMessage();
+            rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
+            final Optional<String> requestLine = rawResponse
+                .filter(l -> l.contains("" + command.requestId()))
+                .map(l -> {
+                    final int startIdx = l.indexOf(":");
+                    final int endIdx = l.indexOf(",");
+                    final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
+                    return pid;
+                });
+            boolean requestFound = requestLine.isPresent();
+            if (requestFound) {
+                return requestLine.orElseThrow();
+            }
+            if (rawResponse.isEmpty()) {
                 sleep(5);
                 final long current = System.nanoTime();
                 final long interval = current - start;
@@ -196,11 +180,8 @@ public class MpvInstanceWindows implements MpvInstance {
                     waitTimeOver = true;
                 }
             }
-            logger.severe("Couldn't wait for response");
-            throw new RuntimeException("Couldn't wait for response");
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-            throw new RuntimeException(e);
         }
+        logger.severe("Couldn't wait for response");
+        throw new RuntimeException("Couldn't wait for response");
     }
 }
