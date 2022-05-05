@@ -1,5 +1,7 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -19,10 +22,12 @@ public class MpvInstanceWindows implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
+    private final CommandLine commandLine;
 
     public MpvInstanceWindows(RunMpvProperties config) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
+        this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
 
         boolean firstLaunch;
         try {
@@ -133,15 +138,7 @@ public class MpvInstanceWindows implements MpvInstance {
             config.executableDir() + "/focus.vbs",
             pid
         );
-        final ProcessBuilder processBuilder = new ProcessBuilder(focusArgs);
-
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        commandLine.singleResultOrThrow(String.join(" ", focusArgs));
     }
 
     public String getProperty(String name) {
