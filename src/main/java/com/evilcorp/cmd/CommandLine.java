@@ -2,6 +2,7 @@ package com.evilcorp.cmd;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface CommandLine {
     CommandLine withFileOutput(Path file);
@@ -16,7 +17,7 @@ public interface CommandLine {
 
     Process run(String command);
 
-    void runOrThrow(String command);
+    void runOrExecute(String command, Consumer<Exception> code);
 
     void runOrThrow(List<String> command);
 

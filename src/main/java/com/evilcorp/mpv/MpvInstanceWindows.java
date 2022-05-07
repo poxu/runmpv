@@ -146,11 +146,8 @@ public class MpvInstanceWindows implements MpvInstance {
             pid
         );
 
-        try {
-            commandLine.runOrThrow(String.join(" ", focusArgs));
-        } catch (RuntimeException e) {
-            logger.log(Level.INFO, "Couldn't focus mpv window", e);
-        }
+        commandLine.runOrExecute(String.join(" ", focusArgs),
+            (e) -> logger.log(Level.INFO, "Couldn't focus mpv window", e));
     }
 
     public String getProperty(String name) {

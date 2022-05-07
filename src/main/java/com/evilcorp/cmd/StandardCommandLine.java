@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class StandardCommandLine implements CommandLine {
     private final Path rootFsDir;
@@ -124,11 +125,11 @@ public class StandardCommandLine implements CommandLine {
     }
 
     @Override
-    public void runOrThrow(String command) {
+    public void runOrExecute(String command, Consumer<Exception> code) {
         final Process process = run(command);
         try {
             if (process.waitFor() != 0) {
-                throw new RuntimeException("Process " + command + " exited with bad code " + process.exitValue());
+                code.accept(new RuntimeException("Process " + command + " exited with bad code " + process.exitValue()));
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
