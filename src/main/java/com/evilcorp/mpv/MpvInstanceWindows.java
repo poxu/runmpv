@@ -125,11 +125,12 @@ public class MpvInstanceWindows implements MpvInstance {
 
     /**
      * Current solution uses wscript from here
-     * https://stackoverflow.com/a/56122113
+     * <a href="https://stackoverflow.com/a/56122113">https://stackoverflow.com/a/56122113</a>
      *
      * It would probably be more reliable to use PowerShell
-     * https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name
-     * https://stackoverflow.com/a/58548853
+     * <a href="https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name">https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name</a>
+     * <a href="https://stackoverflow.com/a/58548853">https://stackoverflow.com/a/58548853</a>
+     * but it doesn't work unless admin gave user an explicit permission
      */
     @Override
     public void focus() {
