@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MpvJsonTest {
+public class MpvMessageQueueTest {
 
     private String json = """
     {"name": "value"}
@@ -21,29 +21,29 @@ public class MpvJsonTest {
 
     @Test
     void consumeHalfFirstLine() {
-        MpvJson mpvJson = new MpvJson();
-        mpvJson.consume(Arrays.copyOfRange(utf8Bytes, 0, 10));
-        Optional<String> optLine = mpvJson.nextLine();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        mpvMessageQueue.consume(Arrays.copyOfRange(utf8Bytes, 0, 10));
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertTrue(optLine.isEmpty());
     }
 
     @Test
     void consumeHalfSecondLine() {
-        MpvJson mpvJson = new MpvJson();
-        mpvJson.consume(Arrays.copyOfRange(utf8Bytes, 0, 20));
-        Optional<String> optLine = mpvJson.nextLine();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        mpvMessageQueue.consume(Arrays.copyOfRange(utf8Bytes, 0, 20));
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
     }
 
     @Test
     void consumeHalfThirdLine() {
-        MpvJson mpvJson = new MpvJson();
-        mpvJson.consume(Arrays.copyOfRange(utf8Bytes, 0, 35));
-        Optional<String> optLine = mpvJson.nextLine();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        mpvMessageQueue.consume(Arrays.copyOfRange(utf8Bytes, 0, 35));
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
-        optLine = mpvJson.nextLine();
+        optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"number\": 123}",optLine.orElseThrow());
     }

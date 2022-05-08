@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MpvJsonBufferTest {
+public class MpvMessageQueueBufferTest {
 
     private String json = """
     {"name": "value"}
@@ -22,40 +22,40 @@ public class MpvJsonBufferTest {
 
     @Test
     void consumeHalfFirstLine() {
-        MpvJson mpvJson = new MpvJson();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 10);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
-        mpvJson.consume(allocate);
-        Optional<String> optLine = mpvJson.nextLine();
+        mpvMessageQueue.consume(allocate);
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertTrue(optLine.isEmpty());
     }
 
     @Test
     void consumeHalfSecondLine() {
-        MpvJson mpvJson = new MpvJson();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 20);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
         System.out.println(allocate.position());
-        mpvJson.consume(allocate);
-        Optional<String> optLine = mpvJson.nextLine();
+        mpvMessageQueue.consume(allocate);
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
     }
 
     @Test
     void consumeHalfThirdLine() {
-        MpvJson mpvJson = new MpvJson();
+        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 35);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
         System.out.println(allocate.position());
-        mpvJson.consume(allocate);
-        Optional<String> optLine = mpvJson.nextLine();
+        mpvMessageQueue.consume(allocate);
+        Optional<String> optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
-        optLine = mpvJson.nextLine();
+        optLine = mpvMessageQueue.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"number\": 123}",optLine.orElseThrow());
     }
