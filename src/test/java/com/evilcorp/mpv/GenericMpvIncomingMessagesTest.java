@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class GenericMpvMessageQueueTest {
+class GenericMpvIncomingMessagesTest {
 
     WritableByteChannel out = Channels.newChannel(new ByteArrayOutputStream(1000));
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(1000);

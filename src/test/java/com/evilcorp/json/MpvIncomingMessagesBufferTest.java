@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MpvMessageQueueBufferTest {
+public class MpvIncomingMessagesBufferTest {
 
     private String json = """
     {"name": "value"}
@@ -22,40 +22,40 @@ public class MpvMessageQueueBufferTest {
 
     @Test
     void consumeHalfFirstLine() {
-        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 10);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
-        mpvMessageQueue.consume(allocate);
-        Optional<String> optLine = mpvMessageQueue.nextLine();
+        mpvIncomingMessages.consume(allocate);
+        Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertTrue(optLine.isEmpty());
     }
 
     @Test
     void consumeHalfSecondLine() {
-        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 20);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
         System.out.println(allocate.position());
-        mpvMessageQueue.consume(allocate);
-        Optional<String> optLine = mpvMessageQueue.nextLine();
+        mpvIncomingMessages.consume(allocate);
+        Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
     }
 
     @Test
     void consumeHalfThirdLine() {
-        MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+        MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 35);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
         System.out.println(allocate.position());
-        mpvMessageQueue.consume(allocate);
-        Optional<String> optLine = mpvMessageQueue.nextLine();
+        mpvIncomingMessages.consume(allocate);
+        Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"name\": \"value\"}",optLine.orElseThrow());
-        optLine = mpvMessageQueue.nextLine();
+        optLine = mpvIncomingMessages.nextLine();
         assertFalse(optLine.isEmpty());
         assertEquals("{\"number\": 123}",optLine.orElseThrow());
     }

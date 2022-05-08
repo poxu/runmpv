@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
 import java.util.Optional;
 import java.util.Queue;
 
-public class MpvMessageQueue {
+public class MpvIncomingMessages {
     ByteBuffer intBytes = ByteBuffer.allocate(1000);
     Queue<String> lines = new ArrayDeque<>();
 

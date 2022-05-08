@@ -1,6 +1,6 @@
 package com.evilcorp.mpv;
 
-import com.evilcorp.json.MpvMessageQueue;
+import com.evilcorp.json.MpvIncomingMessages;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,7 +12,7 @@ import java.util.Optional;
 public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue {
     private final WritableByteChannel out;
     private final ReadableByteChannel in;
-    private final MpvMessageQueue mpvMessageQueue = new MpvMessageQueue();
+    private final MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
 
     public GenericMpvMessageQueue(WritableByteChannel out, ReadableByteChannel in) {
         this.out = out;
@@ -31,8 +31,8 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
 
     @Override
     public Optional<String> nextMessage() {
-        if (mpvMessageQueue.hasMore()) {
-            return mpvMessageQueue.nextLine();
+        if (mpvIncomingMessages.hasMore()) {
+            return mpvIncomingMessages.nextLine();
         }
         final ByteBuffer buffer = ByteBuffer.allocate(100);
         try {
@@ -40,8 +40,8 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
             if (bytesRead <= 0) {
                 return Optional.empty();
             }
-            mpvMessageQueue.consume(buffer);
-            return mpvMessageQueue.nextLine();
+            mpvIncomingMessages.consume(buffer);
+            return mpvIncomingMessages.nextLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
