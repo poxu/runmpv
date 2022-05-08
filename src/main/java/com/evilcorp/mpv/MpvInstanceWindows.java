@@ -1,6 +1,7 @@
 package com.evilcorp.mpv;
 
 import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.Retry;
 import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 
@@ -31,9 +32,10 @@ public class MpvInstanceWindows implements MpvInstance {
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
 
+        final Path fullPipeName = Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName());
         boolean firstLaunch;
         try {
-            ByteChannel channel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
+            ByteChannel channel = FileChannel.open(fullPipeName, StandardOpenOption.READ, StandardOpenOption.WRITE);
             channel.close();
             firstLaunch = false;
         } catch (IOException e) {
@@ -90,32 +92,26 @@ public class MpvInstanceWindows implements MpvInstance {
             }
         }
 
-        FileChannel mpvPipeChannel = null;
-
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-
         // wait until mpv is started and communication pipe is open
-        boolean mpvStarted = false;
-        while (!mpvStarted && !waitTimeOver) {
-            try {
-                mpvPipeChannel = FileChannel.open(Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName()), StandardOpenOption.READ, StandardOpenOption.WRITE);
-                mpvStarted = true;
-            } catch (IOException e) {
-                sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > config.waitSeconds() * 1_000_000_000) {
-                    waitTimeOver = true;
+        Retry<ByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
+            () -> {
+                try {
+                    return Optional.of(FileChannel.open(
+                        fullPipeName,
+                        StandardOpenOption.READ,
+                        StandardOpenOption.WRITE
+                    ));
+                } catch (IOException e) {
+                    return Optional.empty();
                 }
             }
-        }
-        this.queue = new GenericMpvMessageQueue(mpvPipeChannel, mpvPipeChannel);
-
-        if (waitTimeOver) {
+        );
+        final Optional<ByteChannel> channel = findMpvChannel.get();
+        if (channel.isEmpty()) {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
+        this.queue = new GenericMpvMessageQueue(channel.orElseThrow(), channel.orElseThrow());
     }
 
     @Override

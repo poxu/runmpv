@@ -1,6 +1,7 @@
 package com.evilcorp.mpv;
 
 import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.cmd.Retry;
 import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.util.Shortcuts;
@@ -40,10 +41,10 @@ public class MpvInstanceLinux implements MpvInstance {
 
         Shortcuts.createDirectoryIfNotExists(socketDir);
 
-        final Path mpvSocket = socketDir.resolve(config.pipeName());
+        final Path mpvSocketPath = socketDir.resolve(config.pipeName());
 
         boolean firstLaunch;
-        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocket);
+        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocketPath);
         try {
             ByteChannel channel = SocketChannel.open(address);
             channel.close();
@@ -77,7 +78,7 @@ public class MpvInstanceLinux implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + mpvSocket);
+            arguments.add("--input-ipc-server=" + mpvSocketPath);
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
@@ -98,32 +99,22 @@ public class MpvInstanceLinux implements MpvInstance {
                 throw new RuntimeException(e);
             }
         }
-
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-
-        ByteChannel channel = null;
-        // wait until mpv is started and communication pipe is open
-        boolean mpvStarted = false;
-        while (!mpvStarted && !waitTimeOver) {
-            try {
-                channel = SocketChannel.open(address);
-                mpvStarted = true;
-            } catch (IOException e) {
-                sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > (long) config.waitSeconds() * 1_000_000_000) {
-                    waitTimeOver = true;
+        Retry<ByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
+            () -> {
+                try {
+                    return Optional.of(SocketChannel.open(address));
+                } catch (IOException e) {
+                    return Optional.empty();
                 }
             }
-        }
-        this.queue = new GenericMpvMessageQueue(channel, channel);
+        );
+        final Optional<ByteChannel> channel = findMpvChannel.get();
 
-        if (waitTimeOver) {
+        if (channel.isEmpty()) {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
+        this.queue = new GenericMpvMessageQueue(channel.orElseThrow(), channel.orElseThrow());
     }
 
     @Override
@@ -168,31 +159,24 @@ public class MpvInstanceLinux implements MpvInstance {
     public void focus() {
         final String pid = getProperty("pid");
         logger.info("PID = " + pid);
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-        String wid = null;
-        while (!waitTimeOver) {
+        Retry<String> findWindowId = new Retry<>(4, () -> {
             try {
-                wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
-                break;
+                return Optional.of(commandLine.singleResultOrThrow("xdotool search --pid " + pid));
             } catch (RuntimeException e) {
                 logger.log(Level.INFO, "Couldn't find mpv pid", e);
-                sleep(100);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > (long) 4 * 1_000_000_000) {
-                    waitTimeOver = true;
-                }
+                return Optional.empty();
             }
-        }
-        if (waitTimeOver) {
+        });
+
+        Optional<String> wid = findWindowId.get();
+        if (wid.isEmpty()) {
             logger.info("Couldn't wait until mpv starts");
             return;
         }
         final List<String> focusArgs = List.of(
             "xdotool",
             "windowraise",
-            wid
+            wid.orElseThrow()
         );
         commandLine.runOrThrow(focusArgs);
     }
