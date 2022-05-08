@@ -1,5 +1,6 @@
 package com.evilcorp;
 
+import com.evilcorp.args.CommandLineRunMpvArguments;
 import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
@@ -32,27 +33,21 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class StartSingleMpvInstance {
-    /**
-     * Main method, which runs mpv
-     *
-     * @param args one argument supported - video file name
-     * @throws IOException exception might be thrown when starting logging system
-     *                     or when starting emergency logging system
-     */
-    public static void main(String[] args) throws IOException {
-        final RunMpvArguments arguments = new RunMpvArguments(args);
-        if (arguments.empty()) {
-            return;
-        }
-        final FsFile videoDir = new ManualFsFile(arguments.video().path().getParent());
+    private final RunMpvArguments args;
 
-        final FsFile runMpvHomeDir = arguments.runMpvHome()
+    public StartSingleMpvInstance(RunMpvArguments args) {
+        this.args = args;
+    }
+
+    public void run() {
+        final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
+
+        final FsFile runMpvHomeDir = args.runMpvHome()
             .orElse(new RunMpvExecutable());
-        LogManager.getLogManager().readConfiguration(
-            new FileInputStream(runMpvHomeDir.path().toString() + "/logging.properties")
-        );
-        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        final String runmpvdir = runMpvHomeDir.path().toString() + "/logging.properties";
+        initEmergencyLoggingSystem(runmpvdir);
 
+        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final LocalFsPaths fsPaths = new LocalFsPaths(
             new UserHomeDir(),
             runMpvHomeDir,
@@ -100,7 +95,7 @@ public class StartSingleMpvInstance {
             rerouteSystemOutStream(config.runnerLogFile());
         }
 
-        final String videoFileName = arguments.video().path().toString();
+        final String videoFileName = args.video().path().toString();
 
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
@@ -119,11 +114,43 @@ public class StartSingleMpvInstance {
         }
         */
         logger.info("Loading file " + videoFileName);
+
+    }
+
+    public static void initEmergencyLoggingSystem(String runmpvdir)  {
+        try {
+            LogManager.getLogManager().readConfiguration(
+                new FileInputStream(runmpvdir)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Main method, which runs mpv
+     *
+     * @param args one argument supported - video file name
+     * @throws RuntimeException exception might be thrown when starting logging system
+     *                     or when starting emergency logging system
+     */
+    public static void main(String[] args) {
+        RunMpvArguments arguments = new CommandLineRunMpvArguments(args);
+        if (arguments.empty()) {
+            return;
+        }
+        StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
+        runmpv.run();
     }
 
     // A small logging system to diagnose why real logging system fails
-    public static void rerouteSystemOutStream(String logfile) throws FileNotFoundException {
-        final OutputStream out = new FileOutputStream(logfile);
+    public static void rerouteSystemOutStream(String logfile) {
+        final OutputStream out;
+        try {
+            out = new FileOutputStream(logfile);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         PrintStream printWriter = new PrintStream(out);
         System.out.close();
         System.err.close();
