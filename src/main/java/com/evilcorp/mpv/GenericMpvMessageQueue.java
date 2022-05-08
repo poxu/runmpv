@@ -40,7 +40,9 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
             if (bytesRead <= 0) {
                 return Optional.empty();
             }
+            buffer.flip();
             mpvIncomingMessages.consume(buffer);
+            buffer.clear();
             return mpvIncomingMessages.nextLine();
         } catch (IOException e) {
             throw new RuntimeException(e);

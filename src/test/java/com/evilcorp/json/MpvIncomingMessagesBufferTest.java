@@ -26,6 +26,7 @@ public class MpvIncomingMessagesBufferTest {
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 10);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
+        allocate.flip();
         mpvIncomingMessages.consume(allocate);
         Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertTrue(optLine.isEmpty());
@@ -37,7 +38,7 @@ public class MpvIncomingMessagesBufferTest {
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 20);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
-        System.out.println(allocate.position());
+        allocate.flip();
         mpvIncomingMessages.consume(allocate);
         Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertFalse(optLine.isEmpty());
@@ -50,7 +51,7 @@ public class MpvIncomingMessagesBufferTest {
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 35);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
         allocate.put(inBytes);
-        System.out.println(allocate.position());
+        allocate.flip();
         mpvIncomingMessages.consume(allocate);
         Optional<String> optLine = mpvIncomingMessages.nextLine();
         assertFalse(optLine.isEmpty());

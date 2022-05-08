@@ -34,8 +34,14 @@ public class MpvIncomingMessages {
         return !lines.isEmpty();
     }
 
+    /**
+     * Consumes bytes directly from {@link ByteBuffer}
+     * @param bytes - byte buffer with limit set correctly.
+     *              You probably need to call {@link ByteBuffer#flip()} before
+     *              passing buffer to the method
+     */
     public void consume(ByteBuffer bytes) {
-        for (int i = 0; i < bytes.position(); i++) {
+        for (int i = 0; i < bytes.limit(); i++) {
             final byte it = bytes.get(i);
 
             if (it == '\n') {
