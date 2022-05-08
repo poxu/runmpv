@@ -12,6 +12,7 @@ import java.util.Optional;
 public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue {
     private final WritableByteChannel out;
     private final ReadableByteChannel in;
+    final ByteBuffer buffer = ByteBuffer.allocate(1000);
     private final MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
 
     public GenericMpvMessageQueue(WritableByteChannel out, ReadableByteChannel in) {
@@ -34,7 +35,6 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
         if (mpvIncomingMessages.hasMore()) {
             return mpvIncomingMessages.nextLine();
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(100);
         try {
             final int bytesRead = in.read(buffer);
             if (bytesRead <= 0) {
