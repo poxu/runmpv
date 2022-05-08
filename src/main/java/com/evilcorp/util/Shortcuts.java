@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.LogManager;
 
 public class Shortcuts {
     public static void sleep(long millis) {
@@ -15,6 +16,25 @@ public class Shortcuts {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
+    }
+
+    public static void initEmergencyLoggingSystem(String runmpvdir)  {
+        try {
+            LogManager.getLogManager().readConfiguration(
+                new FileInputStream(runmpvdir)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isAscii(String string) {
+        for (int i = 0; i < string.length(); ++i) {
+            if (string.charAt(i) > 127) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static InputStream getInStream(String propertyFileName) {

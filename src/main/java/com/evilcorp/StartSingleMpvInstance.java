@@ -22,15 +22,18 @@ import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Map;
-import java.util.logging.LogManager;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.evilcorp.mpv.GenericMpvMessageQueue.rerouteSystemOutStream;
+import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
@@ -44,8 +47,7 @@ public class StartSingleMpvInstance {
 
         final FsFile runMpvHomeDir = args.runMpvHome()
             .orElse(new RunMpvExecutable());
-        final String runmpvdir = runMpvHomeDir.path().toString() + "/logging.properties";
-        initEmergencyLoggingSystem(runmpvdir);
+        initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final LocalFsPaths fsPaths = new LocalFsPaths(
@@ -114,17 +116,6 @@ public class StartSingleMpvInstance {
         }
         */
         logger.info("Loading file " + videoFileName);
-
-    }
-
-    public static void initEmergencyLoggingSystem(String runmpvdir)  {
-        try {
-            LogManager.getLogManager().readConfiguration(
-                new FileInputStream(runmpvdir)
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -135,35 +126,28 @@ public class StartSingleMpvInstance {
      *                     or when starting emergency logging system
      */
     public static void main(String[] args) {
-        RunMpvArguments arguments = new CommandLineRunMpvArguments(args);
+        final RunMpvArguments arguments = new CommandLineRunMpvArguments(args);
         if (arguments.empty()) {
             return;
         }
-        StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
-        runmpv.run();
-    }
-
-    // A small logging system to diagnose why real logging system fails
-    public static void rerouteSystemOutStream(String logfile) {
-        final OutputStream out;
+        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
+        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
+        final Future<?> task = executor.submit(runmpv::run);
         try {
-            out = new FileOutputStream(logfile);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            task.get(10, TimeUnit.SECONDS);
+            logger.info("runmpv worked fine and finished successfully");
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "Thread interrupted" +
+                " who knows why", e);
+        } catch (ExecutionException e) {
+            logger.log(Level.SEVERE, "Something with executor service" +
+                " who knows why", e);
+        } catch (TimeoutException e) {
+            logger.log(Level.SEVERE, "runmpv has been working more than 10" +
+                " seconds which shouldn't happen", e);
+        } finally {
+            executor.shutdownNow();
         }
-        PrintStream printWriter = new PrintStream(out);
-        System.out.close();
-        System.err.close();
-        System.setOut(printWriter);
-        System.setErr(printWriter);
-    }
-
-    public static boolean isAscii(String string) {
-        for (int i = 0; i < string.length(); ++i) {
-            if (string.charAt(i) > 127) {
-                return false;
-            }
-        }
-        return true;
     }
 }

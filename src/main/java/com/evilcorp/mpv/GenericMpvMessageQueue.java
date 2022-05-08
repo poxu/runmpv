@@ -2,7 +2,11 @@ package com.evilcorp.mpv;
 
 import com.evilcorp.json.MpvIncomingMessages;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -12,7 +16,7 @@ import java.util.Optional;
 public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue {
     private final WritableByteChannel out;
     private final ReadableByteChannel in;
-    final ByteBuffer buffer = ByteBuffer.allocate(1000);
+    private final ByteBuffer buffer = ByteBuffer.allocate(1000);
     private final MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
 
     public GenericMpvMessageQueue(WritableByteChannel out, ReadableByteChannel in) {
@@ -47,5 +51,20 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // A small logging system to diagnose why real logging system fails
+    public static void rerouteSystemOutStream(String logfile) {
+        final OutputStream out;
+        try {
+            out = new FileOutputStream(logfile);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        PrintStream printWriter = new PrintStream(out);
+        System.out.close();
+        System.err.close();
+        System.setOut(printWriter);
+        System.setErr(printWriter);
     }
 }
