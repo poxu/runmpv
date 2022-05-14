@@ -37,9 +37,16 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
+    private MpvInstance mpvInstance;
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
+    }
+
+    public void close() {
+        if (mpvInstance != null) {
+            mpvInstance.close();
+        }
     }
 
     public void run() {
@@ -104,7 +111,7 @@ public class StartSingleMpvInstance {
 
         MvpInstanceProvider provider = new MvpInstanceProvider(config,
             os.operatingSystemFamily());
-        MpvInstance mpvInstance = provider.mvpInstance();
+        mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
         mpvInstance.execute(new ChangeTitle(videoFileName));
         if (config.focusAfterOpen()) {
@@ -147,6 +154,7 @@ public class StartSingleMpvInstance {
             logger.log(Level.SEVERE, "runmpv has been working more than 10" +
                 " seconds which shouldn't happen", e);
         } finally {
+            runmpv.close();
             executor.shutdownNow();
         }
     }

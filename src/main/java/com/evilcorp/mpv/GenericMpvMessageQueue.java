@@ -13,11 +13,16 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue {
+public class GenericMpvMessageQueue implements MpvMessageQueue {
     private final WritableByteChannel out;
     private final ReadableByteChannel in;
     private final ByteBuffer buffer = ByteBuffer.allocate(1000);
     private final MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
+
+    public <CHANNEL extends ReadableByteChannel & WritableByteChannel> GenericMpvMessageQueue(CHANNEL channel) {
+        this.in = channel;
+        this.out = channel;
+    }
 
     public GenericMpvMessageQueue(WritableByteChannel out, ReadableByteChannel in) {
         this.out = out;
@@ -48,6 +53,18 @@ public class GenericMpvMessageQueue implements com.evilcorp.mpv.MpvMessageQueue 
             mpvIncomingMessages.consume(buffer);
             buffer.clear();
             return mpvIncomingMessages.nextLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            in.close();
+            if (in != out) {
+                out.close();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

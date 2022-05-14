@@ -102,7 +102,9 @@ public class MpvInstanceLinux implements MpvInstance {
         Retry<ByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
             () -> {
                 try {
-                    return Optional.of(SocketChannel.open(address));
+                    final SocketChannel socket = SocketChannel.open(address);
+                    socket.configureBlocking(false);
+                    return Optional.of(socket);
                 } catch (IOException e) {
                     return Optional.empty();
                 }
@@ -114,7 +116,8 @@ public class MpvInstanceLinux implements MpvInstance {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-        this.queue = new GenericMpvMessageQueue(channel.orElseThrow(), channel.orElseThrow());
+        this.queue = new GenericMpvMessageQueue(
+            new FixedTimeoutByteChannel(channel.orElseThrow(), 4000));
     }
 
     @Override
@@ -179,5 +182,10 @@ public class MpvInstanceLinux implements MpvInstance {
             wid.orElseThrow()
         );
         commandLine.runOrThrow(focusArgs);
+    }
+
+    @Override
+    public void close() {
+        queue.close();
     }
 }

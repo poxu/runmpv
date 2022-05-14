@@ -111,7 +111,8 @@ public class MpvInstanceWindows implements MpvInstance {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-        this.queue = new GenericMpvMessageQueue(channel.orElseThrow(), channel.orElseThrow());
+        this.queue = new GenericMpvMessageQueue(
+            new FixedTimeoutByteChannel(channel.orElseThrow(), 4000));
     }
 
     @Override
@@ -144,6 +145,11 @@ public class MpvInstanceWindows implements MpvInstance {
 
         commandLine.runOrExecute(String.join(" ", focusArgs),
             (e) -> logger.log(Level.INFO, "Couldn't focus mpv window", e));
+    }
+
+    @Override
+    public void close() {
+        queue.close();
     }
 
     public String getProperty(String name) {
