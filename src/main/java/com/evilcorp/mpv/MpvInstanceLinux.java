@@ -4,13 +4,8 @@ import com.evilcorp.cmd.CommandLine;
 import com.evilcorp.cmd.Retry;
 import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
-import com.evilcorp.util.Shortcuts;
 
 import java.io.IOException;
-import java.net.UnixDomainSocketAddress;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.SocketChannel;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,34 +19,14 @@ public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
-
     private final CommandLine commandLine;
 
-    public MpvInstanceLinux(RunMpvProperties config) {
+    public MpvInstanceLinux(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
-        final String xdgRuntimeDir = System.getenv("XDG_RUNTIME_DIR");
-        final Path socketDir;
-        if (xdgRuntimeDir != null) {
-            socketDir = Path.of(xdgRuntimeDir).resolve("runmpv");
-        } else {
-            socketDir = Path.of("/tmp").resolve("runmpv");
-        }
-
-        Shortcuts.createDirectoryIfNotExists(socketDir);
-
-        final Path mpvSocketPath = socketDir.resolve(config.pipeName());
-
-        boolean firstLaunch;
-        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocketPath);
-        try {
-            ByteChannel channel = SocketChannel.open(address);
-            channel.close();
-            firstLaunch = false;
-        } catch (IOException e) {
-            firstLaunch = true;
-        }
+        commChannel.attach();
+        final boolean firstLaunch = !commChannel.isOpen();
 
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
@@ -78,7 +53,7 @@ public class MpvInstanceLinux implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + mpvSocketPath);
+            arguments.add("--input-ipc-server=" + commChannel.name());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
@@ -99,22 +74,22 @@ public class MpvInstanceLinux implements MpvInstance {
                 throw new RuntimeException(e);
             }
         }
-        Retry<ByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
+        // wait until mpv is started and communication pipe is open
+        Retry<FixedTimeoutByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
             () -> {
-                try {
-                    return Optional.of(SocketChannel.open(address));
-                } catch (IOException e) {
-                    return Optional.empty();
+                commChannel.attach();
+                if (commChannel.isOpen()) {
+                    return Optional.of(commChannel.channel());
                 }
+                return Optional.empty();
             }
         );
-        final Optional<ByteChannel> channel = findMpvChannel.get();
-
+        final Optional<FixedTimeoutByteChannel> channel = findMpvChannel.get();
         if (channel.isEmpty()) {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-        this.queue = new GenericMpvMessageQueue(channel.orElseThrow(), channel.orElseThrow());
+        this.queue = new GenericMpvMessageQueue(channel.orElseThrow());
     }
 
     @Override

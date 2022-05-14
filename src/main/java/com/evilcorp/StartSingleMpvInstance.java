@@ -8,6 +8,8 @@ import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.ChangeTitle;
+import com.evilcorp.mpv.MpvCommunicationChannel;
+import com.evilcorp.mpv.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
@@ -37,9 +39,14 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
+    private MpvCommunicationChannel channel;
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
+    }
+
+    public void close() {
+        channel.detach();
     }
 
     public void run() {
@@ -102,8 +109,11 @@ public class StartSingleMpvInstance {
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
 
-        MvpInstanceProvider provider = new MvpInstanceProvider(config,
+        MpvCommunicationChannelProvider channelProvider = new MpvCommunicationChannelProvider(config,
             os.operatingSystemFamily());
+        channel = channelProvider.channel();
+        MvpInstanceProvider provider = new MvpInstanceProvider(config,
+            os.operatingSystemFamily(), channel);
         MpvInstance mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
         mpvInstance.execute(new ChangeTitle(videoFileName));
@@ -147,6 +157,7 @@ public class StartSingleMpvInstance {
             logger.log(Level.SEVERE, "runmpv has been working more than 10" +
                 " seconds which shouldn't happen", e);
         } finally {
+            runmpv.close();
             executor.shutdownNow();
         }
     }
