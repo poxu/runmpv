@@ -8,18 +8,18 @@ import com.evilcorp.settings.RunMpvProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
     private final CommandLine commandLine;
+    private final Map<Integer, MpvCallback> callbacks = new HashMap<>();
 
     public MpvInstanceLinux(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
@@ -97,62 +97,40 @@ public class MpvInstanceLinux implements MpvInstance {
         queue.send(command.content());
     }
 
-    public String getProperty(String name) {
-        final GetProperty command = new GetProperty(name);
-        execute(command);
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-        while (!waitTimeOver) {
-            final Optional<String> rawResponse = queue.nextMessage();
-            rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
-            final Optional<String> requestLine = rawResponse
-                .filter(l -> l.contains("" + command.requestId()))
-                .map(l -> {
-                    final int startIdx = l.indexOf(":");
-                    final int endIdx = l.indexOf(",");
-                    final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-                    return pid;
-                });
-            boolean requestFound = requestLine.isPresent();
-            if (requestFound) {
-                return requestLine.orElseThrow();
-            }
-            if (rawResponse.isEmpty()) {
-                sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > (long) 4 * 1_000_000_000) {
-                    waitTimeOver = true;
-                }
-            }
-        }
-        logger.severe("Couldn't wait for response");
-        throw new RuntimeException("Couldn't wait for response");
+    @Override
+    public void execute(MpvRequest command, MpvCallback callback) {
+        callbacks.put(command.requestId(), callback);
+        queue.send(command.content());
     }
 
     @Override
-    public void focus() {
-        final String pid = getProperty("pid");
-        logger.info("PID = " + pid);
-        Retry<String> findWindowId = new Retry<>(4, () -> {
-            try {
-                return Optional.of(commandLine.singleResultOrThrow("xdotool search --pid " + pid));
-            } catch (RuntimeException e) {
-                logger.log(Level.INFO, "Couldn't find mpv pid", e);
-                return Optional.empty();
-            }
-        });
+    public MpvCallback focusCallback() {
+        return new FocusMpvLinux(commandLine);
+    }
 
-        Optional<String> wid = findWindowId.get();
-        if (wid.isEmpty()) {
-            logger.info("Couldn't wait until mpv starts");
-            return;
+    @Override
+    public void receiveMessages() {
+        for (
+            Optional<String> rawResponse = queue.nextMessage();
+            rawResponse.isPresent();
+            rawResponse = queue.nextMessage()
+        ) {
+            rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
+            final String response = rawResponse.orElseThrow();
+            final Optional<Integer> currentRequest = callbacks.keySet().stream()
+                .filter(key -> response.contains(key.toString()))
+                .findAny();
+            if (currentRequest.isEmpty()) {
+                return;
+            }
+            callbacks.get(currentRequest.orElseThrow())
+                .execute(rawResponse.orElseThrow());
+            callbacks.remove(currentRequest.orElseThrow());
         }
-        final List<String> focusArgs = List.of(
-            "xdotool",
-            "windowraise",
-            wid.orElseThrow()
-        );
-        commandLine.runOrThrow(focusArgs);
+    }
+
+    @Override
+    public boolean hasPendingRequests() {
+        return !callbacks.isEmpty();
     }
 }

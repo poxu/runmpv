@@ -8,6 +8,7 @@ import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.ChangeTitle;
+import com.evilcorp.mpv.GetProperty;
 import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.mpv.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.MpvInstance;
@@ -23,6 +24,7 @@ import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
+import com.evilcorp.util.Shortcuts;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -118,7 +120,11 @@ public class StartSingleMpvInstance {
         mpvInstance.execute(new OpenFile(videoFileName));
         mpvInstance.execute(new ChangeTitle(videoFileName));
         if (config.focusAfterOpen()) {
-            mpvInstance.focus();
+            mpvInstance.execute(new GetProperty("pid"), mpvInstance.focusCallback());
+        }
+        while (mpvInstance.hasPendingRequests()) {
+            mpvInstance.receiveMessages();
+            Shortcuts.sleep(50);
         }
         /*
         if (firstLaunch) {

@@ -109,7 +109,6 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
             executor.shutdown();
             throw new RuntimeException(e);
         } catch (TimeoutException e) {
-            executor.shutdown();
             return 0;
         }
     }

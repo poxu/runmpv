@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * mpv to mark the message, containing property value.
  *
  */
-public class GetProperty implements MpvCommand {
+public class GetProperty implements MpvRequest {
     private final String propertyName;
     private final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
 
@@ -34,6 +34,7 @@ public class GetProperty implements MpvCommand {
      * this particular property request. So you probably shouldn't reuse
      * this GetProperty objects.
      */
+    @Override
     public int requestId() {
         return requestId;
     }

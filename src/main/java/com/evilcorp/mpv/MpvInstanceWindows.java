@@ -8,12 +8,11 @@ import com.evilcorp.settings.RunMpvProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceWindows implements MpvInstance {
     private final Logger logger;
@@ -21,6 +20,7 @@ public class MpvInstanceWindows implements MpvInstance {
     private final MpvMessageQueue queue;
     private final CommandLine commandLine;
     private final boolean firstLaunch;
+    private final Map<Integer, MpvCallback> callbacks = new HashMap<>();
 
     public MpvInstanceWindows(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
@@ -102,63 +102,40 @@ public class MpvInstanceWindows implements MpvInstance {
         queue.send(command.content());
     }
 
-    /**
-     * Current solution uses wscript from here
-     * <a href="https://stackoverflow.com/a/56122113">https://stackoverflow.com/a/56122113</a>
-     * <p>
-     * It would probably be more reliable to use PowerShell
-     * <a href="https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name">https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name</a>
-     * <a href="https://stackoverflow.com/a/58548853">https://stackoverflow.com/a/58548853</a>
-     * but it doesn't work unless admin gave user an explicit permission
-     */
     @Override
-    public void focus() {
-        if (firstLaunch) {
-            return;
-        }
-        final String pid = getProperty("pid");
-        logger.info("pid is " + pid);
-        final List<String> focusArgs = List.of(
-            "wscript",
-            "/B",
-            config.executableDir() + "/focus.vbs",
-            pid
-        );
-
-        commandLine.runOrExecute(String.join(" ", focusArgs),
-            (e) -> logger.log(Level.INFO, "Couldn't focus mpv window", e));
+    public void execute(MpvRequest command, MpvCallback callback) {
+        callbacks.put(command.requestId(), callback);
+        queue.send(command.content());
     }
 
-    public String getProperty(String name) {
-        final GetProperty command = new GetProperty(name);
-        execute(command);
-        final long start = System.nanoTime();
-        boolean waitTimeOver = false;
-        while (!waitTimeOver) {
-            final Optional<String> rawResponse = queue.nextMessage();
+    @Override
+    public MpvCallback focusCallback() {
+        return new FocusMpvWindows(commandLine, firstLaunch, config);
+    }
+
+    @Override
+    public void receiveMessages() {
+        for (
+            Optional<String> rawResponse = queue.nextMessage();
+            rawResponse.isPresent();
+            rawResponse = queue.nextMessage()
+        ) {
             rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
-            final Optional<String> requestLine = rawResponse
-                .filter(l -> l.contains("" + command.requestId()))
-                .map(l -> {
-                    final int startIdx = l.indexOf(":");
-                    final int endIdx = l.indexOf(",");
-                    final String pid = l.substring(startIdx + 1, endIdx).replaceAll("\"", "");
-                    return pid;
-                });
-            boolean requestFound = requestLine.isPresent();
-            if (requestFound) {
-                return requestLine.orElseThrow();
+            final String response = rawResponse.orElseThrow();
+            final Optional<Integer> currentRequest = callbacks.keySet().stream()
+                .filter(key -> response.contains(key.toString()))
+                .findAny();
+            if (currentRequest.isEmpty()) {
+                return;
             }
-            if (rawResponse.isEmpty()) {
-                sleep(5);
-                final long current = System.nanoTime();
-                final long interval = current - start;
-                if (interval > (long) 4 * 1_000_000_000) {
-                    waitTimeOver = true;
-                }
-            }
+            callbacks.get(currentRequest.orElseThrow())
+                .execute(rawResponse.orElseThrow());
+            callbacks.remove(currentRequest.orElseThrow());
         }
-        logger.severe("Couldn't wait for response");
-        throw new RuntimeException("Couldn't wait for response");
+    }
+
+    @Override
+    public boolean hasPendingRequests() {
+        return !callbacks.isEmpty();
     }
 }

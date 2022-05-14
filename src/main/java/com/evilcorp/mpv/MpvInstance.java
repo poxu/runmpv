@@ -13,12 +13,16 @@ public interface MpvInstance {
     void execute(MpvCommand command);
 
     /**
-     * Focus mpv window. It is not a command, because
-     * mpv doesn't have api to focus itself. It is supposed
-     * that you use window manager to do that.
-     * So, you either should have a different implementation
-     * of MpvInstance per window manager, or inject and implementation
-     * of focus via constructor.
+     * Send a command to mpv instance
+     * executing callback after command is finished
+     *
+     * @param command action mpv should execute
      */
-    void focus();
+    void execute(MpvRequest command, MpvCallback callback);
+
+    MpvCallback focusCallback();
+
+    void receiveMessages();
+
+    boolean hasPendingRequests();
 }
