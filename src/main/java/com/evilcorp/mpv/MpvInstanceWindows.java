@@ -6,10 +6,6 @@ import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +16,6 @@ import java.util.logging.Logger;
 import static com.evilcorp.util.Shortcuts.sleep;
 
 public class MpvInstanceWindows implements MpvInstance {
-    public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
     private final Logger logger;
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
@@ -32,16 +27,9 @@ public class MpvInstanceWindows implements MpvInstance {
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
 
-        final Path fullPipeName = Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName());
-        boolean firstLaunch;
-        try {
-            ByteChannel channel = FileChannel.open(fullPipeName, StandardOpenOption.READ, StandardOpenOption.WRITE);
-            channel.close();
-            firstLaunch = false;
-        } catch (IOException e) {
-            firstLaunch = true;
-        }
-        this.firstLaunch = firstLaunch;
+        MpvCommunicationChannel commChannel = new WindowsMpvCommunicationChannel(config);
+        commChannel.attach();
+        this.firstLaunch = !commChannel.isOpen();
 
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
@@ -70,7 +58,7 @@ public class MpvInstanceWindows implements MpvInstance {
 
             // Argument is needed so that mpv could open control pipe
             // where runmpv would write commands.
-            arguments.add("--input-ipc-server=" + config.pipeName());
+            arguments.add("--input-ipc-server=" + commChannel.name());
 
             if (config.mpvLogFile() != null) {
                 // File, where mpv.exe writes its logs
@@ -93,26 +81,21 @@ public class MpvInstanceWindows implements MpvInstance {
         }
 
         // wait until mpv is started and communication pipe is open
-        Retry<ByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
+        Retry<FixedTimeoutByteChannel> findMpvChannel = new Retry<>(config.waitSeconds(),
             () -> {
-                try {
-                    return Optional.of(FileChannel.open(
-                        fullPipeName,
-                        StandardOpenOption.READ,
-                        StandardOpenOption.WRITE
-                    ));
-                } catch (IOException e) {
-                    return Optional.empty();
+                commChannel.attach();
+                if (commChannel.isOpen()) {
+                    return Optional.of(commChannel.channel());
                 }
+                return Optional.empty();
             }
         );
-        final Optional<ByteChannel> channel = findMpvChannel.get();
+        final Optional<FixedTimeoutByteChannel> channel = findMpvChannel.get();
         if (channel.isEmpty()) {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-        this.queue = new GenericMpvMessageQueue(
-            new FixedTimeoutByteChannel(channel.orElseThrow(), 4000));
+        this.queue = new GenericMpvMessageQueue(channel.orElseThrow());
     }
 
     @Override
@@ -123,7 +106,7 @@ public class MpvInstanceWindows implements MpvInstance {
     /**
      * Current solution uses wscript from here
      * <a href="https://stackoverflow.com/a/56122113">https://stackoverflow.com/a/56122113</a>
-     *
+     * <p>
      * It would probably be more reliable to use PowerShell
      * <a href="https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name">https://stackoverflow.com/questions/42566799/how-to-bring-focus-to-window-by-process-name</a>
      * <a href="https://stackoverflow.com/a/58548853">https://stackoverflow.com/a/58548853</a>
