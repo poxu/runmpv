@@ -41,6 +41,15 @@ public class WindowsMpvCommunicationChannel implements MpvCommunicationChannel {
     }
 
     @Override
+    public void detach() {
+        try {
+            channel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public String name() {
         return config.pipeName();
     }

@@ -21,14 +21,4 @@ public interface MpvInstance {
      * of focus via constructor.
      */
     void focus();
-
-    /**
-     * This method is added, because FixedTimeoutByteChannel#executor
-     * should shut down so that runmpv could exit. This method calls
-     * {@link FixedTimeoutByteChannel#close()} eventually. I think this is an
-     * abstraction leak an it should be removed later. Either by making all
-     * threads, managed by the executor zombies, or by rethinking
-     * {@link MpvInstance} and it's implementations.
-     */
-    void close();
 }

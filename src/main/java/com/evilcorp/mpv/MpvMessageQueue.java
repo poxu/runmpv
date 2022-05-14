@@ -6,6 +6,4 @@ public interface MpvMessageQueue {
     void send(String msg);
 
     Optional<String> nextMessage();
-
-    void close();
 }

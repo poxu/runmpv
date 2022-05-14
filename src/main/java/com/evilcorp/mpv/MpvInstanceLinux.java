@@ -155,9 +155,4 @@ public class MpvInstanceLinux implements MpvInstance {
         );
         commandLine.runOrThrow(focusArgs);
     }
-
-    @Override
-    public void close() {
-        queue.close();
-    }
 }

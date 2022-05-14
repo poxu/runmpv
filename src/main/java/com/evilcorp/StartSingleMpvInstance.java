@@ -8,6 +8,8 @@ import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.ChangeTitle;
+import com.evilcorp.mpv.MpvCommunicationChannel;
+import com.evilcorp.mpv.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.OpenFile;
@@ -37,16 +39,14 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
-    private MpvInstance mpvInstance;
+    private MpvCommunicationChannel channel;
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
     }
 
     public void close() {
-        if (mpvInstance != null) {
-            mpvInstance.close();
-        }
+        channel.detach();
     }
 
     public void run() {
@@ -109,9 +109,12 @@ public class StartSingleMpvInstance {
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
 
-        MvpInstanceProvider provider = new MvpInstanceProvider(config,
+        MpvCommunicationChannelProvider channelProvider = new MpvCommunicationChannelProvider(config,
             os.operatingSystemFamily());
-        mpvInstance = provider.mvpInstance();
+        channel = channelProvider.channel();
+        MvpInstanceProvider provider = new MvpInstanceProvider(config,
+            os.operatingSystemFamily(), channel);
+        MpvInstance mpvInstance = provider.mvpInstance();
         mpvInstance.execute(new OpenFile(videoFileName));
         mpvInstance.execute(new ChangeTitle(videoFileName));
         if (config.focusAfterOpen()) {

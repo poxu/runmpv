@@ -44,6 +44,15 @@ public class LinuxMpvCommunicationChannel implements MpvCommunicationChannel {
     }
 
     @Override
+    public void detach() {
+        try {
+            channel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public String name() {
         if (name != null) {
             return name;

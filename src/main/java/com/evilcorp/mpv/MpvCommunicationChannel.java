@@ -7,5 +7,7 @@ public interface MpvCommunicationChannel {
 
     void attach();
 
+    void detach();
+
     String name();
 }

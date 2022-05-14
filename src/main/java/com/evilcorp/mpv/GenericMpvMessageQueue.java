@@ -58,18 +58,6 @@ public class GenericMpvMessageQueue implements MpvMessageQueue {
         }
     }
 
-    @Override
-    public void close() {
-        try {
-            in.close();
-            if (in != out) {
-                out.close();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // A small logging system to diagnose why real logging system fails
     public static void rerouteSystemOutStream(String logfile) {
         final OutputStream out;

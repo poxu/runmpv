@@ -129,11 +129,6 @@ public class MpvInstanceWindows implements MpvInstance {
             (e) -> logger.log(Level.INFO, "Couldn't focus mpv window", e));
     }
 
-    @Override
-    public void close() {
-        queue.close();
-    }
-
     public String getProperty(String name) {
         final GetProperty command = new GetProperty(name);
         execute(command);
