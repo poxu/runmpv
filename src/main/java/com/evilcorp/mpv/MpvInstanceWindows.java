@@ -22,12 +22,11 @@ public class MpvInstanceWindows implements MpvInstance {
     private final CommandLine commandLine;
     private final boolean firstLaunch;
 
-    public MpvInstanceWindows(RunMpvProperties config) {
+    public MpvInstanceWindows(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceWindows.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
 
-        MpvCommunicationChannel commChannel = new WindowsMpvCommunicationChannel(config);
         commChannel.attach();
         this.firstLaunch = !commChannel.isOpen();
 

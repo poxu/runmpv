@@ -19,14 +19,12 @@ public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final MpvMessageQueue queue;
-
     private final CommandLine commandLine;
 
-    public MpvInstanceLinux(RunMpvProperties config) {
+    public MpvInstanceLinux(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
-        MpvCommunicationChannel commChannel = new LinuxMpvCommunicationChannel(config);
         commChannel.attach();
         final boolean firstLaunch = !commChannel.isOpen();
 

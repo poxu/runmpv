@@ -17,8 +17,10 @@ public class MvpInstanceProvider {
 
     public MpvInstance mvpInstance() {
         return switch (os) {
-            case WINDOWS -> new MpvInstanceWindows(properties);
-            case LINUX -> new MpvInstanceLinux(properties);
+            case WINDOWS -> new MpvInstanceWindows(properties,
+                new WindowsMpvCommunicationChannel(properties));
+            case LINUX -> new MpvInstanceLinux(properties,
+                new LinuxMpvCommunicationChannel(properties));
             default -> throw new IllegalArgumentException("unexpected os for mpv - " + os);
         };
     }
