@@ -26,7 +26,7 @@ public class FocusMpvLinux implements MpvCallback {
     }
 
     @Override
-    public void execute(String response) {
+    public void execute(String response, MpvEvents events, MpvMessageQueue serverQueue) {
         final int startIdx = response.indexOf(":");
         final int endIdx = response.indexOf(",");
         final String pid = response.substring(startIdx + 1, endIdx).replaceAll("\"", "");

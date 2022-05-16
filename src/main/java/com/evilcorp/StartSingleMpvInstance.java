@@ -8,12 +8,18 @@ import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.ChangeTitle;
+import com.evilcorp.mpv.GenericMpvMessageQueue;
 import com.evilcorp.mpv.GetProperty;
 import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.mpv.MpvCommunicationChannelProvider;
+import com.evilcorp.mpv.MpvEvents;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
+import com.evilcorp.mpv.ObservePause;
+import com.evilcorp.mpv.ObserveProperty;
 import com.evilcorp.mpv.OpenFile;
+import com.evilcorp.mpv.ServerPauseCallback;
+import com.evilcorp.mpv.SyncServerCommunicationChannel;
 import com.evilcorp.os.OperatingSystem;
 import com.evilcorp.os.RuntimeOperatingSystem;
 import com.evilcorp.settings.CompositeSettings;
@@ -24,7 +30,6 @@ import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
-import com.evilcorp.util.Shortcuts;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -42,6 +47,8 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
     private MpvCommunicationChannel channel;
+    private SyncServerCommunicationChannel serverChannel;
+    private long lastResponse = Long.MAX_VALUE;
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
@@ -49,6 +56,7 @@ public class StartSingleMpvInstance {
 
     public void close() {
         channel.detach();
+        serverChannel.detach();
     }
 
     public void run() {
@@ -108,6 +116,11 @@ public class StartSingleMpvInstance {
 
         final String videoFileName = args.video().path().toString();
 
+        serverChannel = new SyncServerCommunicationChannel(config);
+        if (config.sync()) {
+            serverChannel.attach();
+        }
+
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
 
@@ -117,14 +130,34 @@ public class StartSingleMpvInstance {
         MvpInstanceProvider provider = new MvpInstanceProvider(config,
             os.operatingSystemFamily(), channel);
         MpvInstance mpvInstance = provider.mvpInstance();
-        mpvInstance.execute(new OpenFile(videoFileName));
-        mpvInstance.execute(new ChangeTitle(videoFileName));
-        if (config.focusAfterOpen()) {
-            mpvInstance.execute(new GetProperty("pid"), mpvInstance.focusCallback());
+        MpvEvents events = new MpvEvents(
+            new GenericMpvMessageQueue(channel.channel()),
+            new GenericMpvMessageQueue(serverChannel.channel())
+        );
+        if (config.sync() && serverChannel.isOpen()) {
+            events.registerServerCallback(new ServerPauseCallback());
         }
-        while (mpvInstance.hasPendingRequests()) {
-            mpvInstance.receiveMessages();
-            Shortcuts.sleep(50);
+
+        if (config.focusAfterOpen()) {
+            events.execute(new GetProperty("pid"), mpvInstance.focusCallback());
+        }
+        events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
+        events.execute(new GetProperty("filename"), (e, evts, __2) -> {
+            evts.execute(new OpenFile(videoFileName));
+            evts.execute(new ChangeTitle(videoFileName));
+        });
+        if (config.sync() && serverChannel.isOpen()) {
+            events.observe(new ObserveProperty("pause"), new ObservePause());
+        }
+        while (events.hasPendingRequests()
+            || (config.sync() && serverChannel.isOpen() && ((System.nanoTime() - lastResponse) < 1_000_000_000L))
+        ) {
+            events.receiveMessages();
+//            Shortcuts.sleep(50);
+            if (config.sync() && serverChannel.isOpen()) {
+                events.execute(new GetProperty("time-pos"), (m, e, s) -> { });
+                events.receiveServerMessages();
+            }
         }
         /*
         if (firstLaunch) {

@@ -8,18 +8,14 @@ import com.evilcorp.settings.RunMpvProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
-    private final MpvMessageQueue queue;
     private final CommandLine commandLine;
-    private final Map<Integer, MpvCallback> callbacks = new HashMap<>();
 
     public MpvInstanceLinux(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
@@ -89,48 +85,10 @@ public class MpvInstanceLinux implements MpvInstance {
             logger.warning("Waited more than " + config.waitSeconds());
             throw new RuntimeException("Couldn't wait until mpv started");
         }
-        this.queue = new GenericMpvMessageQueue(channel.orElseThrow());
-    }
-
-    @Override
-    public void execute(MpvCommand command) {
-        queue.send(command.content());
-    }
-
-    @Override
-    public void execute(MpvRequest command, MpvCallback callback) {
-        callbacks.put(command.requestId(), callback);
-        queue.send(command.content());
     }
 
     @Override
     public MpvCallback focusCallback() {
         return new FocusMpvLinux(commandLine);
-    }
-
-    @Override
-    public void receiveMessages() {
-        for (
-            Optional<String> rawResponse = queue.nextMessage();
-            rawResponse.isPresent();
-            rawResponse = queue.nextMessage()
-        ) {
-            rawResponse.ifPresent(l -> logger.fine("mpv msg: " + l));
-            final String response = rawResponse.orElseThrow();
-            final Optional<Integer> currentRequest = callbacks.keySet().stream()
-                .filter(key -> response.contains(key.toString()))
-                .findAny();
-            if (currentRequest.isEmpty()) {
-                return;
-            }
-            callbacks.get(currentRequest.orElseThrow())
-                .execute(rawResponse.orElseThrow());
-            callbacks.remove(currentRequest.orElseThrow());
-        }
-    }
-
-    @Override
-    public boolean hasPendingRequests() {
-        return !callbacks.isEmpty();
     }
 }

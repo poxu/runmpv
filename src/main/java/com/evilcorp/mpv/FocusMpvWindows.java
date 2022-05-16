@@ -40,7 +40,7 @@ public class FocusMpvWindows implements MpvCallback {
     }
 
     @Override
-    public void execute(String response) {
+    public void execute(String response, MpvEvents events, MpvMessageQueue serverQueue) {
         if (firstLaunch) {
             return;
         }
