@@ -1,7 +1,5 @@
 package com.evilcorp.mpv.callbacks;
 
-import java.math.BigDecimal;
-
 public class FilenameResponse {
     private final String body;
 
