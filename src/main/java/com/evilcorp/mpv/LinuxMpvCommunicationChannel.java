@@ -5,7 +5,6 @@ import com.evilcorp.util.Shortcuts;
 
 import java.io.IOException;
 import java.net.UnixDomainSocketAddress;
-import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
 
@@ -38,7 +37,8 @@ public class LinuxMpvCommunicationChannel implements MpvCommunicationChannel {
 
         UnixDomainSocketAddress address = UnixDomainSocketAddress.of(mpvSocketPath);
         try {
-            ByteChannel channel = SocketChannel.open(address);
+            SocketChannel channel = SocketChannel.open(address);
+            channel.configureBlocking(false);
             this.channel = new FixedTimeoutByteChannel(channel, 4000);
         } catch (IOException ignored) { }
     }
