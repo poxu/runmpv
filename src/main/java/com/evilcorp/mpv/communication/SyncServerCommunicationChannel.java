@@ -1,19 +1,17 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.communication;
 
+import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
 
-public class WindowsMpvCommunicationChannel implements MpvCommunicationChannel {
-    public static final String WINDOWS_PIPE_PREFIX = "\\\\.\\pipe\\";
+public class SyncServerCommunicationChannel implements MpvCommunicationChannel {
     private FixedTimeoutByteChannel channel;
     private final RunMpvProperties config;
 
-    public WindowsMpvCommunicationChannel(RunMpvProperties config) {
+    public SyncServerCommunicationChannel(RunMpvProperties config) {
         this.config = config;
     }
 
@@ -32,16 +30,18 @@ public class WindowsMpvCommunicationChannel implements MpvCommunicationChannel {
         if (isOpen()) {
             return;
         }
-        final Path fullPipeName = Path.of(WINDOWS_PIPE_PREFIX).resolve(config.pipeName());
         try {
-            ByteChannel channel = FileChannel.open(fullPipeName,
-                StandardOpenOption.READ, StandardOpenOption.WRITE);
+            final SocketChannel channel = SocketChannel.open(new InetSocketAddress("localhost", 5454));
+            channel.configureBlocking(false);
             this.channel = new FixedTimeoutByteChannel(channel, 4000);
         } catch (IOException ignored) { }
     }
 
     @Override
     public void detach() {
+        if (channel == null) {
+            return;
+        }
         try {
             channel.close();
         } catch (IOException e) {
@@ -51,6 +51,6 @@ public class WindowsMpvCommunicationChannel implements MpvCommunicationChannel {
 
     @Override
     public String name() {
-        return config.pipeName();
+        return "unnamed";
     }
 }

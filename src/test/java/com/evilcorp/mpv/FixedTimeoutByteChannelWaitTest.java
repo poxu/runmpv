@@ -1,5 +1,6 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.mpv.communication.FixedTimeoutByteChannel;
 import com.evilcorp.util.Shortcuts;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

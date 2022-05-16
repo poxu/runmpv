@@ -1,5 +1,6 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.communication;
 
+import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.os.OperatingSystemFamily;
 import com.evilcorp.settings.RunMpvProperties;
 

@@ -1,5 +1,7 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.mpv.communication.FixedTimeoutByteChannel;
+
 public interface MpvCommunicationChannel {
     boolean isOpen();
 

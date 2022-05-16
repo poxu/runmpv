@@ -1,4 +1,6 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.communication;
+
+import com.evilcorp.mpv.WriteTimeoutExceededException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

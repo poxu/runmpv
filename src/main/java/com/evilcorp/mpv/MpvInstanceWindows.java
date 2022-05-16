@@ -4,6 +4,7 @@ import com.evilcorp.cmd.CommandLine;
 import com.evilcorp.cmd.Retry;
 import com.evilcorp.cmd.StandardCommandLine;
 import com.evilcorp.mpv.callbacks.FocusMpvWindows;
+import com.evilcorp.mpv.communication.FixedTimeoutByteChannel;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;

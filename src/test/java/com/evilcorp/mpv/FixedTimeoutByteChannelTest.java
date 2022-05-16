@@ -1,5 +1,6 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.mpv.communication.FixedTimeoutByteChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
