@@ -47,4 +47,23 @@ public interface RunMpvProperties {
      * If false, mpv window is only focused on first launch
      */
     boolean focusAfterOpen();
+
+    /**
+     * This turns on syncing with remote server. Currently, works as a feature
+     * toggle.
+     *
+     * What it actually means is that runmpv wouldn't shutdown right after mpv
+     * is started, but instead would work until mpv instance exits.
+     *
+     * Runmpv would listen to mpv and if playback is paused, runmpv would send
+     * pause command to remote server, so that server could broadcast that
+     * command to other runmpv instances, working on remote machines.
+     * Same goes with unpause.
+     *
+     * Also, runmpv would listen to remote server commands to pause and unpause
+     * in sync with other runmpv instances.
+     *
+     * @return current state of sync feature toggle
+     */
+    boolean sync();
 }

@@ -63,4 +63,11 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
             .map(Boolean::valueOf)
             .orElse(false);
     }
+
+    @Override
+    public boolean sync() {
+        return settings.setting("sync")
+            .map(Boolean::valueOf)
+            .orElse(false);
+    }
 }

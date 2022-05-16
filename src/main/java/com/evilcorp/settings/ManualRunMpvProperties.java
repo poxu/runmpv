@@ -60,4 +60,9 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     public boolean focusAfterOpen() {
         return focusAfterOpen;
     }
+
+    @Override
+    public boolean sync() {
+        return false;
+    }
 }
