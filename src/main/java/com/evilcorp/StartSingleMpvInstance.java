@@ -34,6 +34,7 @@ import com.evilcorp.settings.UniquePipePerDirectorySettings;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,8 +50,10 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 public class StartSingleMpvInstance {
     private final RunMpvArguments args;
     private MpvCommunicationChannel channel;
+    private volatile RunMpvProperties config;
     private SyncServerCommunicationChannel serverChannel;
     private long lastResponse = Long.MAX_VALUE;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
@@ -59,6 +62,18 @@ public class StartSingleMpvInstance {
     public void close() {
         channel.detach();
         serverChannel.detach();
+    }
+
+    public boolean runsInBackground() {
+        return config.sync() && serverChannel.isOpen();
+    }
+
+    public void waitUntilInitializationComplete() {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void run() {
@@ -112,6 +127,7 @@ public class StartSingleMpvInstance {
             ),
             fsPaths
         );
+        this.config = config;
         if (config.runnerLogFile() != null) {
             rerouteSystemOutStream(config.runnerLogFile());
         }
@@ -122,6 +138,7 @@ public class StartSingleMpvInstance {
         if (config.sync()) {
             serverChannel.attach();
         }
+        latch.countDown();
 
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
@@ -190,7 +207,12 @@ public class StartSingleMpvInstance {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Future<?> task = executor.submit(runmpv::run);
         try {
-            task.get(10, TimeUnit.SECONDS);
+            runmpv.waitUntilInitializationComplete();
+            if (runmpv.runsInBackground()) {
+                task.get();
+            } else {
+                task.get(10, TimeUnit.SECONDS);
+            }
             logger.info("runmpv worked fine and finished successfully");
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, "Thread interrupted" +
@@ -201,6 +223,8 @@ public class StartSingleMpvInstance {
         } catch (TimeoutException e) {
             logger.log(Level.SEVERE, "runmpv has been working more than 10" +
                 " seconds which shouldn't happen", e);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected exception", e);
         } finally {
             runmpv.close();
             executor.shutdownNow();
