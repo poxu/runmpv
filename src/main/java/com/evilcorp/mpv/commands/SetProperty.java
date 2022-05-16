@@ -1,4 +1,6 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.commands;
+
+import com.evilcorp.mpv.MpvCommand;
 
 import java.math.BigDecimal;
 

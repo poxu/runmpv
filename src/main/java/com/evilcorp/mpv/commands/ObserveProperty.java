@@ -1,4 +1,7 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.commands;
+
+import com.evilcorp.mpv.MpvCommand;
+import com.evilcorp.mpv.MpvRequest;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * mpv to mark the message, containing property value.
  *
  */
-public class GetProperty implements MpvRequest {
+public class ObserveProperty implements MpvRequest {
     private final String propertyName;
     private final int requestId = ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE);
 
@@ -17,13 +20,13 @@ public class GetProperty implements MpvRequest {
      * Creates {@link MpvCommand} to find mpv property
      * @param propertyName taken from mpv documentation.
      */
-    public GetProperty(String propertyName) {
+    public ObserveProperty(String propertyName) {
         this.propertyName = propertyName;
     }
 
     @Override
     public String content() {
-        return "{\"command\": [\"get_property\",\"" + propertyName + "\"], \"request_id\": \"" + requestId + "\"  }\n";
+        return "{\"command\": [\"observe_property\"," + requestId + ", \"" + propertyName + "\"]}\n";
     }
 
     /**

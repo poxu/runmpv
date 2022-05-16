@@ -1,4 +1,6 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.commands;
+
+import com.evilcorp.mpv.MpvCommand;
 
 public class ChangeTitle implements MpvCommand {
     private final String videoFileName;

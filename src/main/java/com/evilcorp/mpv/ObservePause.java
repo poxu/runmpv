@@ -1,5 +1,7 @@
 package com.evilcorp.mpv;
 
+import com.evilcorp.mpv.commands.GetProperty;
+
 public class ObservePause implements MpvCallback {
     @Override
     public void execute(String response, MpvEvents events, MpvMessageQueue server) {
