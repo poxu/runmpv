@@ -13,6 +13,7 @@ import com.evilcorp.mpv.MpvEvents;
 import com.evilcorp.mpv.MpvInstance;
 import com.evilcorp.mpv.MvpInstanceProvider;
 import com.evilcorp.mpv.ServerPauseCallback;
+import com.evilcorp.mpv.callbacks.FilenameResponse;
 import com.evilcorp.mpv.callbacks.ObservePause;
 import com.evilcorp.mpv.commands.ChangeTitle;
 import com.evilcorp.mpv.commands.GetProperty;
@@ -32,6 +33,7 @@ import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -143,8 +145,12 @@ public class StartSingleMpvInstance {
         }
         events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
         events.execute(new GetProperty("filename"), (e, evts, __2) -> {
-            evts.execute(new OpenFile(videoFileName));
-            evts.execute(new ChangeTitle(videoFileName));
+            final String playedFile = args.video().path().getFileName().toString();
+            final FilenameResponse resp = new FilenameResponse(e);
+            if (!resp.available() || !Objects.equals(resp.filename(), playedFile)) {
+                evts.execute(new OpenFile(videoFileName));
+                evts.execute(new ChangeTitle(videoFileName));
+            }
         });
         if (config.sync() && serverChannel.isOpen()) {
             events.observe(new ObserveProperty("pause"), new ObservePause());
