@@ -1,6 +1,9 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.callbacks;
 
 import com.evilcorp.cmd.CommandLine;
+import com.evilcorp.mpv.MpvCallback;
+import com.evilcorp.mpv.MpvEvents;
+import com.evilcorp.mpv.MpvMessageQueue;
 import com.evilcorp.settings.RunMpvProperties;
 
 import java.util.List;

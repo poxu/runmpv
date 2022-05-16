@@ -1,5 +1,9 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.callbacks;
 
+import com.evilcorp.mpv.MpvCallback;
+import com.evilcorp.mpv.MpvEvents;
+import com.evilcorp.mpv.MpvMessageQueue;
+import com.evilcorp.mpv.ServerPauseCommand;
 import com.evilcorp.mpv.commands.GetProperty;
 
 public class ObservePause implements MpvCallback {

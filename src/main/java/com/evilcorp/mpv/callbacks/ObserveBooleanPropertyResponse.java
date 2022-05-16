@@ -1,4 +1,4 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.callbacks;
 
 public class ObserveBooleanPropertyResponse {
     private final String body;

@@ -1,4 +1,4 @@
-package com.evilcorp.mpv;
+package com.evilcorp.mpv.callbacks;
 
 import java.math.BigDecimal;
 
