@@ -109,7 +109,7 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
             return bytesRead;
         } catch (InterruptedException | ExecutionException e) {
             executor.shutdown();
-            throw new RuntimeException(e);
+            throw new DelayedChannelOperationException("Exception reading", e);
         } catch (TimeoutException e) {
             return 0;
         }
@@ -136,7 +136,7 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException e) {
             executor.shutdown();
-            throw new RuntimeException(e);
+            throw new DelayedChannelOperationException("Exception writing", e);
         } catch (TimeoutException e) {
             out.close();
             executor.shutdown();
