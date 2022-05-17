@@ -1,7 +1,6 @@
 package com.evilcorp.mpv.communication;
 
 import com.evilcorp.mpv.MpvCommunicationChannel;
-import com.evilcorp.settings.RunMpvProperties;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,10 +8,12 @@ import java.nio.channels.SocketChannel;
 
 public class SyncServerCommunicationChannel implements MpvCommunicationChannel {
     private FixedTimeoutByteChannel channel;
-    private final RunMpvProperties config;
+    private final String address;
+    private final int port;
 
-    public SyncServerCommunicationChannel(RunMpvProperties config) {
-        this.config = config;
+    public SyncServerCommunicationChannel(String address, int port) {
+        this.address = address;
+        this.port = port;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class SyncServerCommunicationChannel implements MpvCommunicationChannel {
             return;
         }
         try {
-            final SocketChannel channel = SocketChannel.open(new InetSocketAddress("localhost", 5454));
+            final SocketChannel channel = SocketChannel.open(new InetSocketAddress(address, port));
             channel.configureBlocking(false);
             this.channel = new FixedTimeoutByteChannel(channel, 4000);
         } catch (IOException ignored) { }
