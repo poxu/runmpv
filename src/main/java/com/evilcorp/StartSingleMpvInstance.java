@@ -179,7 +179,7 @@ public class StartSingleMpvInstance {
             || (config.sync() && serverChannel.isOpen() && ((System.nanoTime() - lastResponse) < 1_000_000_000L))
         ) {
             events.receiveMessages();
-//            Shortcuts.sleep(50);
+            Shortcuts.sleep(50);
             if (config.sync() && serverChannel.isOpen()) {
                 if (((System.nanoTime() - lastResponse) > 500_000_000L)) {
                     events.execute(new GetProperty("time-pos"), (m, e, s) -> {
