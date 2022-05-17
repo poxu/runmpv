@@ -4,6 +4,7 @@ import com.evilcorp.mpv.WriteTimeoutExceededException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.concurrent.ExecutionException;
@@ -94,6 +95,9 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
      */
     @Override
     public int read(ByteBuffer dst) throws IOException {
+        if (in instanceof FileChannel && ((FileChannel) in).size() == 0) {
+            return 0;
+        }
         if (readOp == null) {
             readOp = executor.submit(() -> in.read(readBuffer));
         }
@@ -131,6 +135,11 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
+        if (readOp != null) {
+
+            executor.shutdown();
+            throw new RuntimeException("nO readwrite");
+        }
         try {
             return executor.submit(() -> out.write(src))
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
