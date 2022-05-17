@@ -1,44 +1,33 @@
 package com.evilcorp.mpv.communication;
 
-import com.evilcorp.mpv.MpvCommunicationChannel;
-
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
 
-public class SyncServerCommunicationChannel implements MpvCommunicationChannel {
-    private FixedTimeoutByteChannel channel;
+public class SyncServerCommunicationChannel {
+    private PermanentServerByteChannel channel;
     private final String address;
     private final int port;
 
     public SyncServerCommunicationChannel(String address, int port) {
         this.address = address;
         this.port = port;
+        this.channel = new PermanentServerByteChannel(address, port);
     }
 
-    @Override
     public boolean isOpen() {
-        return channel != null;
+        return channel != null && channel.isOpen();
     }
 
-    @Override
-    public FixedTimeoutByteChannel channel() {
+    public PermanentServerByteChannel channel() {
         return channel;
     }
 
-    @Override
     public void attach() {
         if (isOpen()) {
             return;
         }
-        try {
-            final SocketChannel channel = SocketChannel.open(new InetSocketAddress(address, port));
-            channel.configureBlocking(false);
-            this.channel = new FixedTimeoutByteChannel(channel, 4000);
-        } catch (IOException ignored) { }
+        channel.reconnect();
     }
 
-    @Override
     public void detach() {
         if (channel == null) {
             return;
@@ -48,10 +37,5 @@ public class SyncServerCommunicationChannel implements MpvCommunicationChannel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public String name() {
-        return "unnamed";
     }
 }
