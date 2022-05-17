@@ -32,6 +32,7 @@ import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
+import com.evilcorp.util.Shortcuts;
 
 import java.util.Map;
 import java.util.Objects;
@@ -180,7 +181,10 @@ public class StartSingleMpvInstance {
             events.receiveMessages();
 //            Shortcuts.sleep(50);
             if (config.sync() && serverChannel.isOpen()) {
-                events.execute(new GetProperty("time-pos"), (m, e, s) -> { });
+                if (((System.nanoTime() - lastResponse) > 500_000_000L)) {
+                    events.execute(new GetProperty("time-pos"), (m, e, s) -> {
+                    });
+                }
                 events.receiveServerMessages();
             }
         }
