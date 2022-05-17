@@ -65,4 +65,14 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     public boolean sync() {
         return false;
     }
+
+    @Override
+    public String syncAddress() {
+        return "localhost";
+    }
+
+    @Override
+    public int syncPort() {
+        return 5445;
+    }
 }

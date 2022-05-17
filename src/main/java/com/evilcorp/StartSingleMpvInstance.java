@@ -134,7 +134,7 @@ public class StartSingleMpvInstance {
 
         final String videoFileName = args.video().path().toString();
 
-        serverChannel = new SyncServerCommunicationChannel("localhost", 5454);
+        serverChannel = new SyncServerCommunicationChannel(config.syncAddress(), config.syncPort());
         if (config.sync()) {
             serverChannel.attach();
         }

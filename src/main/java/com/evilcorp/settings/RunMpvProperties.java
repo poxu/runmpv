@@ -66,4 +66,16 @@ public interface RunMpvProperties {
      * @return current state of sync feature toggle
      */
     boolean sync();
+
+    /**
+     * Address for remote server to sync mpv instances
+     * @return remote server address
+     */
+    String syncAddress();
+
+    /**
+     * Port for remote server to sync mpv instances
+     * @return remote server port
+     */
+    int syncPort();
 }

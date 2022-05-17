@@ -70,4 +70,17 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
             .map(Boolean::valueOf)
             .orElse(false);
     }
+
+    @Override
+    public String syncAddress() {
+        return settings.setting("syncAddress")
+            .orElse("localhost");
+    }
+
+    @Override
+    public int syncPort() {
+        return settings.setting("syncPort")
+            .map(Integer::valueOf)
+            .orElse(5454);
+    }
 }
