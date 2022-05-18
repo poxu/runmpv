@@ -1,5 +1,8 @@
 package com.evilcorp.server;
 
+import com.evilcorp.server.settings.RunMpvServerPropertiesFromSettings;
+import com.evilcorp.settings.TextFileSettings;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -13,9 +16,11 @@ import java.util.Set;
 
 public class StartMpvServer {
     public static void main(String[] args) throws IOException {
+        final var config = new RunMpvServerPropertiesFromSettings(
+            new TextFileSettings("runmpvserver.properties"));
         Selector selector = Selector.open();
         final ServerSocketChannel server = ServerSocketChannel.open();
-        server.bind(new InetSocketAddress(34218));
+        server.bind(new InetSocketAddress(config.port()));
         server.configureBlocking(false);
         final SelectionKey serverKey = server.register(selector, SelectionKey.OP_ACCEPT);
         ByteBuffer buff = ByteBuffer.allocate(1000);
