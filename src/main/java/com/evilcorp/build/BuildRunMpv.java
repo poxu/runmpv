@@ -1,3 +1,5 @@
+package com.evilcorp.build;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,31 +11,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("MethodCount")
 public class BuildRunMpv {
-    private final static Map<String, String> vsPath = Map.of(
+    private static final Map<String, String> vsPath = Map.of(
         "2019", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\",
         "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\"
     );
-    private final static Map<String, String> editbin = Map.of(
+    private static final Map<String, String> editbin = Map.of(
         "2017", "BuildTools\\VC\\Tools\\MSVC\\14.16.27023\\bin\\Hostx64\\x64\\editbin",
         "2019", "Community\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\editbin"
     );
 
-    private final static Map<String, String> vcvars64bat = Map.of(
+    private static final  Map<String, String> vcvars64bat = Map.of(
         "2017", "BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
         "2019", "Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
     );
 
-    private static enum OS {
+    private enum OS {
         WINDOWS,
-        LINUX
-        ;
+        LINUX;
         public boolean is(String os) {
             return toString().toLowerCase().equals(os.toLowerCase());
         }
-
     }
 
+    /**
+     * Builder script for runmpv. Java is better than bash!
+     * @param args First argunent should be operating system either linux or
+     *             windows.
+     *
+     *             If operating system is windows, then second argument should
+     *             be Visual Studio version. Either 2017 or 2019.
+     *
+     *             Then user can specify path to Graal, with trailing slash
+     *             included.
+     *
+     *             Linux example: BuildRunMpv linux /path/to/graal
+     *             Windows example: BuildRunMpv windows 2017 C:/path/to/graal
+     */
+    @SuppressWarnings("ReturnCount")
     public static void main(String[] args) throws IOException, InterruptedException {
         final String runmpv = "runmpv";
         if (args.length == 0) {

@@ -39,8 +39,13 @@ jobs:
       - name: Install native-image component
         run: |
           gu.cmd install native-image
-      - name: compile runmpv.exe and create runmpv.zip
-        run: java --source 17 javascript/BuildRunMpv.java windows 2017
+
+      - name: Build runmpv builder
+        run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
+
+      - name: Run runmpv builder
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv windows 2017
+
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -68,8 +73,11 @@ jobs:
       - name: Check gu binary
         run: gu install native-image
 
-      - name: Build runmpv binary
-        run: java --source 17 javascript/BuildRunMpv.java linux
+      - name: Build runmpv builder
+        run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
+
+      - name: Run runmpv builder
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv linux
 
       - name: Upload Release Asset
         id: upload-release-asset
