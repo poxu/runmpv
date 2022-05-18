@@ -119,7 +119,8 @@
             <property name="protectedAllowed" value="true"/>
         </module>
         <module name="UncommentedMain">
-            <property name="excludedClasses" value="StartSingleMpvInstance|BuildRunMpv"/>
+            <property name="excludedClasses"
+                      value="StartSingleMpvInstance|BuildRunMpv|StartMpvServer"/>
         </module>
         <!--
         Two consecutive upper case letters not allowed
