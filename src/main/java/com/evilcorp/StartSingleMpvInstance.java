@@ -19,6 +19,7 @@ import com.evilcorp.mpv.commands.ChangeTitle;
 import com.evilcorp.mpv.commands.GetProperty;
 import com.evilcorp.mpv.commands.ObserveProperty;
 import com.evilcorp.mpv.commands.OpenFile;
+import com.evilcorp.mpv.commands.SetProperty;
 import com.evilcorp.mpv.communication.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.communication.SyncServerCommunicationChannel;
 import com.evilcorp.os.OperatingSystem;
@@ -168,6 +169,7 @@ public class StartSingleMpvInstance {
                 evts.execute(new OpenFile(videoFileName));
                 evts.execute(new ChangeTitle(videoFileName));
             }
+            events.execute(new SetProperty("pause", false));
         });
         if (config.sync() && serverChannel.isOpen()) {
             events.observe(new ObserveProperty("pause"), new ObservePause());
