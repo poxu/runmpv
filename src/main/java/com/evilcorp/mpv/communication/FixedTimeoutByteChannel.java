@@ -136,7 +136,6 @@ public class FixedTimeoutByteChannel implements ReadableByteChannel, WritableByt
     @Override
     public int write(ByteBuffer src) throws IOException {
         if (readOp != null) {
-
             executor.shutdown();
             throw new RuntimeException("nO readwrite");
         }
