@@ -120,6 +120,10 @@ public class StandardCommandLine implements CommandLine {
             final Process process = processBuilder.start();
             return process;
         } catch (IOException e) {
+            if (e.getMessage().contains("error=2")) {
+                throw new ExecutableNotFoundException(
+                    processBuilder.command().iterator().next(), e);
+            }
             throw new RuntimeException(e);
         }
     }
