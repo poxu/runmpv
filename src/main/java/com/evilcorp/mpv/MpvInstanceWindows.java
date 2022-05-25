@@ -96,6 +96,11 @@ public class MpvInstanceWindows implements MpvInstance {
 
     @Override
     public MpvCallback focusCallback() {
-        return new FocusMpvWindows(commandLine, firstLaunch, config);
+        return new FocusMpvWindows(commandLine, config);
+    }
+
+    @Override
+    public boolean firstLaunch() {
+        return firstLaunch;
     }
 }

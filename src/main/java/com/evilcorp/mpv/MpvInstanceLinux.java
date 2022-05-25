@@ -18,13 +18,14 @@ public class MpvInstanceLinux implements MpvInstance {
     private final Logger logger;
     private final RunMpvProperties config;
     private final CommandLine commandLine;
+    private final boolean firstLaunch;
 
     public MpvInstanceLinux(RunMpvProperties config, MpvCommunicationChannel commChannel) {
         this.config = config;
         logger = Logger.getLogger(MpvInstanceLinux.class.getName());
         this.commandLine = new StandardCommandLine(config.executableDir(), Collections.emptyMap());
         commChannel.attach();
-        final boolean firstLaunch = !commChannel.isOpen();
+        firstLaunch = !commChannel.isOpen();
 
         if (firstLaunch) {
             List<String> arguments = new ArrayList<>();
@@ -92,5 +93,10 @@ public class MpvInstanceLinux implements MpvInstance {
     @Override
     public MpvCallback focusCallback() {
         return new FocusMpvLinux(commandLine);
+    }
+
+    @Override
+    public boolean firstLaunch() {
+        return firstLaunch;
     }
 }

@@ -1,13 +1,12 @@
 package com.evilcorp.mpv.callbacks;
 
 import com.evilcorp.cmd.CommandLine;
-import com.evilcorp.cmd.Retry;
+import com.evilcorp.cmd.ExecutableNotFoundException;
 import com.evilcorp.mpv.MpvCallback;
 import com.evilcorp.mpv.MpvEvents;
 import com.evilcorp.mpv.MpvMessageQueue;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,24 +33,19 @@ public class FocusMpvLinux implements MpvCallback {
         final int endIdx = response.indexOf(",");
         final String pid = response.substring(startIdx + 1, endIdx).replaceAll("\"", "");
         logger.info("PID = " + pid);
-        Retry<String> findWindowId = new Retry<>(4, () -> {
-            try {
-                return Optional.of(commandLine.singleResultOrThrow("xdotool search --pid " + pid));
-            } catch (RuntimeException e) {
-                logger.log(Level.INFO, "Couldn't find mpv pid", e);
-                return Optional.empty();
-            }
-        });
-
-        Optional<String> wid = findWindowId.get();
-        if (wid.isEmpty()) {
-            logger.info("Couldn't wait until mpv starts");
+        final String wid;
+        try {
+            wid = commandLine.singleResultOrThrow("xdotool search --pid " + pid);
+        } catch (ExecutableNotFoundException e) {
+            logger.log(Level.SEVERE, "xdotool is probably not installed. " +
+                " runmpv needs xdotool to focus mpv window.", e);
             return;
         }
+
         final List<String> focusArgs = List.of(
             "xdotool",
             "windowraise",
-            wid.orElseThrow()
+            wid
         );
         commandLine.runOrThrow(focusArgs);
     }
