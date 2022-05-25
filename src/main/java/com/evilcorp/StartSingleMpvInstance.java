@@ -159,7 +159,7 @@ public class StartSingleMpvInstance {
             events.registerServerCallback(new ServerPauseCallback());
         }
 
-        if (config.focusAfterOpen()) {
+        if (config.focusAfterOpen() && !mpvInstance.firstLaunch()) {
             events.execute(new GetProperty("pid"), mpvInstance.focusCallback());
         }
         events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());

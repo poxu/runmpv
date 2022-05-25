@@ -29,24 +29,18 @@ import java.util.logging.Logger;
 public class FocusMpvWindows implements MpvCallback {
     Logger logger = Logger.getLogger(FocusMpvWindows.class.getName());
     private final CommandLine commandLine;
-    private final boolean firstLaunch;
     private final RunMpvProperties config;
 
     public FocusMpvWindows(
         CommandLine commandLine,
-        boolean firstLaunch,
         RunMpvProperties config
     ) {
         this.commandLine = commandLine;
-        this.firstLaunch = firstLaunch;
         this.config = config;
     }
 
     @Override
     public void execute(String response, MpvEvents events, MpvMessageQueue serverQueue) {
-        if (firstLaunch) {
-            return;
-        }
         final int startIdx = response.indexOf(":");
         final int endIdx = response.indexOf(",");
         final String pid = response.substring(startIdx + 1, endIdx).replaceAll("\"", "");
