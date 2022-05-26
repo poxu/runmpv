@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TextFileSettingsTest {
 
     private final String RAW_SETTINGS = """
+        # comment
+        # waitSeconds=15
+        # waitSeconds=16
         waitSeconds=10
         illegalSetting
         halfDefinedSetting=\s

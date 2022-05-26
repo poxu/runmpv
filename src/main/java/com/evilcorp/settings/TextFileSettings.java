@@ -33,6 +33,7 @@ public class TextFileSettings implements SoftSettings {
         final InputStreamReader inputStreamReader = new InputStreamReader(source, StandardCharsets.UTF_8);
         final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         settings = bufferedReader.lines()
+            .filter(l -> !l.trim().startsWith("#"))
             .map(l -> l.split("="))
             .filter(s -> s.length == 2)
             .filter(s -> !s[0].isBlank())
