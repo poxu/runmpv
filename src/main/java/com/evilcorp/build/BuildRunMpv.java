@@ -1,7 +1,10 @@
 package com.evilcorp.build;
 
+import com.evilcorp.build.files.TextFile;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -13,6 +16,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("MethodCount")
 public class BuildRunMpv {
+    public static final String RUNMPV_ENTRY_POINT = "src/main/java/com/evilcorp/StartSingleMpvInstance.java";
     private static final Map<String, String> vsPath = Map.of(
         "2019", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\",
         "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\"
@@ -53,11 +57,16 @@ public class BuildRunMpv {
     public static void main(String[] args) throws IOException, InterruptedException {
         final String runmpv = "runmpv";
         if (args.length == 0) {
-            System.out.println("You should specify operating system manually. Use \"windows\" or \"linux\" " +
-                "as first argument. No defaults.");
+            System.out.println("You should specify version as first argument.");
             return;
         }
-        final String os = args[0];
+        final String version = args[0];
+        if (args.length == 1) {
+            System.out.println("You should specify operating system manually. Use \"windows\" or \"linux\" " +
+                "as second argument. No defaults.");
+            return;
+        }
+        final String os = args[1];
         if (!List.of(
             OS.LINUX.toString().toLowerCase(),
             OS.WINDOWS.toString().toLowerCase()
@@ -67,12 +76,12 @@ public class BuildRunMpv {
             return;
         }
         final String vsEdition;
-        if (OS.WINDOWS.is(os) && args.length < 2) {
+        if (OS.WINDOWS.is(os) && args.length < 3) {
             System.out.println("Visual Studio edition should be specified for windows builds. 2017 or 2019");
             return;
         }
         if (OS.WINDOWS.is(os)) {
-            vsEdition = args[1];
+            vsEdition = args[2];
         } else {
             vsEdition = " Specifying Visual Studio edition is pointless, because we're building runmpv on linux";
         }
@@ -82,10 +91,10 @@ public class BuildRunMpv {
             return;
         }
         final String graalBin;
-        if (OS.WINDOWS.is(os) && args.length == 3) {
+        if (OS.WINDOWS.is(os) && args.length == 4) {
+            graalBin = args[3];
+        } else if (OS.LINUX.is(os) && args.length == 3) {
             graalBin = args[2];
-        } else if (OS.LINUX.is(os) && args.length == 2) {
-            graalBin = args[1];
         } else {
             graalBin = "";
         }
@@ -95,6 +104,10 @@ public class BuildRunMpv {
         } else {
             executableName = runmpv + ".exe";
         }
+
+        final TextFile runmpvOrig = new TextFile(
+            Path.of(RUNMPV_ENTRY_POINT));
+        runmpvOrig.replace("RUNMPV_VERSION_NUMBER", version);
 
         final String buildDirName = "build";
         createDirectoryIfNotExists(Path.of(buildDirName));
@@ -149,6 +162,10 @@ public class BuildRunMpv {
             "runmpv-uninstall.bat",
             "runmpv-document.ico"), dest);
 
+        try (PrintStream out = new PrintStream(dest + "/version")) {
+            out.println(version);
+        }
+
         if (Files.exists(Path.of("runmpv-local.properties"))) {
             copy("runmpv-local.properties", dest + "/runmpv.properties");
         }
@@ -159,6 +176,10 @@ public class BuildRunMpv {
         run(List.of(
             "tar", "-a", "-c", "-f", runmpv + ".zip", runmpv
         ), buildDirectory);
+
+        final TextFile runmpvChanged = new TextFile(
+            Path.of(RUNMPV_ENTRY_POINT));
+        runmpvChanged.replace(version, "RUNMPV_VERSION_NUMBER");
     }
 
     private static void createDirectoryIfNotExists(Path buildDir) throws IOException {
