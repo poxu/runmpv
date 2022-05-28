@@ -50,6 +50,8 @@ import static com.evilcorp.mpv.GenericMpvMessageQueue.rerouteSystemOutStream;
 import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
 public class StartSingleMpvInstance {
+    public static final String VERSION = "RUNMPV_VERSION_NUMBER";
+
     private final RunMpvArguments args;
     private MpvCommunicationChannel channel;
     private volatile RunMpvProperties config;
@@ -203,7 +205,12 @@ public class StartSingleMpvInstance {
      * @throws RuntimeException exception might be thrown when starting logging system
      *                     or when starting emergency logging system
      */
+    @SuppressWarnings("ReturnCount")
     public static void main(String[] args) {
+        if (args.length > 0 && "--version".equals(args[0])) {
+            System.out.println(VERSION);
+            return;
+        }
         final RunMpvArguments arguments = new CommandLineRunMpvArguments(args);
         if (arguments.empty()) {
             return;
