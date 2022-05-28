@@ -46,6 +46,7 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
+        shell: bat
         with:
           runmpvVersion: ${{ steps.tagName.outputs.tag }}
         run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ runmpvVersion }}-${{ github.sha }} windows 2017
@@ -84,6 +85,7 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
+        shell: bash
         with:
           runmpvVersion: ${{ steps.tagName.outputs.tag }}
         run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ runmpvVersion }}-${{ github.sha }} linux
