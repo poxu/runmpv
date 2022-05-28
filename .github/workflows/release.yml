@@ -46,10 +46,7 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
-        with:
-          runmpvVersion: ${{ steps.tagName.outputs.tag }}
-        shell: bat
-        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ runmpvVersion }}-${{ github.sha }} windows 2017
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ steps.tagName.outputs.tag }}-${{ github.sha }} windows 2017
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -57,10 +54,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          runmpvVersion: ${{ steps.tagName.outputs.tag }}
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./build/runmpv.zip
-          asset_name: runmpv-windows-x86_64-${{ runmpvVersion }}.zip
+          asset_name: runmpv-windows-x86_64-${{ steps.tagName.outputs.tag }}.zip
           asset_content_type: application/zip
   linux-executable:
     runs-on: ubuntu-latest
@@ -85,10 +81,8 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
-        with:
-          runmpvVersion: ${{ steps.tagName.outputs.tag }}
         shell: bash
-        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ runmpvVersion }}-${{ github.sha }} linux
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ steps.tagName.outputs.tag }}-${{ github.sha }} linux
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -96,8 +90,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          runmpvVersion: ${{ steps.tagName.outputs.tag }}
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./build/runmpv.zip
-          asset_name: runmpv-linux-x86_64-${{ runmpvVersion }}.zip
+          asset_name: runmpv-linux-x86_64-${{ steps.tagName.outputs.tag }}.zip
           asset_content_type: application/zip
