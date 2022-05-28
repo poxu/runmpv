@@ -44,7 +44,7 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
-        run: java -cp script-build com.evilcorp.build.BuildRunMpv windows 2017
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ github.ref }}-${{ github.sha }} windows 2017
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -54,7 +54,7 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./build/runmpv.zip
-          asset_name: runmpv-windows-x86_64.zip
+          asset_name: runmpv-windows-x86_64-${{ github.ref }}-${{ github.sha }}.zip
           asset_content_type: application/zip
   linux-executable:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
         run: javac -d script-build -sourcepath src/main/java src/main/java/com/evilcorp/build/BuildRunMpv.java
 
       - name: Run runmpv builder
-        run: java -cp script-build com.evilcorp.build.BuildRunMpv linux
+        run: java -cp script-build com.evilcorp.build.BuildRunMpv ${{ github.ref }}-${{ github.sha }} linux
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -87,5 +87,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./build/runmpv.zip
-          asset_name: runmpv-linux-x86_64.zip
+          asset_name: runmpv-linux-x86_64-${{ github.ref }}-${{ github.sha }}.zip
           asset_content_type: application/zip
