@@ -17,6 +17,48 @@ Also, I like java.
 
 Currently runmpv works under Windows and under Linux. 
 
+# Features
+### Open all video files in the same mpv window
+Basically single instance feature for mpv. Mpv always opens new videos in 
+separate windows. And that's not the behaviour, many users want. If you open
+videos with runmpv, runmpv first looks for an existing instance of mpv and
+commands it to start playing the video. If there's no mpv instances open,
+then runmpv starts one.
+### Focus mpv window after you open a new video. 
+Especially convenient if you didn't tune mpv to put its window on top. 
+Also useful, if you want to use mpv hotkeys right after you have opened a new
+video. Make volume lower for example.
+### Do not restart if mpv already plays the video you are trying to open.
+Convenient if you put mpv window to background and just want to 
+bring it to front.
+### Start playing a new video after opening, if current video is on pause. 
+Useful, if mpv is tuned to not close its window, after video is over. 
+Without this feature, a new video would be paused after opening.
+### Open files from different directories in different mpv windows.
+What if you are watching Supernatural and then your friend comes to watch
+an episode of The Boys.
+
+Single instance feature is inconvenient then. runmpv would open an episode of
+The Boys in the same windows as Supernatural. And after you're done with 
+The Boys, you'll have to look for Supernatural episode you were watching
+and maybe search for the position you were in.
+
+You could just open The Boys in stock mpv window, but you'd have
+to keep remembering about having to do that. 
+On the other hand, how good it would have been if episodes
+of The Boys opened in one window and episodes of Supernaturals opened in the
+other!
+
+runmpv can do just that by opening videos from different directories in 
+different mpv windows! 
+
+Because, all episodes of the current season of Supernatural are
+probably in one directory and all episodes of the current season of The Boys
+are probably in another directory.
+
+But that's not default, you have to put ```openMode=instance-per-directory```
+in runmpv.properties for this behaviour.
+
 # Installation
 
 ## Windows
