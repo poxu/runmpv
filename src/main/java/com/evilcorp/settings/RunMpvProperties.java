@@ -8,6 +8,7 @@ package com.evilcorp.settings;
  *
  * Code completion works and all settings are typed.
  */
+@SuppressWarnings("MethodCount")
 public interface RunMpvProperties {
     /**
      * Number of seconds to wait until mpv executable starts,
@@ -78,4 +79,6 @@ public interface RunMpvProperties {
      * @return remote server port
      */
     int syncPort();
+
+    String video();
 }

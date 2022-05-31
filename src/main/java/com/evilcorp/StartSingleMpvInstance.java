@@ -24,6 +24,7 @@ import com.evilcorp.mpv.communication.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.communication.SyncServerCommunicationChannel;
 import com.evilcorp.os.OperatingSystem;
 import com.evilcorp.os.RuntimeOperatingSystem;
+import com.evilcorp.settings.CommandLineSettings;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvExecutableSettings;
@@ -81,6 +82,8 @@ public class StartSingleMpvInstance {
     }
 
     public void run() {
+        final String[] rawArgs = ((CommandLineRunMpvArguments) args).args();
+        final CommandLineSettings commandLineSettings = new CommandLineSettings(rawArgs);
         final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
 
         final FsFile runMpvHomeDir = args.runMpvHome()
@@ -98,6 +101,7 @@ public class StartSingleMpvInstance {
             new PipeSettings(
                 new UniquePipePerDirectorySettings(videoDir),
                 new CompositeSettings(
+                    commandLineSettings,
                     new TextFileSettings(
                         fsPaths.resolve("%r/runmpv.properties").path().toString()
                     ),

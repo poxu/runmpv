@@ -1,5 +1,6 @@
 package com.evilcorp.settings;
 
+@SuppressWarnings("MethodCount")
 public class ManualRunMpvProperties implements RunMpvProperties {
     private final Integer waitSeconds;
     private final String mpvHomeDir;
@@ -8,6 +9,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     private final String executableDir;
     private final String runnerLogFile;
     private final boolean focusAfterOpen;
+    private final String video;
 
     public ManualRunMpvProperties(
         Integer waitSeconds,
@@ -16,7 +18,9 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         String mpvLogFile,
         String executableDir,
         String runnerLogFile,
-        boolean focusAfterOpen) {
+        boolean focusAfterOpen,
+        String video
+    ) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
         this.pipeName = pipeName;
@@ -24,6 +28,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         this.executableDir = executableDir;
         this.runnerLogFile = runnerLogFile;
         this.focusAfterOpen = focusAfterOpen;
+        this.video = video;
     }
 
     @Override
@@ -74,5 +79,10 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     @Override
     public int syncPort() {
         return 5445;
+    }
+
+    @Override
+    public String video() {
+        return video;
     }
 }
