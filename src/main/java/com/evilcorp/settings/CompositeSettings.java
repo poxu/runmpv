@@ -9,20 +9,22 @@ import java.util.Optional;
  * are searched for it.
  */
 public class CompositeSettings implements SoftSettings {
-    private final SoftSettings actualSettings;
-    private final SoftSettings defaultSettings;
+    private final SoftSettings[] settingVariants;
 
     public CompositeSettings(
-        SoftSettings actualSettings,
-        SoftSettings defaultSettings
+        SoftSettings... settingVariants
     ) {
-        this.actualSettings = actualSettings;
-        this.defaultSettings = defaultSettings;
+        this.settingVariants = settingVariants;
     }
 
     @Override
     public Optional<String> setting(String name) {
-        return actualSettings.setting(name)
-            .or(() -> defaultSettings.setting(name));
+        for (SoftSettings settings : settingVariants) {
+            final Optional<String> setting = settings.setting(name);
+            if (setting.isPresent()) {
+                return setting;
+            }
+        }
+        return Optional.empty();
     }
 }

@@ -8,6 +8,7 @@ import com.evilcorp.fs.FsPaths;
  * converts them to proper data types and
  * resolves paths if needed.
  */
+@SuppressWarnings("MethodCount")
 public class RunMpvPropertiesFromSettings implements RunMpvProperties {
     private final FsPaths fsPaths;
     private final SoftSettings settings;
@@ -82,5 +83,11 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
         return settings.setting("syncPort")
             .map(Integer::valueOf)
             .orElse(5454);
+    }
+
+    @Override
+    public String video() {
+        return settings.setting("videoFile")
+            .orElse(null);
     }
 }

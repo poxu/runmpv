@@ -24,16 +24,19 @@ import com.evilcorp.mpv.communication.MpvCommunicationChannelProvider;
 import com.evilcorp.mpv.communication.SyncServerCommunicationChannel;
 import com.evilcorp.os.OperatingSystem;
 import com.evilcorp.os.RuntimeOperatingSystem;
+import com.evilcorp.settings.CommandLineSettings;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvExecutableSettings;
 import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
+import com.evilcorp.settings.SoftSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 import com.evilcorp.util.Shortcuts;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -52,42 +55,99 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 public class StartSingleMpvInstance {
     public static final String VERSION = "RUNMPV_VERSION_NUMBER";
 
-    private final RunMpvArguments args;
     private MpvCommunicationChannel channel;
     private volatile RunMpvProperties config;
     private SyncServerCommunicationChannel serverChannel;
     private long lastResponse = Long.MAX_VALUE;
+    /**
+     * This lock is needed, because runmpv is launched is a separate thread and
+     * main thread makes sure this thread doesn't hang.
+     *
+     * It runmpv thread works longer than 10 seconds, main thread kills runmpv
+     * thread.
+     *
+     * But if runmpv is used to synchronise instances of mpv on different
+     * machines, then thread should not quit while mpv instance exists.
+     *
+     * To decide which mode runmpv works in it checks __sync__ setting in
+     * runmpv.properties . So config should be read before main thread decides
+     * whether it should kill runmpv thread after 10 seconds or not.
+     *
+     * Also, runmpv shouldn't work in background if runmpv couldn't connect to
+     * remote server. This behaviour will change in the future, because if there's
+     * no connection when runmpv starts it might be established later. But right
+     * now, during development phase if there's no connection it probably means,
+     * that sync server is down, and I just want to watch a video.
+     *
+     * This lock should be released after it is safe to call
+     * {@link StartSingleMpvInstance#runsInBackground()} method, which checks
+     * if runmpv should work in background or not. Currently, it's after config
+     * is fully read and after runmpv made a fair attempt to connect to remote
+     * sync server.
+     *
+     * That, by the way, makes {@link StartSingleMpvInstance#runsInBackground()}
+     * {@link StartSingleMpvInstance#config},
+     * {@link StartSingleMpvInstance#serverChannel}
+     * and lock release position tightly coupled.
+     *
+     * Not a good solution, but will do for now.
+     */
     private final CountDownLatch latch = new CountDownLatch(1);
+    private final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+    private final SoftSettings commandLineSettings;
 
-    public StartSingleMpvInstance(RunMpvArguments args) {
-        this.args = args;
+    public StartSingleMpvInstance(SoftSettings commandLineSettings) {
+        this.commandLineSettings = commandLineSettings;
     }
 
     public void close() {
-        channel.detach();
-        serverChannel.detach();
+        if (channel != null) {
+            channel.detach();
+        }
+        if (serverChannel != null) {
+            serverChannel.detach();
+        }
     }
 
     public boolean runsInBackground() {
         return config.sync() && serverChannel.isOpen();
     }
 
+    /**
+     * If initialisation is not complete within 3 seconds, something is
+     * probably wrong.
+     */
     public void waitUntilInitializationComplete() {
         try {
-            latch.await();
+            final boolean initCompleteInTime = latch.await(3, TimeUnit.SECONDS);
+            if (!initCompleteInTime) {
+                logger.warning("Couldn't complete initialisation in 3 seconds. " +
+                    "Something is probably wrong");
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void run() {
-        final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
+    public void runAndReleaseLock() {
+        try {
+            run();
+        } finally {
+            latch.countDown();
+        }
+    }
 
-        final FsFile runMpvHomeDir = args.runMpvHome()
+    public void run() {
+        final FsFile videoDir = new ManualFsFile(
+            commandLineSettings.setting("videoFile").map(Path::of)
+                .orElseThrow().getParent());
+
+        final FsFile runMpvHomeDir = commandLineSettings.setting("executableDir")
+            .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
             .orElse(new RunMpvExecutable());
+
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
-        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final LocalFsPaths fsPaths = new LocalFsPaths(
             new UserHomeDir(),
             runMpvHomeDir,
@@ -98,35 +158,34 @@ public class StartSingleMpvInstance {
             new PipeSettings(
                 new UniquePipePerDirectorySettings(videoDir),
                 new CompositeSettings(
+                    commandLineSettings,
                     new TextFileSettings(
                         fsPaths.resolve("%r/runmpv.properties").path().toString()
                     ),
-                    new CompositeSettings(
-                        new MpvExecutableSettings(
-                            os,
-                            "%r/../",
-                            ""
-                        ),
-                        new ManualSettings(Map.of(
-                            // @formatter:off
-                            // checkstyle:off
-                            //--------------|-----------------------------------//
-                            //     name     |         default value             //
-                            //--------------|-----------------------------------//
-                            "waitSeconds"   , "10",
-                            //--------------|-----------------------------------//
-                            "openMode"      , "single-instance",
-                            //--------------|-----------------------------------//
-                            "pipeName"      , "myPipe",
-                            //--------------|-----------------------------------//
-                            "executableDir" , runMpvHomeDir.path().toString(),
-                            //--------------|-----------------------------------//
-                            "focusAfterOpen", "true"
-                            //--------------|-----------------------------------//
-                            // checkstyle:on
-                            // @formatter:on
-                        ))
-                    )
+                    new MpvExecutableSettings(
+                        os,
+                        "%r/../",
+                        ""
+                    ),
+                    new ManualSettings(Map.of(
+                        // @formatter:off
+                        // checkstyle:off
+                        //--------------|-----------------------------------//
+                        //     name     |         default value             //
+                        //--------------|-----------------------------------//
+                        "waitSeconds"   , "10",
+                        //--------------|-----------------------------------//
+                        "openMode"      , "single-instance",
+                        //--------------|-----------------------------------//
+                        "pipeName"      , "myPipe",
+                        //--------------|-----------------------------------//
+                        "executableDir" , runMpvHomeDir.path().toString(),
+                        //--------------|-----------------------------------//
+                        "focusAfterOpen", "true"
+                        //--------------|-----------------------------------//
+                        // checkstyle:on
+                        // @formatter:on
+                    ))
                 )
             ),
             fsPaths
@@ -136,7 +195,7 @@ public class StartSingleMpvInstance {
             rerouteSystemOutStream(config.runnerLogFile());
         }
 
-        final String videoFileName = args.video().path().toString();
+        final String videoFileName = config.video();
 
         serverChannel = new SyncServerCommunicationChannel(config.syncAddress(), config.syncPort());
         if (config.sync()) {
@@ -166,7 +225,7 @@ public class StartSingleMpvInstance {
         }
         events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
         events.execute(new GetProperty("filename"), (e, evts, __2) -> {
-            final String playedFile = args.video().path().getFileName().toString();
+            final String playedFile = Path.of(config.video()).getFileName().toString();
             final FilenameResponse resp = new FilenameResponse(e);
             if (!resp.available() || !Objects.equals(resp.filename(), playedFile)) {
                 evts.execute(new OpenFile(videoFileName));
@@ -201,9 +260,17 @@ public class StartSingleMpvInstance {
     /**
      * Main method, which runs mpv
      *
-     * @param args one argument supported - video file name
-     * @throws RuntimeException exception might be thrown when starting logging system
-     *                     or when starting emergency logging system
+     * @param args if first argument is --version, runmpv will print version
+     *             and then quit.
+     *
+     *             If there's no arguments, runmpv will quit silently.
+     *
+     *             Video file should be last argument.
+     *
+     *             Also, same arguments as in runmpv.properties are accepted.
+     *             For example, you could
+     *             runmpv --openMode=instance-per-directory <video file name>
+     *             to open video in separate mpv instance just this once.
      */
     @SuppressWarnings("ReturnCount")
     public static void main(String[] args) {
@@ -215,10 +282,11 @@ public class StartSingleMpvInstance {
         if (arguments.empty()) {
             return;
         }
-        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
+        final CommandLineSettings commandLineSettings = new CommandLineSettings(args);
+        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final Future<?> task = executor.submit(runmpv::run);
+        final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
         try {
             runmpv.waitUntilInitializationComplete();
             if (runmpv.runsInBackground()) {
