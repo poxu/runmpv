@@ -31,6 +31,7 @@ import com.evilcorp.settings.MpvExecutableSettings;
 import com.evilcorp.settings.PipeSettings;
 import com.evilcorp.settings.RunMpvProperties;
 import com.evilcorp.settings.RunMpvPropertiesFromSettings;
+import com.evilcorp.settings.SoftSettings;
 import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 import com.evilcorp.util.Shortcuts;
@@ -54,7 +55,6 @@ import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 public class StartSingleMpvInstance {
     public static final String VERSION = "RUNMPV_VERSION_NUMBER";
 
-    private final RunMpvArguments args;
     private MpvCommunicationChannel channel;
     private volatile RunMpvProperties config;
     private SyncServerCommunicationChannel serverChannel;
@@ -74,7 +74,7 @@ public class StartSingleMpvInstance {
      * whether it should kill runmpv thread after 10 seconds or not.
      *
      * Also, runmpv shouldn't work in background if runmpv couldn't connect to
-     * remote server. This behaviour will change in the future, because if there
+     * remote server. This behaviour will change in the future, because if there's
      * no connection when runmpv starts it might be established later. But right
      * now, during development phase if there's no connection it probably means,
      * that sync server is down, and I just want to watch a video.
@@ -94,9 +94,10 @@ public class StartSingleMpvInstance {
      */
     private final CountDownLatch latch = new CountDownLatch(1);
     private final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
+    private final SoftSettings commandLineSettings;
 
-    public StartSingleMpvInstance(RunMpvArguments args) {
-        this.args = args;
+    public StartSingleMpvInstance(SoftSettings commandLineSettings) {
+        this.commandLineSettings = commandLineSettings;
     }
 
     public void close() {
@@ -111,7 +112,6 @@ public class StartSingleMpvInstance {
     public boolean runsInBackground() {
         return config.sync() && serverChannel.isOpen();
     }
-
 
     /**
      * If initialisation is not complete within 3 seconds, something is
@@ -138,15 +138,10 @@ public class StartSingleMpvInstance {
     }
 
     public void run() {
-        final String[] rawArgs = ((CommandLineRunMpvArguments) args).args();
-        final CommandLineSettings commandLineSettings = new CommandLineSettings(rawArgs);
-//        final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
         final FsFile videoDir = new ManualFsFile(
             commandLineSettings.setting("videoFile").map(Path::of)
                 .orElseThrow().getParent());
 
-//        final FsFile runMpvHomeDir = args.runMpvHome()
-//            .orElse(new RunMpvExecutable());
         final FsFile runMpvHomeDir = commandLineSettings.setting("executableDir")
             .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
             .orElse(new RunMpvExecutable());
@@ -200,7 +195,7 @@ public class StartSingleMpvInstance {
             rerouteSystemOutStream(config.runnerLogFile());
         }
 
-        final String videoFileName = args.video().path().toString();
+        final String videoFileName = config.video();
 
         serverChannel = new SyncServerCommunicationChannel(config.syncAddress(), config.syncPort());
         if (config.sync()) {
@@ -230,7 +225,7 @@ public class StartSingleMpvInstance {
         }
         events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
         events.execute(new GetProperty("filename"), (e, evts, __2) -> {
-            final String playedFile = args.video().path().getFileName().toString();
+            final String playedFile = Path.of(config.video()).getFileName().toString();
             final FilenameResponse resp = new FilenameResponse(e);
             if (!resp.available() || !Objects.equals(resp.filename(), playedFile)) {
                 evts.execute(new OpenFile(videoFileName));
@@ -279,7 +274,8 @@ public class StartSingleMpvInstance {
         if (arguments.empty()) {
             return;
         }
-        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
+        final CommandLineSettings commandLineSettings = new CommandLineSettings(args);
+        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
