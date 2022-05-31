@@ -45,8 +45,4 @@ public class CommandLineRunMpvArguments implements RunMpvArguments {
     public boolean empty() {
         return args.length == 0;
     }
-
-    public String[] args() {
-        return args;
-    }
 }
