@@ -260,9 +260,17 @@ public class StartSingleMpvInstance {
     /**
      * Main method, which runs mpv
      *
-     * @param args one argument supported - video file name
-     * @throws RuntimeException exception might be thrown when starting logging system
-     *                     or when starting emergency logging system
+     * @param args if first argument is --version, runmpv will print version
+     *             and then quit.
+     *
+     *             If there's no arguments, runmpv will quit silently.
+     *
+     *             Video file should be last argument.
+     *
+     *             Also, same arguments as in runmpv.properties are accepted.
+     *             For example, you could
+     *             runmpv --openMode=instance-per-directory <video file name>
+     *             to open video in separate mpv instance just this once.
      */
     @SuppressWarnings("ReturnCount")
     public static void main(String[] args) {
