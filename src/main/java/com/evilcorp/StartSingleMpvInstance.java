@@ -101,32 +101,30 @@ public class StartSingleMpvInstance {
                     new TextFileSettings(
                         fsPaths.resolve("%r/runmpv.properties").path().toString()
                     ),
-                    new CompositeSettings(
-                        new MpvExecutableSettings(
-                            os,
-                            "%r/../",
-                            ""
-                        ),
-                        new ManualSettings(Map.of(
-                            // @formatter:off
-                            // checkstyle:off
-                            //--------------|-----------------------------------//
-                            //     name     |         default value             //
-                            //--------------|-----------------------------------//
-                            "waitSeconds"   , "10",
-                            //--------------|-----------------------------------//
-                            "openMode"      , "single-instance",
-                            //--------------|-----------------------------------//
-                            "pipeName"      , "myPipe",
-                            //--------------|-----------------------------------//
-                            "executableDir" , runMpvHomeDir.path().toString(),
-                            //--------------|-----------------------------------//
-                            "focusAfterOpen", "true"
-                            //--------------|-----------------------------------//
-                            // checkstyle:on
-                            // @formatter:on
-                        ))
-                    )
+                    new MpvExecutableSettings(
+                        os,
+                        "%r/../",
+                        ""
+                    ),
+                    new ManualSettings(Map.of(
+                        // @formatter:off
+                        // checkstyle:off
+                        //--------------|-----------------------------------//
+                        //     name     |         default value             //
+                        //--------------|-----------------------------------//
+                        "waitSeconds"   , "10",
+                        //--------------|-----------------------------------//
+                        "openMode"      , "single-instance",
+                        //--------------|-----------------------------------//
+                        "pipeName"      , "myPipe",
+                        //--------------|-----------------------------------//
+                        "executableDir" , runMpvHomeDir.path().toString(),
+                        //--------------|-----------------------------------//
+                        "focusAfterOpen", "true"
+                        //--------------|-----------------------------------//
+                        // checkstyle:on
+                        // @formatter:on
+                    ))
                 )
             ),
             fsPaths
