@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CommandLineSettingsTest {
     private final String[] RAW_SETTINGS = {
         "--waitSeconds=10",
+        "--halfDefinedSetting="
     };
     private final CommandLineSettings settings =
         new CommandLineSettings(RAW_SETTINGS);
@@ -22,11 +23,10 @@ public class CommandLineSettingsTest {
     @Test
     public void notExistingProperty() {
         assertTrue(settings.setting("Seconds").isEmpty());
-        assertTrue(settings.setting("halfDefinedSetting").isEmpty());
     }
 
     @Test
     public void existingIllegalProperty() {
-//        assertTrue(settings.setting("halfDefinedSetting").isEmpty());
+        assertTrue(settings.setting("halfDefinedSetting").isEmpty());
     }
 }
