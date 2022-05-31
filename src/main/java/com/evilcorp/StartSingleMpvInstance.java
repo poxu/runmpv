@@ -35,6 +35,7 @@ import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 import com.evilcorp.util.Shortcuts;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -84,10 +85,17 @@ public class StartSingleMpvInstance {
     public void run() {
         final String[] rawArgs = ((CommandLineRunMpvArguments) args).args();
         final CommandLineSettings commandLineSettings = new CommandLineSettings(rawArgs);
-        final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
+//        final FsFile videoDir = new ManualFsFile(args.video().path().getParent());
+        final FsFile videoDir = new ManualFsFile(
+            commandLineSettings.setting("videoFile").map(Path::of)
+                .orElseThrow().getParent());
 
-        final FsFile runMpvHomeDir = args.runMpvHome()
+//        final FsFile runMpvHomeDir = args.runMpvHome()
+//            .orElse(new RunMpvExecutable());
+        final FsFile runMpvHomeDir = commandLineSettings.setting("runmpv-executable-dir")
+            .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
             .orElse(new RunMpvExecutable());
+
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
