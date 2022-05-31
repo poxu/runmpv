@@ -59,26 +59,81 @@ public class StartSingleMpvInstance {
     private volatile RunMpvProperties config;
     private SyncServerCommunicationChannel serverChannel;
     private long lastResponse = Long.MAX_VALUE;
+    /**
+     * This lock is needed, because runmpv is launched is a separate thread and
+     * main thread makes sure this thread doesn't hang.
+     *
+     * It runmpv thread works longer than 10 seconds, main thread kills runmpv
+     * thread.
+     *
+     * But if runmpv is used to synchronise instances of mpv on different
+     * machines, then thread should not quit while mpv instance exists.
+     *
+     * To decide which mode runmpv works in it checks __sync__ setting in
+     * runmpv.properties . So config should be read before main thread decides
+     * whether it should kill runmpv thread after 10 seconds or not.
+     *
+     * Also, runmpv shouldn't work in background if runmpv couldn't connect to
+     * remote server. This behaviour will change in the future, because if there
+     * no connection when runmpv starts it might be established later. But right
+     * now, during development phase if there's no connection it probably means,
+     * that sync server is down, and I just want to watch a video.
+     *
+     * This lock should be released after it is safe to call
+     * {@link StartSingleMpvInstance#runsInBackground()} method, which checks
+     * if runmpv should work in background or not. Currently, it's after config
+     * is fully read and after runmpv made a fair attempt to connect to remote
+     * sync server.
+     *
+     * That, by the way, makes {@link StartSingleMpvInstance#runsInBackground()}
+     * {@link StartSingleMpvInstance#config},
+     * {@link StartSingleMpvInstance#serverChannel}
+     * and lock release position tightly coupled.
+     *
+     * Not a good solution, but will do for now.
+     */
     private final CountDownLatch latch = new CountDownLatch(1);
+    private final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
 
     public StartSingleMpvInstance(RunMpvArguments args) {
         this.args = args;
     }
 
     public void close() {
-        channel.detach();
-        serverChannel.detach();
+        if (channel != null) {
+            channel.detach();
+        }
+        if (serverChannel != null) {
+            serverChannel.detach();
+        }
     }
 
     public boolean runsInBackground() {
         return config.sync() && serverChannel.isOpen();
     }
 
+
+    /**
+     * If initialisation is not complete within 3 seconds, something is
+     * probably wrong.
+     */
     public void waitUntilInitializationComplete() {
         try {
-            latch.await();
+            final boolean initCompleteInTime = latch.await(3, TimeUnit.SECONDS);
+            if (!initCompleteInTime) {
+                logger.warning("Couldn't complete initialisation in 3 seconds. " +
+                    "Something is probably wrong");
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void runAndReleaseLock() {
+        try {
+            run();
+        } finally {
+            latch.countDown();
         }
     }
 
@@ -92,13 +147,12 @@ public class StartSingleMpvInstance {
 
 //        final FsFile runMpvHomeDir = args.runMpvHome()
 //            .orElse(new RunMpvExecutable());
-        final FsFile runMpvHomeDir = commandLineSettings.setting("runmpv-executable-dir")
+        final FsFile runMpvHomeDir = commandLineSettings.setting("executableDir")
             .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
             .orElse(new RunMpvExecutable());
 
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
-        final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final LocalFsPaths fsPaths = new LocalFsPaths(
             new UserHomeDir(),
             runMpvHomeDir,
@@ -228,7 +282,7 @@ public class StartSingleMpvInstance {
         final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(arguments);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final Future<?> task = executor.submit(runmpv::run);
+        final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
         try {
             runmpv.waitUntilInitializationComplete();
             if (runmpv.runsInBackground()) {
