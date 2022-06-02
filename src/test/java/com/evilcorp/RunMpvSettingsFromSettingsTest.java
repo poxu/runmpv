@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RunMpvSettingsFromSettingsTest {
-
     private final RunMpvProperties properties = new RunMpvPropertiesFromSettings(
         new ManualSettings(
             Map.of(

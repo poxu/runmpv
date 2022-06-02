@@ -8,10 +8,9 @@ import java.io.ByteArrayInputStream;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CommentedTextFileSettingsTest {
-
     @Nested
     class IgnoresCommentedLines {
-        private final String RAW_SETTINGS = """
+        private static final String RAW_SETTINGS = """
             # waitSeconds=15
             # waitSeconds=16
             """;

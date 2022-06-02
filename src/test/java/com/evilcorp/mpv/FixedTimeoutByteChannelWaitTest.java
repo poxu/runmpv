@@ -79,7 +79,7 @@ class FixedTimeoutByteChannelWaitTest {
         final FixedTimeoutByteChannel channel = new FixedTimeoutByteChannel(block, 500);
 
         @Test
-        void oneStepInProgressRead() throws IOException {
+        public void oneStepInProgressRead() throws IOException {
             final long start = System.nanoTime();
             final ByteBuffer buff = ByteBuffer.allocate(1000);
             int bytesRead = channel.read(buff);

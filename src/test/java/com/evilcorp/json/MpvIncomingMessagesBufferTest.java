@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MpvIncomingMessagesBufferTest {
-
     private String json = """
     {"name": "value"}
     {"number": 123}
@@ -21,7 +20,7 @@ public class MpvIncomingMessagesBufferTest {
     private byte[] utf8Bytes = StandardCharsets.UTF_8.encode(json).array();
 
     @Test
-    void consumeHalfFirstLine() {
+    public void consumeHalfFirstLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 10);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
@@ -33,7 +32,7 @@ public class MpvIncomingMessagesBufferTest {
     }
 
     @Test
-    void consumeHalfSecondLine() {
+    public void consumeHalfSecondLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 20);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);
@@ -46,7 +45,7 @@ public class MpvIncomingMessagesBufferTest {
     }
 
     @Test
-    void consumeHalfThirdLine() {
+    public void consumeHalfThirdLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         final byte[] inBytes = Arrays.copyOfRange(utf8Bytes, 0, 35);
         final ByteBuffer allocate = ByteBuffer.allocate(1000);

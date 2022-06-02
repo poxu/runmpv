@@ -38,7 +38,7 @@ class RetryTest {
     }
 
     @Test
-    void runAndFailFirstTime() {
+    public void runAndFailFirstTime() {
         RetryContainer container = new RetryContainer(2);
 
         Retry<Boolean> retry = new Retry<>(4, () -> {
@@ -55,7 +55,7 @@ class RetryTest {
     }
 
     @Test
-    void runAndFailMostTimes() {
+    public void runAndFailMostTimes() {
         RetryContainer container = new RetryContainer(4);
         Retry<Boolean> retry = new Retry<>(1,
             () -> {
@@ -65,7 +65,7 @@ class RetryTest {
                 }
                 return Optional.empty();
             },
-            (timeout) -> {},
+            (timeout) -> { },
             container::nanoSecondsSinceStart
         );
 
@@ -75,9 +75,9 @@ class RetryTest {
     }
 
     @Test
-    void runAndFailAlways() {
+    public void runAndFailAlways() {
         RetryContainer container = new RetryContainer(20);
-        Retry<Boolean> retry = new Retry<>(4, Optional::empty, (timeout) -> {},
+        Retry<Boolean> retry = new Retry<>(4, Optional::empty, (timeout) -> { },
             () -> {
                 container.executeTry();
                 return container.nanoSecondsSinceStart();
@@ -89,11 +89,11 @@ class RetryTest {
     }
 
     @Test
-    void runAndSuccessAlways() {
+    public void runAndSuccessAlways() {
         RetryContainer container = new RetryContainer(2);
         Retry<Boolean> retry = new Retry<>(4,
             () -> Optional.of(Boolean.TRUE),
-            (timeout) -> {},
+            (timeout) -> { },
             () -> {
                 container.executeTry();
                 return container.nanoSecondsSinceStart();

@@ -2,13 +2,11 @@ package com.evilcorp.settings;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommandLineSettingsTest {
-    private final String[] RAW_SETTINGS = {
+    private static final String[] RAW_SETTINGS = {
         "--waitSeconds=10",
         "--halfDefinedSetting="
     };

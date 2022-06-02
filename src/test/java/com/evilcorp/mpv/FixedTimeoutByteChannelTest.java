@@ -25,7 +25,7 @@ class FixedTimeoutByteChannelTest {
     FixedTimeoutByteChannel channel;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         PrintWriter printWriter = new PrintWriter(outStream);
         printWriter.print("himi");
         printWriter.flush();
@@ -35,7 +35,7 @@ class FixedTimeoutByteChannelTest {
     }
 
     @Test
-    void completedRead() throws IOException {
+    public void completedRead() throws IOException {
         final ByteBuffer buff = ByteBuffer.allocate(1000);
         final int bytesRead = channel.read(buff);
         buff.flip();
@@ -45,7 +45,7 @@ class FixedTimeoutByteChannelTest {
     }
 
     @Test
-    void completedWrite() throws IOException {
+    public void completedWrite() throws IOException {
         final ByteBuffer buff = StandardCharsets.UTF_8.encode("mihi");
         final int bytesRead = channel.write(buff);
         final String line = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(wst.toByteArray())).toString().trim();

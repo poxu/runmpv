@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class GenericMpvIncomingMessagesTest {
-
     WritableByteChannel out = Channels.newChannel(new ByteArrayOutputStream(1000));
     ByteArrayOutputStream outStream = new ByteArrayOutputStream(1000);
     ByteArrayInputStream inStream;
@@ -23,7 +22,7 @@ class GenericMpvIncomingMessagesTest {
 
     MpvMessageQueue queue;
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         PrintWriter printWriter = new PrintWriter(outStream);
         printWriter.println("hi");
         printWriter.println("mi");
@@ -34,13 +33,13 @@ class GenericMpvIncomingMessagesTest {
     }
 
     @Test
-    void sendMessage() {
+    public void sendMessage() {
         String msg = "test command";
         queue.send(msg);
     }
 
     @Test
-    void receiveMessage() {
+    public void receiveMessage() {
         Optional<String> msg = queue.nextMessage();
         assertFalse(msg.isEmpty());
         assertEquals("hi", msg.orElseThrow());

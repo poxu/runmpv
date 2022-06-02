@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CompositeSettingsTest {
-
     private final CompositeSettings settings = new CompositeSettings(
         new ManualSettings(Map.of(
             "uniqueSetting", "uniqueValue",

@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MpvIncomingMessagesTest {
-
     private String json = """
     {"name": "value"}
     {"number": 123}
@@ -20,7 +19,7 @@ public class MpvIncomingMessagesTest {
     private byte[] utf8Bytes = StandardCharsets.UTF_8.encode(json).array();
 
     @Test
-    void consumeHalfFirstLine() {
+    public void consumeHalfFirstLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         mpvIncomingMessages.consume(Arrays.copyOfRange(utf8Bytes, 0, 10));
         Optional<String> optLine = mpvIncomingMessages.nextLine();
@@ -28,7 +27,7 @@ public class MpvIncomingMessagesTest {
     }
 
     @Test
-    void consumeHalfSecondLine() {
+    public void consumeHalfSecondLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         mpvIncomingMessages.consume(Arrays.copyOfRange(utf8Bytes, 0, 20));
         Optional<String> optLine = mpvIncomingMessages.nextLine();
@@ -37,7 +36,7 @@ public class MpvIncomingMessagesTest {
     }
 
     @Test
-    void consumeHalfThirdLine() {
+    public void consumeHalfThirdLine() {
         MpvIncomingMessages mpvIncomingMessages = new MpvIncomingMessages();
         mpvIncomingMessages.consume(Arrays.copyOfRange(utf8Bytes, 0, 35));
         Optional<String> optLine = mpvIncomingMessages.nextLine();
