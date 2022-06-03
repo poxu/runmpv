@@ -73,6 +73,10 @@ public class StartSingleMpvInstance {
      * runmpv.properties . So config should be read before main thread decides
      * whether it should kill runmpv thread after 10 seconds or not.
      *
+     * There's more. If another instance of runmpv is already running in
+     * daemon mode, then this instance of runmpv shouldn't be daemon. It should
+     * just send mpv command to open the video and then quit.
+     *
      * Also, runmpv shouldn't work in background if runmpv couldn't connect to
      * remote server. This behaviour will change in the future, because if there's
      * no connection when runmpv starts it might be established later. But right
@@ -83,11 +87,13 @@ public class StartSingleMpvInstance {
      * {@link StartSingleMpvInstance#runsInBackground()} method, which checks
      * if runmpv should work in background or not. Currently, it's after config
      * is fully read and after runmpv made a fair attempt to connect to remote
-     * sync server.
+     * sync server and after runmpv knows if mpv was running before runmpv
+     * started.
      *
      * That, by the way, makes {@link StartSingleMpvInstance#runsInBackground()}
      * {@link StartSingleMpvInstance#config},
-     * {@link StartSingleMpvInstance#serverChannel}
+     * {@link StartSingleMpvInstance#serverChannel} ,
+     * {@link StartSingleMpvInstance#mpvInstance}
      * and lock release position tightly coupled.
      *
      * Not a good solution, but will do for now.
@@ -95,6 +101,7 @@ public class StartSingleMpvInstance {
     private final CountDownLatch latch = new CountDownLatch(1);
     private final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
     private final SoftSettings commandLineSettings;
+    private MpvInstance mpvInstance;
 
     public StartSingleMpvInstance(SoftSettings commandLineSettings) {
         this.commandLineSettings = commandLineSettings;
@@ -110,7 +117,8 @@ public class StartSingleMpvInstance {
     }
 
     public boolean runsInBackground() {
-        return config.sync() && serverChannel.isOpen();
+        return config.sync()
+            && serverChannel.isOpen() && mpvInstance.firstLaunch();
     }
 
     /**
@@ -201,7 +209,6 @@ public class StartSingleMpvInstance {
         if (config.sync()) {
             serverChannel.attach();
         }
-        latch.countDown();
 
         logger.info("started");
         logger.info("runmpv argument is " + videoFileName);
@@ -211,19 +218,15 @@ public class StartSingleMpvInstance {
         channel = channelProvider.channel();
         MvpInstanceProvider provider = new MvpInstanceProvider(config,
             os.operatingSystemFamily(), channel);
-        MpvInstance mpvInstance = provider.mvpInstance();
+        mpvInstance = provider.mvpInstance();
+        latch.countDown();
         MpvEvents events = new MpvEvents(
             new GenericMpvMessageQueue(channel.channel()),
             new GenericMpvMessageQueue(serverChannel.channel())
         );
-        if (config.sync() && serverChannel.isOpen()) {
-            events.registerServerCallback(new ServerPauseCallback());
-        }
-
         if (config.focusAfterOpen() && !mpvInstance.firstLaunch()) {
             events.execute(new GetProperty("pid"), mpvInstance.focusCallback());
         }
-        events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
         events.execute(new GetProperty("filename"), (e, evts, __2) -> {
             final String playedFile = Path.of(config.video()).getFileName().toString();
             final FilenameResponse resp = new FilenameResponse(e);
@@ -233,18 +236,19 @@ public class StartSingleMpvInstance {
             }
             events.execute(new SetProperty("pause", false));
         });
-        if (config.sync() && serverChannel.isOpen()) {
-            events.observe(new ObserveProperty("pause"), new ObservePause());
-        }
-        while (events.hasPendingRequests()
-            || (config.sync() && serverChannel.isOpen() && ((System.nanoTime() - lastResponse) < 1_000_000_000L))
-        ) {
+        while (events.hasPendingRequests()) {
             events.receiveMessages();
             Shortcuts.sleep(50);
-            if (config.sync() && serverChannel.isOpen()) {
+        }
+        if (runsInBackground()) {
+            events.registerServerCallback(new ServerPauseCallback());
+            events.registerMessageCallback((msg, __1, __2) -> lastResponse = System.nanoTime());
+            events.observe(new ObserveProperty("pause"), new ObservePause());
+            while ((System.nanoTime() - lastResponse) < 1_000_000_000L) {
+                events.receiveMessages();
+                Shortcuts.sleep(50);
                 if (((System.nanoTime() - lastResponse) > 500_000_000L)) {
-                    events.execute(new GetProperty("time-pos"), (m, e, s) -> {
-                    });
+                    events.execute(new GetProperty("time-pos"), (m, e, s) -> { });
                 }
                 events.receiveServerMessages();
             }
