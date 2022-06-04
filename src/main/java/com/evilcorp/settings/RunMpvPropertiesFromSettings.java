@@ -90,4 +90,10 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
         return settings.setting("videoFile")
             .orElse(null);
     }
+
+    @Override
+    public String runmpvTmpDir() {
+        return settings.setting("runmpvTmpDir")
+            .orElse(null);
+    }
 }

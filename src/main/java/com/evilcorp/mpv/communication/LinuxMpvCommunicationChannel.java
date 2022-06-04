@@ -58,13 +58,8 @@ public class LinuxMpvCommunicationChannel implements MpvCommunicationChannel {
         if (name != null) {
             return name;
         }
-        final String xdgRuntimeDir = System.getenv("XDG_RUNTIME_DIR");
-        final Path socketDir;
-        if (xdgRuntimeDir != null) {
-            socketDir = Path.of(xdgRuntimeDir).resolve("runmpv");
-        } else {
-            socketDir = Path.of("/tmp").resolve("runmpv");
-        }
+        final Path socketDir = Path.of(config.runmpvTmpDir())
+            .resolve("runmpv");
         final Path mpvSocketPath = socketDir.resolve(config.pipeName());
         name = mpvSocketPath.toString();
         return name;
