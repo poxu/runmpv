@@ -10,6 +10,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     private final String runnerLogFile;
     private final boolean focusAfterOpen;
     private final String video;
+    private final String runmpvTmpDir;
 
     public ManualRunMpvProperties(
         Integer waitSeconds,
@@ -19,7 +20,8 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         String executableDir,
         String runnerLogFile,
         boolean focusAfterOpen,
-        String video
+        String video,
+        String runmpvTmpDir
     ) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
@@ -29,6 +31,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         this.runnerLogFile = runnerLogFile;
         this.focusAfterOpen = focusAfterOpen;
         this.video = video;
+        this.runmpvTmpDir = runmpvTmpDir;
     }
 
     @Override
@@ -84,5 +87,10 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     @Override
     public String video() {
         return video;
+    }
+
+    @Override
+    public String runmpvTmpDir() {
+        return runmpvTmpDir;
     }
 }

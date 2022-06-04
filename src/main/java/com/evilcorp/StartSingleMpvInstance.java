@@ -60,36 +60,36 @@ public class StartSingleMpvInstance {
     private SyncServerCommunicationChannel serverChannel;
     private long lastResponse = Long.MAX_VALUE;
     /**
-     * This lock is needed, because runmpv is launched is a separate thread and
+     * This lock is needed, because runmpv is launched in a separate thread and
      * main thread makes sure this thread doesn't hang.
-     *
+     * <p/>
      * It runmpv thread works longer than 10 seconds, main thread kills runmpv
      * thread.
-     *
+     * <p/>
      * But if runmpv is used to synchronise instances of mpv on different
      * machines, then thread should not quit while mpv instance exists.
-     *
+     * <p/>
      * To decide which mode runmpv works in it checks __sync__ setting in
      * runmpv.properties . So config should be read before main thread decides
      * whether it should kill runmpv thread after 10 seconds or not.
-     *
+     * <p/>
      * There's more. If another instance of runmpv is already running in
      * daemon mode, then this instance of runmpv shouldn't be daemon. It should
      * just send mpv command to open the video and then quit.
-     *
+     * <p/>
      * Also, runmpv shouldn't work in background if runmpv couldn't connect to
      * remote server. This behaviour will change in the future, because if there's
      * no connection when runmpv starts it might be established later. But right
      * now, during development phase if there's no connection it probably means,
      * that sync server is down, and I just want to watch a video.
-     *
+     * <p/>
      * This lock should be released after it is safe to call
      * {@link StartSingleMpvInstance#runsInBackground()} method, which checks
      * if runmpv should work in background or not. Currently, it's after config
      * is fully read and after runmpv made a fair attempt to connect to remote
      * sync server and after runmpv knows if mpv was running before runmpv
      * started.
-     *
+     * <p/>
      * That, by the way, makes {@link StartSingleMpvInstance#runsInBackground()}
      * {@link StartSingleMpvInstance#config},
      * {@link StartSingleMpvInstance#serverChannel} ,
@@ -117,8 +117,9 @@ public class StartSingleMpvInstance {
     }
 
     public boolean runsInBackground() {
-        return config.sync()
-            && serverChannel.isOpen() && mpvInstance.firstLaunch();
+        return config != null && config.sync()
+            && serverChannel != null && serverChannel.isOpen()
+            && mpvInstance != null && mpvInstance.firstLaunch();
     }
 
     /**
@@ -175,6 +176,9 @@ public class StartSingleMpvInstance {
                         "%r/../",
                         ""
                     ),
+                    new ManualSettings(
+                        "runmpvTmpDir", System.getenv("XDG_RUNTIME_DIR")
+                    ),
                     new ManualSettings(Map.of(
                         // @formatter:off
                         // checkstyle:off
@@ -189,7 +193,9 @@ public class StartSingleMpvInstance {
                         //--------------|-----------------------------------//
                         "executableDir" , runMpvHomeDir.path().toString(),
                         //--------------|-----------------------------------//
-                        "focusAfterOpen", "true"
+                        "focusAfterOpen", "true",
+                        //--------------|-----------------------------------//
+                         "runmpvTmpDir" , "/tmp"
                         //--------------|-----------------------------------//
                         // checkstyle:on
                         // @formatter:on

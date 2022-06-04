@@ -81,4 +81,13 @@ public interface RunMpvProperties {
     int syncPort();
 
     String video();
+
+    /**
+     * Path to directory, where runmpv could place its temporary files, sockets etc.
+     * runmpv will create a directory named "runmpv" in tmp directory and put all
+     * temporary files there.
+     *
+     * @return path to runmpv tmp directory in string form
+     */
+    String runmpvTmpDir();
 }

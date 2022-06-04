@@ -1,5 +1,6 @@
 package com.evilcorp.settings;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,6 +16,16 @@ public class ManualSettings implements SoftSettings {
      */
     public ManualSettings(Map<String, String> settings) {
         this.settings = settings;
+    }
+
+    public ManualSettings(String... settings) {
+        if (settings.length % 2 != 0) {
+            throw new RuntimeException("You should pass pairs to ManualSettings");
+        }
+        this.settings = new HashMap<>();
+        for (int i = 0; i < settings.length; i += 2) {
+            this.settings.put(settings[i], settings[i + 1]);
+        }
     }
 
     @Override
