@@ -147,13 +147,20 @@ public class StartSingleMpvInstance {
     }
 
     public void run() {
+        final SoftSettings minDefaultSettings = new ManualSettings(
+            "executableDir", new RunMpvExecutable().path().getParent().toString()
+        );
+        final SoftSettings startSettings = new CompositeSettings(
+            commandLineSettings,
+            minDefaultSettings
+        );
         final FsFile videoDir = new ManualFsFile(
-            commandLineSettings.setting("videoFile").map(Path::of)
+            startSettings.setting("videoFile").map(Path::of)
                 .orElseThrow().getParent());
 
-        final FsFile runMpvHomeDir = commandLineSettings.setting("executableDir")
+        final FsFile runMpvHomeDir = startSettings.setting("executableDir")
             .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
-            .orElse(new RunMpvExecutable());
+            .orElseThrow();
 
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
