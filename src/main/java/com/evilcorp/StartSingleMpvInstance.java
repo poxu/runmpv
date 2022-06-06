@@ -4,10 +4,10 @@ import com.evilcorp.args.CommandLineRunMpvArguments;
 import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
-import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.GenericMpvMessageQueue;
+import com.evilcorp.mpv.MinSettings;
 import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.mpv.MpvEvents;
 import com.evilcorp.mpv.MpvInstance;
@@ -147,13 +147,16 @@ public class StartSingleMpvInstance {
     }
 
     public void run() {
-        final FsFile videoDir = new ManualFsFile(
-            commandLineSettings.setting("videoFile").map(Path::of)
-                .orElseThrow().getParent());
-
-        final FsFile runMpvHomeDir = commandLineSettings.setting("executableDir")
-            .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
-            .orElse(new RunMpvExecutable());
+        final SoftSettings minDefaultSettings = new ManualSettings(
+            "executableDir", new RunMpvExecutable().path().getParent().toString()
+        );
+        final SoftSettings startSettings = new CompositeSettings(
+            commandLineSettings,
+            minDefaultSettings
+        );
+        final MinSettings minSettings = new MinSettings(startSettings);
+        final FsFile videoDir = minSettings.videoDir();
+        final FsFile runMpvHomeDir = minSettings.runmpvBinDir();
 
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
@@ -179,6 +182,7 @@ public class StartSingleMpvInstance {
                     new ManualSettings(
                         "runmpvTmpDir", System.getenv("XDG_RUNTIME_DIR")
                     ),
+                    minDefaultSettings,
                     new ManualSettings(Map.of(
                         // @formatter:off
                         // checkstyle:off
@@ -190,8 +194,6 @@ public class StartSingleMpvInstance {
                         "openMode"      , "single-instance",
                         //--------------|-----------------------------------//
                         "pipeName"      , "myPipe",
-                        //--------------|-----------------------------------//
-                        "executableDir" , runMpvHomeDir.path().toString(),
                         //--------------|-----------------------------------//
                         "focusAfterOpen", "true",
                         //--------------|-----------------------------------//
