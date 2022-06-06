@@ -4,10 +4,10 @@ import com.evilcorp.args.CommandLineRunMpvArguments;
 import com.evilcorp.args.RunMpvArguments;
 import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.LocalFsPaths;
-import com.evilcorp.fs.ManualFsFile;
 import com.evilcorp.fs.RunMpvExecutable;
 import com.evilcorp.fs.UserHomeDir;
 import com.evilcorp.mpv.GenericMpvMessageQueue;
+import com.evilcorp.mpv.MinSettings;
 import com.evilcorp.mpv.MpvCommunicationChannel;
 import com.evilcorp.mpv.MpvEvents;
 import com.evilcorp.mpv.MpvInstance;
@@ -154,13 +154,9 @@ public class StartSingleMpvInstance {
             commandLineSettings,
             minDefaultSettings
         );
-        final FsFile videoDir = new ManualFsFile(
-            startSettings.setting("videoFile").map(Path::of)
-                .orElseThrow().getParent());
-
-        final FsFile runMpvHomeDir = startSettings.setting("executableDir")
-            .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
-            .orElseThrow();
+        final MinSettings minSettings = new MinSettings(startSettings);
+        final FsFile videoDir = minSettings.videoDir();
+        final FsFile runMpvHomeDir = minSettings.runmpvBinDir();
 
         initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
 
@@ -186,6 +182,7 @@ public class StartSingleMpvInstance {
                     new ManualSettings(
                         "runmpvTmpDir", System.getenv("XDG_RUNTIME_DIR")
                     ),
+                    minDefaultSettings,
                     new ManualSettings(Map.of(
                         // @formatter:off
                         // checkstyle:off
@@ -197,8 +194,6 @@ public class StartSingleMpvInstance {
                         "openMode"      , "single-instance",
                         //--------------|-----------------------------------//
                         "pipeName"      , "myPipe",
-                        //--------------|-----------------------------------//
-                        "executableDir" , runMpvHomeDir.path().toString(),
                         //--------------|-----------------------------------//
                         "focusAfterOpen", "true",
                         //--------------|-----------------------------------//

@@ -1,6 +1,9 @@
 package com.evilcorp.settings;
 
+import com.evilcorp.fs.FsFile;
 import com.evilcorp.fs.FsPaths;
+import com.evilcorp.mpv.MinSettings;
+import com.evilcorp.mpv.RunmpvMinimalSettings;
 
 /**
  * Settings for runmpv.
@@ -9,13 +12,15 @@ import com.evilcorp.fs.FsPaths;
  * resolves paths if needed.
  */
 @SuppressWarnings("MethodCount")
-public class RunMpvPropertiesFromSettings implements RunMpvProperties {
+public class RunMpvPropertiesFromSettings implements RunMpvProperties, RunmpvMinimalSettings {
     private final FsPaths fsPaths;
     private final SoftSettings settings;
+    private final RunmpvMinimalSettings minSettings;
 
     public RunMpvPropertiesFromSettings(SoftSettings settings, FsPaths fsPaths) {
         this.fsPaths = fsPaths;
         this.settings = settings;
+        this.minSettings = new MinSettings(settings);
     }
 
     @Override
@@ -47,8 +52,7 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
 
     @Override
     public String executableDir() {
-        return settings.setting("executableDir")
-            .orElse(null);
+        return minSettings.runmpvBinDir().path().toString();
     }
 
     @Override
@@ -95,5 +99,15 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties {
     public String runmpvTmpDir() {
         return settings.setting("runmpvTmpDir")
             .orElse(null);
+    }
+
+    @Override
+    public FsFile videoDir() {
+        return minSettings.videoDir();
+    }
+
+    @Override
+    public FsFile runmpvBinDir() {
+        return minSettings.runmpvBinDir();
     }
 }
