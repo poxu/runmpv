@@ -37,4 +37,10 @@ public interface RunmpvMinimalSettings {
      * @return directory, where runmpv executable is placed.
      */
     FsFile runmpvBinDir();
+
+    /**
+     * @return File, containing runmpv logging settings.
+     * logging.properties by default.
+     */
+    FsFile logSettings();
 }

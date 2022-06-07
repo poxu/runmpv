@@ -44,4 +44,10 @@ public class MinSettings implements RunmpvMinimalSettings {
             .map(dir -> (FsFile)new ManualFsFile(Path.of(dir)))
             .orElseThrow();
     }
+
+    @Override
+    public FsFile logSettings() {
+        return new ManualFsFile(Path.of(settings.setting("logSettings")
+            .orElseThrow()));
+    }
 }

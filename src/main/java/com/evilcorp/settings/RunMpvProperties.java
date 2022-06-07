@@ -1,5 +1,7 @@
 package com.evilcorp.settings;
 
+import com.evilcorp.mpv.RunmpvMinimalSettings;
+
 /**
  * Settings for runmpv.
  *
@@ -9,7 +11,7 @@ package com.evilcorp.settings;
  * Code completion works and all settings are typed.
  */
 @SuppressWarnings("MethodCount")
-public interface RunMpvProperties {
+public interface RunMpvProperties extends RunmpvMinimalSettings {
     /**
      * Number of seconds to wait until mpv executable starts,
      * before quitting with error.

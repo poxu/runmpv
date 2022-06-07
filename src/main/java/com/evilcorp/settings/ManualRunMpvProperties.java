@@ -1,5 +1,7 @@
 package com.evilcorp.settings;
 
+import com.evilcorp.fs.FsFile;
+
 @SuppressWarnings("MethodCount")
 public class ManualRunMpvProperties implements RunMpvProperties {
     private final Integer waitSeconds;
@@ -11,6 +13,9 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     private final boolean focusAfterOpen;
     private final String video;
     private final String runmpvTmpDir;
+    private final FsFile videoDir;
+    private final FsFile runmpvBinDir;
+    private final FsFile logSettings;
 
     public ManualRunMpvProperties(
         Integer waitSeconds,
@@ -21,7 +26,10 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         String runnerLogFile,
         boolean focusAfterOpen,
         String video,
-        String runmpvTmpDir
+        String runmpvTmpDir,
+        FsFile videoDir,
+        FsFile runmpvBinDir,
+        FsFile logSettings
     ) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
@@ -32,6 +40,9 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         this.focusAfterOpen = focusAfterOpen;
         this.video = video;
         this.runmpvTmpDir = runmpvTmpDir;
+        this.videoDir = videoDir;
+        this.runmpvBinDir = runmpvBinDir;
+        this.logSettings = logSettings;
     }
 
     @Override
@@ -92,5 +103,20 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     @Override
     public String runmpvTmpDir() {
         return runmpvTmpDir;
+    }
+
+    @Override
+    public FsFile videoDir() {
+        return videoDir;
+    }
+
+    @Override
+    public FsFile runmpvBinDir() {
+        return runmpvBinDir;
+    }
+
+    @Override
+    public FsFile logSettings() {
+        return logSettings;
     }
 }
