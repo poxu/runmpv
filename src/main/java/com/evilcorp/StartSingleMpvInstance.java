@@ -148,7 +148,8 @@ public class StartSingleMpvInstance {
 
     public void run() {
         final SoftSettings minDefaultSettings = new ManualSettings(
-            "executableDir", new RunMpvExecutable().path().getParent().toString()
+            "executableDir", new RunMpvExecutable().path().getParent().toString(),
+            "logSettings", "logging.properties"
         );
         final SoftSettings startSettings = new CompositeSettings(
             commandLineSettings,
@@ -158,7 +159,9 @@ public class StartSingleMpvInstance {
         final FsFile videoDir = minSettings.videoDir();
         final FsFile runMpvHomeDir = minSettings.runmpvBinDir();
 
-        initEmergencyLoggingSystem(runMpvHomeDir.path().toString() + "/logging.properties");
+        final String initLogFile = runMpvHomeDir.path()
+            .resolve(minSettings.logSettings().path()).toString();
+        initEmergencyLoggingSystem(initLogFile);
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
             new UserHomeDir(),
@@ -207,6 +210,9 @@ public class StartSingleMpvInstance {
             fsPaths
         );
         this.config = config;
+        final String configLogFile = runMpvHomeDir.path()
+            .resolve(config.logSettings().path()).toString();
+        initEmergencyLoggingSystem(configLogFile);
         if (config.runnerLogFile() != null) {
             rerouteSystemOutStream(config.runnerLogFile());
         }
