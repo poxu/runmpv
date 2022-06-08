@@ -115,4 +115,9 @@ public class RunMpvPropertiesFromSettings implements RunMpvProperties, RunmpvMin
     public FsFile logSettings() {
         return minSettings.logSettings();
     }
+
+    @Override
+    public FsFile userHome() {
+        return minSettings.userHome();
+    }
 }

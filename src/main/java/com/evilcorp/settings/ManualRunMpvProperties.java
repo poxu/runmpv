@@ -16,6 +16,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     private final FsFile videoDir;
     private final FsFile runmpvBinDir;
     private final FsFile logSettings;
+    private final FsFile userHome;
 
     public ManualRunMpvProperties(
         Integer waitSeconds,
@@ -29,8 +30,8 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         String runmpvTmpDir,
         FsFile videoDir,
         FsFile runmpvBinDir,
-        FsFile logSettings
-    ) {
+        FsFile logSettings,
+        FsFile userHome) {
         this.waitSeconds = waitSeconds;
         this.mpvHomeDir = mpvHomeDir;
         this.pipeName = pipeName;
@@ -43,6 +44,7 @@ public class ManualRunMpvProperties implements RunMpvProperties {
         this.videoDir = videoDir;
         this.runmpvBinDir = runmpvBinDir;
         this.logSettings = logSettings;
+        this.userHome = userHome;
     }
 
     @Override
@@ -118,5 +120,10 @@ public class ManualRunMpvProperties implements RunMpvProperties {
     @Override
     public FsFile logSettings() {
         return logSettings;
+    }
+
+    @Override
+    public FsFile userHome() {
+        return userHome;
     }
 }

@@ -149,7 +149,8 @@ public class StartSingleMpvInstance {
     public void run() {
         final SoftSettings minDefaultSettings = new ManualSettings(
             "executableDir", new RunMpvExecutable().path().getParent().toString(),
-            "logSettings", "logging.properties"
+            "logSettings", "logging.properties",
+            "userHome", new UserHomeDir().path().toString()
         );
         final SoftSettings startSettings = new CompositeSettings(
             commandLineSettings,
@@ -164,7 +165,7 @@ public class StartSingleMpvInstance {
         initEmergencyLoggingSystem(initLogFile);
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
-            new UserHomeDir(),
+            minSettings.userHome(),
             runMpvHomeDir,
             videoDir
         );

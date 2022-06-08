@@ -50,4 +50,10 @@ public class MinSettings implements RunmpvMinimalSettings {
         return new ManualFsFile(Path.of(settings.setting("logSettings")
             .orElseThrow()));
     }
+
+    @Override
+    public FsFile userHome() {
+        return new ManualFsFile(Path.of(settings.setting("userHome")
+            .orElseThrow()));
+    }
 }
