@@ -56,4 +56,9 @@ public class MinSettings implements RunmpvMinimalSettings {
         return new ManualFsFile(Path.of(settings.setting("userHome")
             .orElseThrow()));
     }
+
+    public String runmpvSettings() {
+        return settings.setting("runmpvSettings")
+            .orElseThrow();
+    }
 }
