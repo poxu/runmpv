@@ -8,7 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CommandLineSettingsTest {
     private static final String[] RAW_SETTINGS = {
         "--waitSeconds=10",
-        "--halfDefinedSetting="
+        "--halfDefinedSetting=",
+        "--whitespaceSetting= ",
+        " ",
+        ""
     };
     private final CommandLineSettings settings =
         new CommandLineSettings(RAW_SETTINGS);
@@ -26,5 +29,10 @@ public class CommandLineSettingsTest {
     @Test
     public void existingIllegalProperty() {
         assertTrue(settings.setting("halfDefinedSetting").isEmpty());
+    }
+
+    @Test
+    public void whitespaceOnlyProperty() {
+        assertTrue(settings.setting("whitespaceSetting").isEmpty());
     }
 }
