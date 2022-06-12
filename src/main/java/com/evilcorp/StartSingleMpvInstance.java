@@ -139,17 +139,25 @@ public class StartSingleMpvInstance {
     }
 
     public void runAndReleaseLock() {
+        Exception e = null;
         try {
             run();
+        } catch (Exception ex) {
+            e = ex;
         } finally {
             latch.countDown();
+        }
+        if (e != null) {
+            throw new RuntimeException(e);
         }
     }
 
     public void run() {
         final SoftSettings minDefaultSettings = new ManualSettings(
-            "executableDir", new RunMpvExecutable().path().getParent().toString(),
-            "logSettings", "logging.properties"
+            "executableDir", new RunMpvExecutable().path().toString(),
+            "logSettings", "logging.properties",
+            "userHome", new UserHomeDir().path().toString(),
+            "runmpvSettings", "%r/runmpv.properties"
         );
         final SoftSettings startSettings = new CompositeSettings(
             commandLineSettings,
@@ -164,7 +172,7 @@ public class StartSingleMpvInstance {
         initEmergencyLoggingSystem(initLogFile);
 
         final LocalFsPaths fsPaths = new LocalFsPaths(
-            new UserHomeDir(),
+            minSettings.userHome(),
             runMpvHomeDir,
             videoDir
         );
@@ -175,7 +183,8 @@ public class StartSingleMpvInstance {
                 new CompositeSettings(
                     commandLineSettings,
                     new TextFileSettings(
-                        fsPaths.resolve("%r/runmpv.properties").path().toString()
+                        fsPaths.resolve(minSettings.runmpvSettings())
+                            .path().toString()
                     ),
                     new MpvExecutableSettings(
                         os,

@@ -43,4 +43,6 @@ public interface RunmpvMinimalSettings {
      * logging.properties by default.
      */
     FsFile logSettings();
+
+    FsFile userHome();
 }
