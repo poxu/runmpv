@@ -1,9 +1,6 @@
 package com.evilcorp.settings;
 
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Settings, contained in command line.
@@ -13,20 +10,10 @@ import java.util.stream.Collectors;
  * --version is also not ok
  */
 public class CommandLineSettings implements SoftSettings {
-    private final Map<String, String> settings;
     private final String[] args;
 
     public CommandLineSettings(String[] args) {
         this.args = args;
-        settings = Arrays.stream(args)
-            .filter(l -> l.startsWith("--"))
-            .map(l -> l.substring(2))
-            .map(l -> l.split("="))
-            .filter(s -> s.length == 2)
-            .filter(s -> !s[0].isBlank())
-            .filter(s -> !s[1].isBlank())
-            .map(s -> new String[]{s[0].trim(), s[1].trim()})
-            .collect(Collectors.toUnmodifiableMap(s -> s[0], s -> s[1]));
     }
 
     @Override
@@ -37,6 +24,13 @@ public class CommandLineSettings implements SoftSettings {
             }
             return Optional.of(args[args.length - 1]);
         }
-        return Optional.ofNullable(settings.get(name));
+        for (String argument : args) {
+            final String arg = argument.trim();
+            final String argPrefix = "--" + name + "=";
+            if (arg.length() > argPrefix.length() && arg.startsWith(argPrefix)) {
+                return Optional.of(arg.substring(argPrefix.length()));
+            }
+        }
+        return Optional.empty();
     }
 }
