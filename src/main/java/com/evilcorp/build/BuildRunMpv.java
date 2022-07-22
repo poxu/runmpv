@@ -19,16 +19,19 @@ public class BuildRunMpv {
     public static final String RUNMPV_ENTRY_POINT = "src/main/java/com/evilcorp/StartSingleMpvInstance.java";
     private static final Map<String, String> vsPath = Map.of(
         "2019", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\",
-        "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\"
+        "2017", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\",
+        "2022", "C:\\Program Files\\Microsoft Visual Studio\\2022\\"
     );
     private static final Map<String, String> editbin = Map.of(
         "2017", "BuildTools\\VC\\Tools\\MSVC\\14.16.27023\\bin\\Hostx64\\x64\\editbin",
-        "2019", "Community\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\editbin"
+        "2019", "Community\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\editbin",
+        "2022", "Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\Hostx64\\x64\\editbin"
     );
 
     private static final  Map<String, String> vcvars64bat = Map.of(
         "2017", "BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
-        "2019", "Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
+        "2019", "Community\\VC\\Auxiliary\\Build\\vcvars64.bat",
+        "2022", "Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
     );
 
     private enum OS {
@@ -85,7 +88,7 @@ public class BuildRunMpv {
         } else {
             vsEdition = " Specifying Visual Studio edition is pointless, because we're building runmpv on linux";
         }
-        if (OS.WINDOWS.is(os) && !List.of("2019", "2017").contains(vsEdition)) {
+        if (OS.WINDOWS.is(os) && !List.of("2019", "2017", "2022").contains(vsEdition)) {
             System.out.println("Specified Visual Studio edition is " + vsEdition + ", but it should be 2017 or 2019. " +
                 "Only 2017 and 2019 arguments are supported");
             return;
@@ -141,6 +144,8 @@ public class BuildRunMpv {
         }
         buildNativeImage.addAll(commonArgs);
 
+
+        run(List.of(graalBin + "gu.cmd", "install", "native-image"), buildDirectory);
         run(buildNativeImage, buildDirectory);
 
         if (OS.WINDOWS.is(os)) {
@@ -232,6 +237,7 @@ public class BuildRunMpv {
             process.waitFor();
             final int exitValue = process.exitValue();
             if (exitValue != 0) {
+                System.out.println(arguments);
                 throw new RuntimeException("Process exited with bad code " + exitValue);
             }
         } catch (IOException e) {
