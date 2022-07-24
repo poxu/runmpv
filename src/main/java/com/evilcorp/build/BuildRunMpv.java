@@ -144,7 +144,6 @@ public class BuildRunMpv {
         }
         buildNativeImage.addAll(commonArgs);
 
-
         run(List.of(graalBin + "gu.cmd", "install", "native-image"), buildDirectory);
         run(buildNativeImage, buildDirectory);
 
