@@ -89,8 +89,8 @@ public class BuildRunMpv {
             vsEdition = " Specifying Visual Studio edition is pointless, because we're building runmpv on linux";
         }
         if (OS.WINDOWS.is(os) && !List.of("2019", "2017", "2022").contains(vsEdition)) {
-            System.out.println("Specified Visual Studio edition is " + vsEdition + ", but it should be 2017 or 2019. " +
-                "Only 2017 and 2019 arguments are supported");
+            System.out.println("Specified Visual Studio edition is " + vsEdition + ", but it should be 2017, 2019 or 2022. " +
+                "Only 2017, 2019 and 2022  arguments are supported");
             return;
         }
         final String graalBin;
