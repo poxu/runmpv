@@ -25,6 +25,7 @@ import com.evilcorp.mpv.communication.SyncServerCommunicationChannel;
 import com.evilcorp.os.OperatingSystem;
 import com.evilcorp.os.RuntimeOperatingSystem;
 import com.evilcorp.settings.CommandLineSettings;
+import com.evilcorp.settings.CommandLineSettingsBase64;
 import com.evilcorp.settings.CompositeSettings;
 import com.evilcorp.settings.ManualSettings;
 import com.evilcorp.settings.MpvExecutableSettings;
@@ -36,6 +37,7 @@ import com.evilcorp.settings.TextFileSettings;
 import com.evilcorp.settings.UniquePipePerDirectorySettings;
 import com.evilcorp.util.Shortcuts;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -300,7 +302,7 @@ public class StartSingleMpvInstance {
      *             to open video in separate mpv instance just this once.
      */
     @SuppressWarnings("ReturnCount")
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         if (args.length > 0 && "--version".equals(args[0])) {
             System.out.println(VERSION);
             return;
@@ -309,7 +311,9 @@ public class StartSingleMpvInstance {
         if (arguments.empty()) {
             return;
         }
-        final CommandLineSettings commandLineSettings = new CommandLineSettings(args);
+        final SoftSettings base64Settings = new CommandLineSettingsBase64(args);
+        final SoftSettings uncodedSettings = new CommandLineSettings(args);
+        final SoftSettings commandLineSettings = new CompositeSettings(base64Settings, uncodedSettings);
         final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
