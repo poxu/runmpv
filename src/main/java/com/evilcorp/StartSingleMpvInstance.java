@@ -228,6 +228,10 @@ public class StartSingleMpvInstance implements AutoCloseable {
         }
 
         final String videoFileName = config.video();
+        if (!Path.of(videoFileName).isAbsolute()) {
+            throw new RuntimeException("runmpv does not support relative paths yet. " +
+                "Current path provided to runmpv is " + videoFileName);
+        }
 
         serverChannel = new SyncServerCommunicationChannel(config.syncAddress(), config.syncPort());
         if (config.sync()) {
