@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 import static com.evilcorp.mpv.GenericMpvMessageQueue.rerouteSystemOutStream;
 import static com.evilcorp.util.Shortcuts.initEmergencyLoggingSystem;
 
-public class StartSingleMpvInstance {
+public class StartSingleMpvInstance implements AutoCloseable {
     public static final String VERSION = "RUNMPV_VERSION_NUMBER";
 
     private MpvCommunicationChannel channel;
@@ -95,7 +95,7 @@ public class StartSingleMpvInstance {
      * {@link StartSingleMpvInstance#serverChannel} ,
      * {@link StartSingleMpvInstance#mpvInstance}
      * and lock release position tightly coupled.
-     *
+     * <p/>
      * Not a good solution, but will do for now.
      */
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -107,6 +107,7 @@ public class StartSingleMpvInstance {
         this.commandLineSettings = commandLineSettings;
     }
 
+    @Override
     public void close() {
         if (channel != null) {
             channel.detach();
@@ -227,6 +228,10 @@ public class StartSingleMpvInstance {
         }
 
         final String videoFileName = config.video();
+        if (!Path.of(videoFileName).isAbsolute()) {
+            throw new RuntimeException("runmpv does not support relative paths yet. " +
+                "Current path provided to runmpv is " + videoFileName);
+        }
 
         serverChannel = new SyncServerCommunicationChannel(config.syncAddress(), config.syncPort());
         if (config.sync()) {
@@ -289,11 +294,11 @@ public class StartSingleMpvInstance {
      *
      * @param args if first argument is --version, runmpv will print version
      *             and then quit.
-     *
+     *             <p/>
      *             If there's no arguments, runmpv will quit silently.
-     *
+     *             <p/>
      *             Video file should be last argument.
-     *
+     *             <p/>
      *             Also, same arguments as in runmpv.properties are accepted.
      *             For example, you could
      *             runmpv --openMode=instance-per-directory <video file name>
@@ -310,11 +315,10 @@ public class StartSingleMpvInstance {
             return;
         }
         final CommandLineSettings commandLineSettings = new CommandLineSettings(args);
-        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
-        try {
+        try (StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings)) {
+            final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
             runmpv.waitUntilInitializationComplete();
             if (runmpv.runsInBackground()) {
                 task.get();
@@ -334,7 +338,6 @@ public class StartSingleMpvInstance {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected exception", e);
         } finally {
-            runmpv.close();
             executor.shutdownNow();
         }
     }
