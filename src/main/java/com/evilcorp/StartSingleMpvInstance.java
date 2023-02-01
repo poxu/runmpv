@@ -317,7 +317,7 @@ public class StartSingleMpvInstance implements AutoCloseable {
         final CommandLineSettings commandLineSettings = new CommandLineSettings(args);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        try (final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings)) {
+        try (StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings)) {
             final Future<?> task = executor.submit(runmpv::runAndReleaseLock);
             runmpv.waitUntilInitializationComplete();
             if (runmpv.runsInBackground()) {
