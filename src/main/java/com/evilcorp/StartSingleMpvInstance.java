@@ -319,7 +319,6 @@ public class StartSingleMpvInstance implements AutoCloseable {
         final SoftSettings base64Settings = new CommandLineSettingsBase64(args);
         final SoftSettings uncodedSettings = new CommandLineSettings(args);
         final SoftSettings commandLineSettings = new CompositeSettings(base64Settings, uncodedSettings);
-        final StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings);
         final Logger logger = Logger.getLogger(StartSingleMpvInstance.class.getName());
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         try (StartSingleMpvInstance runmpv = new StartSingleMpvInstance(commandLineSettings)) {
